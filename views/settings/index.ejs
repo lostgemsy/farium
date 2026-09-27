@@ -55,6 +55,18 @@
             100% { opacity:1; transform:none; }
         }
 
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes slidePageOut {
+            to { transform: translateX(-100%); }
+        }
+
+        @keyframes slidePageIn {
+            from { transform: translateX(100%); }
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -212,6 +224,39 @@
         .topbar a:hover svg,
         .topbar a.active svg {
             stroke: var(--text);
+        }
+
+        /* Games button (accent colored) */
+        .topbar a.games-btn {
+            width: auto;
+            padding: 0 14px 0 10px;
+            gap: 8px;
+            color: var(--text);
+            font-size: 12.5px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            background: linear-gradient(135deg, rgba(124,140,255,.16), rgba(180,124,255,.12));
+            border: 1px solid rgba(124,140,255,.3);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+        }
+
+        .topbar a.games-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--accent);
+        }
+
+        .topbar a.games-btn:hover {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow:
+                0 10px 28px -8px var(--accent-glow),
+                inset 0 1px 0 rgba(255,255,255,.2);
+        }
+
+        .topbar a.games-btn:hover svg {
+            stroke: #fff;
         }
 
         /* ============ SETTINGS ============ */
@@ -497,10 +542,77 @@
             transform: translateY(-1px) scale(0.98);
         }
 
+        /* ============ PAGE SLIDE TRANSITION ============ */
+        .page-slide {
+            position: fixed;
+            inset: 0;
+            z-index: 30000;
+            background: var(--bg);
+            transform: translateX(100%);
+            transition: transform .55s cubic-bezier(.65, 0, .35, 1);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-slide::after {
+            content: "";
+            width: 44px;
+            height: 44px;
+            border: 3px solid var(--input-border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        .page-slide.active {
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        .page-slide.active::after {
+            opacity: 1;
+            animation: spin .9s linear infinite;
+            animation-delay: .3s;
+        }
+
+        /* Enter animation (when arriving from another page) */
+        .page-slide.enter {
+            transform: translateX(0);
+            transition: none;
+        }
+
+        .page-slide.enter.leaving {
+            transform: translateX(-100%);
+            transition: transform .55s cubic-bezier(.65, 0, .35, 1);
+        }
+
         @media (max-width: 600px) {
             .topbar {
                 top: 12px;
                 right: 12px;
+                gap: 4px;
+                padding: 4px;
+            }
+
+            .topbar a {
+                width: 38px;
+                height: 34px;
+            }
+
+            .topbar a.games-btn {
+                padding: 0 10px 0 8px;
+                font-size: 11.5px;
+            }
+
+            .topbar a.games-btn span {
+                display: none;
+            }
+
+            .topbar a.games-btn {
+                width: 38px;
+                padding: 0;
             }
 
             .settings-wrapper {
@@ -591,6 +703,13 @@
         <a href="/settings" class="active" title="Settings">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         </a>
+        <a href="/gnmath.html" class="games-btn" id="gamesBtn" title="Play Games">
+            <svg viewBox="0 0 24 24">
+                <rect x="2" y="6" width="20" height="12" rx="3"/>
+                <path d="M6 12h4M8 10v4M15 11h.01M17.5 13h.01"/>
+            </svg>
+            <span>Games</span>
+        </a>
     </div>
 
     <div class="settings-wrapper">
@@ -662,8 +781,41 @@
 
     </div>
 
+    <!-- PAGE SLIDE OVERLAY -->
+    <div class="page-slide" id="pageSlide"></div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            /* ============ PAGE SLIDE — ENTER ANIMATION ============ */
+            (function () {
+                const slide = document.getElementById("pageSlide");
+                if (sessionStorage.getItem("slideFrom")) {
+                    sessionStorage.removeItem("slideFrom");
+                    slide.classList.add("enter");
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            slide.classList.add("leaving");
+                        });
+                    });
+                    setTimeout(() => {
+                        slide.classList.remove("enter", "leaving");
+                    }, 700);
+                }
+            })();
+
+            /* ============ PAGE SLIDE — EXIT ANIMATION (Games button) ============ */
+            const gamesBtn = document.getElementById("gamesBtn");
+            gamesBtn.addEventListener("click", (e) => {
+                e.preventDefault();
+                const slide = document.getElementById("pageSlide");
+                slide.classList.add("active");
+                sessionStorage.setItem("slideFrom", "true");
+                setTimeout(() => {
+                    window.location.href = "/gnmath.html";
+                }, 620);
+            });
+
+            /* ============ SETTINGS LOGIC ============ */
             const defaultBg = '/assets/backgrounds/foggy-forest.png';
             let bg = localStorage.getItem('bg');
             if (!bg) {

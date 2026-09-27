@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xylara - Settings</title>
+    <script src="https://app.rybbit.io/api/script.js" data-site-id="8b65ec526edf" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes rumble {
+            0%, 100% { transform: translateX(0); }
+            15% { transform: translateX(-2px); }
+            30% { transform: translateX(2px); }
+            45% { transform: translateX(-1px); }
+            60% { transform: translateX(1px); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(25px, -20px) scale(1.08); }
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            min-height: 100%;
+            background: #f7f7f7;
+        }
+
+        body {
+            background-color: #f7f7f7;
+            color: #111;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* White base with subtle radial glow */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(
+                ellipse 80% 60% at 50% 0%,
+                rgba(0, 0, 0, 0.03) 0%,
+                rgba(255, 255, 255, 0) 60%
+            );
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Floating soft glow orb */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(
+                circle,
+                rgba(0, 0, 0, 0.03) 0%,
+                rgba(0, 0, 0, 0.015) 40%,
+                transparent 70%
+            );
+            filter: blur(20px);
+            transform: translateX(-50%);
+            animation: float 14s ease-in-out infinite, glowPulse 6s ease-in-out infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Subtle grain/noise overlay for depth */
+        .noise {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.025;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        /* ============ TOPBAR ============ */
+
+        .topbar {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            padding: 5px;
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            animation: fadeIn 0.5s ease, slideUp 0.5s ease;
+        }
+
+        .topbar a {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 38px;
+            border-radius: 12px;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-decoration: none;
+        }
+
+        .topbar a:hover {
+            background: rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .topbar a.active {
+            background: linear-gradient(
+                135deg,
+                rgba(0, 0, 0, 0.08),
+                rgba(0, 0, 0, 0.03)
+            );
+            box-shadow:
+                0 4px 15px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .topbar a:active {
+            animation: rumble 0.3s ease;
+        }
+
+        .topbar svg {
+            width: 18px;
+            height: 18px;
+            stroke: #333;
+            fill: none;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: all 0.25s ease;
+        }
+
+        .topbar a:hover svg,
+        .topbar a.active svg {
+            stroke: #111;
+        }
+
+        /* ============ SETTINGS ============ */
+
+        .settings-wrapper {
+            position: relative;
+            z-index: 2;
+            width: min(100%, 580px);
+            padding: 40px 22px 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Logo area */
+        .logo-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            animation: slideUp 0.6s ease both;
+        }
+
+        .farius-logo {
+            height: 72px;
+            width: auto;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .farius-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-fallback {
+            display: none;
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: 6px;
+            color: #111;
+            text-transform: uppercase;
+        }
+
+        /* Title */
+        .page-title {
+            text-align: center;
+            margin: 0 4px 6px;
+            color: #111;
+            font-size: clamp(1.8rem, 5vw, 2.35rem);
+            font-weight: 800;
+            letter-spacing: -1px;
+            animation: slideUp 0.6s 0.05s ease both;
+        }
+
+        /* Subtitle */
+        .page-subtitle {
+            text-align: center;
+            margin: -8px 4px 12px;
+            color: rgba(0, 0, 0, 0.5);
+            font-size: 0.86rem;
+            letter-spacing: 0.3px;
+            animation: slideUp 0.6s 0.1s ease both;
+        }
+
+        .settings-container {
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            padding: 20px 22px;
+            border-radius: 18px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow:
+                0 8px 24px rgba(0, 0, 0, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            animation: slideUp 0.5s ease both;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Left accent bar */
+        .settings-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(
+                180deg,
+                #111,
+                rgba(0, 0, 0, 0.2),
+                transparent
+            );
+            opacity: 0.6;
+        }
+
+        /* Corner glow */
+        .settings-container::after {
+            content: '';
+            position: absolute;
+            top: -80px;
+            right: -70px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.02);
+            filter: blur(24px);
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .settings-container:hover {
+            border-color: rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 1);
+            box-shadow:
+                0 14px 34px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 1);
+        }
+
+        .settings-container:hover::after {
+            opacity: 1;
+        }
+
+        .settings-container:active {
+            animation: rumble 0.3s ease;
+        }
+
+        .setting-item {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            min-height: 38px;
+            margin-bottom: 14px;
+        }
+
+        .setting-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .setting-item label {
+            font-size: 0.82rem;
+            margin-right: 10px;
+            color: #111;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .setting-item select,
+        .setting-item input {
+            min-height: 38px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.02);
+            color: #111;
+            font-size: 0.8rem;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.25s ease;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .setting-item select {
+            min-width: 150px;
+            padding: 8px 34px 8px 13px;
+            cursor: pointer;
+        }
+
+        .setting-item input {
+            width: 235px;
+            padding: 8px 13px;
+        }
+
+        .setting-item select:hover,
+        .setting-item input:hover {
+            background: rgba(0, 0, 0, 0.04);
+            border-color: rgba(0, 0, 0, 0.25);
+        }
+
+        .setting-item select:focus,
+        .setting-item input:focus {
+            border-color: #111;
+            background: #ffffff;
+            box-shadow:
+                0 0 0 3px rgba(0, 0, 0, 0.06),
+                0 0 22px rgba(0, 0, 0, 0.06);
+        }
+
+        .setting-item select option {
+            background-color: #ffffff;
+            color: #111;
+        }
+
+        .setting-item input::placeholder {
+            color: rgba(0, 0, 0, 0.3);
+        }
+
+        /* ============ BOTTOM ACTION BUTTONS ============ */
+        .action-bar {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 26px;
+            padding-top: 22px;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            animation: slideUp 0.6s 0.4s ease both;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 28px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #111;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+        }
+
+        .action-btn svg {
+            width: 15px;
+            height: 15px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .action-btn:hover {
+            background: #111;
+            border-color: #111;
+            color: #ffffff;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 26px rgba(0, 0, 0, 0.15);
+        }
+
+        .action-btn:active {
+            transform: translateY(-1px) scale(0.98);
+            animation: rumble 0.3s ease;
+        }
+
+        @media (max-width: 600px) {
+            .topbar {
+                top: 12px;
+                right: 12px;
+            }
+
+            .settings-wrapper {
+                padding: 30px 14px 40px;
+                gap: 13px;
+            }
+
+            .farius-logo {
+                height: 56px;
+            }
+
+            .page-title {
+                margin-left: 2px;
+            }
+
+            .settings-container {
+                padding: 17px;
+                border-radius: 15px;
+            }
+
+            .setting-item {
+                gap: 12px;
+            }
+
+            .setting-item label {
+                font-size: 0.76rem;
+            }
+
+            .setting-item select {
+                min-width: 132px;
+                max-width: 52%;
+                padding-left: 10px;
+                padding-right: 25px;
+            }
+
+            .setting-item input {
+                width: 52%;
+                min-width: 0;
+            }
+
+            #custom-wisp-server-container {
+                align-items: flex-start;
+            }
+
+            .action-bar {
+                gap: 8px;
+            }
+
+            .action-btn {
+                padding: 11px 20px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .setting-item {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .setting-item select,
+            .setting-item input {
+                width: 100%;
+                max-width: none;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="noise"></div>
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <a href="/" title="Home">
+            <svg viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM9 20v-6h6v6"/></svg>
+        </a>
+        <a href="/settings" class="active" title="Settings">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        </a>
+    </div>
+
+    <div class="settings-wrapper">
+
+        <!-- LOGO -->
+        <div class="logo-area">
+            <img src="public/assets/farius.png" alt="Farius" class="farius-logo"
+                 onerror="this.style.display='none'; document.querySelector('.logo-fallback').style.display='block';">
+            <div class="logo-fallback">Farius</div>
+        </div>
+
+        <h1 class="page-title">Settings</h1>
+        <p class="page-subtitle">Make sure to use DuckDuckGo — Google ain't workin :sob</p>
+
+        <div class="settings-container" style="animation-delay: 0.05s;">
+            <div class="setting-item">
+                <label for="type">Proxy Type</label>
+                <select id="type">
+                    <option value="ultraviolet">Ultraviolet</option>
+                    <option value="scramjet">Scramjet</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="settings-container" style="animation-delay: 0.1s;">
+            <div class="setting-item">
+                <label for="search-engine">Search Engine</label>
+                <select id="search-engine">
+                    <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
+                    <option value="https://www.bing.com/search?q=">Bing</option>
+                    <option value="https://search.brave.com/search?q=">Brave</option>
+                    <option value="https://www.google.com/search?q=">Google</option>
+                    <option value="https://www.ecosia.org/search?q=">Ecosia</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="settings-container" style="animation-delay: 0.15s;">
+            <div class="setting-item">
+                <label for="transport-type">Transport</label>
+                <select id="transport-type">
+                    <option value="libcurl">Libcurl</option>
+                    <option value="epoxy">Epoxy</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="settings-container" style="animation-delay: 0.2s;">
+            <div class="setting-item">
+                <label for="wisp-server-type">Wisp Server</label>
+                <select id="wisp-server-type">
+                    <option value="default">Default</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
+            <div class="setting-item" id="custom-wisp-server-container" style="display: none;">
+                <label for="custom-wisp-server-input">Custom Wisp URL</label>
+                <input type="text" id="custom-wisp-server-input" placeholder="wss://your-wisp.com/wisp/">
+            </div>
+        </div>
+
+        <!-- SINGLE ACTION BUTTON -->
+        <div class="action-bar">
+            <a href="/" class="action-btn">
+                <svg viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM9 20v-6h6v6"/></svg>
+                Back to Home
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const defaultBg = '/assets/backgrounds/foggy-forest.png';
+            let bg = localStorage.getItem('bg');
+            if (!bg) {
+                bg = defaultBg;
+                localStorage.setItem('bg', bg);
+            }
+
+            const proxyTypeSelect = document.getElementById('type');
+            if (!localStorage.getItem('proxy')) localStorage.setItem('proxy', 'ultraviolet');
+            proxyTypeSelect.value = localStorage.getItem('proxy');
+            proxyTypeSelect.addEventListener('change', (event) => localStorage.setItem('proxy', event.target.value));
+
+            // Default search engine = DuckDuckGo
+            const searchEngineSelect = document.getElementById('search-engine');
+            if (!localStorage.getItem('search')) localStorage.setItem('search', 'https://duckduckgo.com/?q=');
+            searchEngineSelect.value = localStorage.getItem('search');
+            searchEngineSelect.addEventListener('change', (event) => localStorage.setItem('search', event.target.value));
+
+            const transportTypeSelect = document.getElementById('transport-type');
+            if (!localStorage.getItem('transport')) localStorage.setItem('transport', 'libcurl');
+            transportTypeSelect.value = localStorage.getItem('transport');
+            transportTypeSelect.addEventListener('change', (event) => localStorage.setItem('transport', event.target.value));
+
+            const wispServerTypeSelect = document.getElementById('wisp-server-type');
+            const customWispServerContainer = document.getElementById('custom-wisp-server-container');
+            const customWispServerInput = document.getElementById('custom-wisp-server-input');
+            const defaultWispUrl = `wss://${window.location.host}/wisp/`;
+
+            if (!localStorage.getItem('wisp')) localStorage.setItem('wisp', defaultWispUrl);
+
+            const currentWispUrl = localStorage.getItem('wisp');
+            if (currentWispUrl === defaultWispUrl) {
+                wispServerTypeSelect.value = 'default';
+                customWispServerInput.value = '';
+            } else {
+                wispServerTypeSelect.value = 'custom';
+                customWispServerInput.value = currentWispUrl;
+            }
+
+            const updateWispServerVisibility = () => {
+                if (wispServerTypeSelect.value === 'custom') {
+                    customWispServerContainer.style.display = 'flex';
+                } else {
+                    customWispServerContainer.style.display = 'none';
+                }
+            };
+            updateWispServerVisibility();
+
+            wispServerTypeSelect.addEventListener('change', (event) => {
+                const selectedType = event.target.value;
+                if (selectedType === 'default') localStorage.setItem('wisp', defaultWispUrl);
+                else localStorage.setItem('wisp', customWispServerInput.value);
+                updateWispServerVisibility();
+            });
+
+            customWispServerInput.addEventListener('input', (event) => {
+                if (wispServerTypeSelect.value === 'custom') localStorage.setItem('wisp', event.target.value);
+            });
+
+            const savedFont = localStorage.getItem('font');
+            if (savedFont) document.body.style.fontFamily = savedFont;
+        });
+    </script>
+</body>
+</html>

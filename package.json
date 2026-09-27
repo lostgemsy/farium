@@ -1,0 +1,30 @@
+{
+  "name": "xylara",
+  "version": "1.6.0",
+  "type": "module",
+  "packageManager": "pnpm@9.12.3",
+  "engines": {
+    "npm": ">=10.0.0",
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node ."
+  },
+  "author": "playstation451",
+  "license": "AGPL-3.0-only",
+  "dependencies": {
+    "@mercuryworkshop/bare-as-module3": "^2.2.5",
+    "@mercuryworkshop/bare-mux": "^2.1.7",
+    "@mercuryworkshop/epoxy-transport": "^2.1.27",
+    "@mercuryworkshop/libcurl-transport": "^1.5.1",
+    "@mercuryworkshop/wisp-js": "^0.3.3",
+    "@tomphttp/bare-server-node": "^2.0.5",
+    "ejs": "^3.1.10",
+    "express": "^4.21.1",
+    "venus-pit": "^1.1.7",
+    "wisp-server-node": "^1.1.7"
+  },
+  "devDependencies": {
+    "eslint": "^9.15.0"
+  }
+}

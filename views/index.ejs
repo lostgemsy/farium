@@ -15,6 +15,7 @@
     <link rel="icon" type="image/gif" href="/logo.gif">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
+        /* ============ ORIGINAL STYLES (unchanged) ============ */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -38,6 +39,13 @@
             --accent-2: #b47cff;
             --accent-glow: rgba(124,140,255,.28);
             --ring: rgba(124,140,255,.28);
+
+            --bg-scale: 1;
+            --bg-pos-x: 50%;
+            --bg-pos-y: 50%;
+
+            --overlay-top: rgba(0,0,0,.65);
+            --overlay-bottom: rgba(0,0,0,.78);
         }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -54,34 +62,40 @@
             100% { transform: translate3d(var(--drift, 0px), 110vh, 0); }
         }
 
-        html, body {
-            background: #000;
-            color: var(--text);
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            overflow: hidden;
-            min-height: 100vh;
-        }
+        html { background: #000; }
 
         body {
             margin: 0;
             padding: 0;
+            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow: hidden;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
-            background: #000;
+
+            background-color: #000;
+            background-image: url('/assets/backgrounds/foggy-forest.png');
+            background-size: calc(100% * var(--bg-scale, 1)) auto;
+            background-position: var(--bg-pos-x, 50%) var(--bg-pos-y, 50%);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
         }
 
         body::before {
             content: '';
             position: fixed;
             inset: 0;
-            background: radial-gradient(700px 500px at 50% 50%, rgba(124,140,255,.05), transparent 65%);
+            background:
+                linear-gradient(180deg, var(--overlay-top) 0%, var(--overlay-bottom) 100%),
+                radial-gradient(700px 500px at 50% 50%, rgba(124,140,255,.05), transparent 65%);
             z-index: 0;
             pointer-events: none;
+            transition: background .15s ease;
         }
 
-        /* ============ SNOW ============ */
         .snow-layer {
             position: fixed;
             inset: 0;
@@ -104,10 +118,8 @@
             animation: snowFall linear infinite;
             animation-duration: var(--dur, 8s);
             animation-delay: var(--delay, 0s);
-            transform: translate3d(0,0,0);
         }
 
-        /* ============ COUNTDOWN ============ */
         .countdown {
             position: fixed;
             top: 14px;
@@ -119,7 +131,7 @@
             gap: 3px;
             padding: 9px 14px;
             border-radius: 14px;
-            background: #0a0a0a;
+            background: rgba(10,10,10,.85);
             border: 1px solid var(--card-border);
             color: var(--text);
             font-size: 12px;
@@ -128,554 +140,291 @@
             user-select: none;
             animation: fadeIn .4s ease;
         }
-        .countdown .label {
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 1.4px;
-            color: var(--text-dim);
-            font-weight: 700;
-        }
+        .countdown .label { font-size: 9px; text-transform: uppercase; letter-spacing: 1.4px; color: var(--text-dim); font-weight: 700; }
         .countdown .value {
-            display: flex;
-            align-items: baseline;
-            gap: 4px;
-            font-weight: 800;
+            display: flex; align-items: baseline; gap: 4px; font-weight: 800;
             background: linear-gradient(135deg, var(--accent), var(--accent-2));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
         }
         .countdown .value .num { font-size: 18px; line-height: 1; letter-spacing: -0.5px; }
         .countdown .value .unit { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; opacity: .85; }
         .countdown .sub { font-size: 9.5px; color: var(--text-dim); font-weight: 500; }
 
-        /* ============ RIGHT SIDE PANEL ============ */
         .side-dock {
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            right: 0;
-            z-index: 100;
-            width: 130px;
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            justify-content: center;
-            gap: 6px;
-            padding: 18px 12px;
-            background: #0a0a0a;
-            border-left: 1px solid var(--card-border);
+            position: fixed; top: 0; bottom: 0; right: 0; z-index: 100;
+            width: 130px; display: flex; flex-direction: column; align-items: stretch;
+            justify-content: center; gap: 6px; padding: 18px 12px;
+            background: rgba(10,10,10,.85); border-left: 1px solid var(--card-border);
             animation: slideRight .4s cubic-bezier(.2,.9,.25,1.15) both;
         }
         .side-dock::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            top: 18%;
-            bottom: 18%;
-            width: 2px;
+            content: ""; position: absolute; left: 0; top: 18%; bottom: 18%; width: 2px;
             background: linear-gradient(180deg, transparent, var(--accent), var(--accent-2), transparent);
-            opacity: .5;
-            pointer-events: none;
+            opacity: .5; pointer-events: none;
         }
-
         .dock-btn {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            height: 44px;
-            padding: 0 14px;
-            border-radius: 12px;
-            text-decoration: none;
-            color: var(--text-dim-2);
-            font-size: 12.5px;
-            font-weight: 700;
-            letter-spacing: .3px;
-            background: transparent;
-            border: 1px solid transparent;
+            display: flex; align-items: center; gap: 10px; height: 44px;
+            padding: 0 14px; border-radius: 12px; text-decoration: none;
+            color: var(--text-dim-2); font-size: 12.5px; font-weight: 700;
+            letter-spacing: .3px; background: transparent; border: 1px solid transparent;
             transition: transform .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
-            cursor: pointer;
-            will-change: transform;
-            font-family: inherit;
+            cursor: pointer; will-change: transform; font-family: inherit;
         }
         .dock-btn .label { flex: 1; text-align: left; }
         .dock-btn svg {
-            width: 17px;
-            height: 17px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 1.9;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            flex-shrink: 0;
-            transition: stroke .2s ease, transform .25s ease;
+            width: 17px; height: 17px; stroke: currentColor; fill: none;
+            stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
+            flex-shrink: 0; transition: stroke .2s ease, transform .25s ease;
         }
         .dock-btn:hover {
-            color: var(--text);
-            background: var(--card-hover);
-            border-color: var(--card-border-hover);
-            transform: translateY(-3px) scale(1.04);
-            box-shadow: 0 10px 24px -10px var(--shadow);
+            color: var(--text); background: var(--card-hover); border-color: var(--card-border-hover);
+            transform: translateY(-3px) scale(1.04); box-shadow: 0 10px 24px -10px var(--shadow);
         }
         .dock-btn:hover svg { stroke: var(--accent); transform: scale(1.08); }
         .dock-btn:active { transform: translateY(-1px) scale(1.01); }
-        .dock-btn.active {
-            color: var(--text);
-            background: var(--card);
-            border-color: var(--card-border);
-        }
+        .dock-btn.active { color: var(--text); background: var(--card); border-color: var(--card-border); }
         .dock-btn.games-btn {
             background: linear-gradient(135deg, rgba(124,140,255,.16), rgba(180,124,255,.12));
-            border: 1px solid rgba(124,140,255,.3);
-            color: var(--text);
+            border: 1px solid rgba(124,140,255,.3); color: var(--text);
         }
         .dock-btn.games-btn svg { stroke: var(--accent); }
         .dock-btn.games-btn:hover {
             background: linear-gradient(135deg, var(--accent), var(--accent-2));
-            border-color: transparent;
-            color: #fff;
-            transform: translateY(-3px) scale(1.06);
+            border-color: transparent; color: #fff; transform: translateY(-3px) scale(1.06);
             box-shadow: 0 12px 28px -10px var(--accent-glow);
         }
         .dock-btn.games-btn:hover svg { stroke: #fff; }
         .dock-sep {
-            height: 1px;
-            margin: 4px 6px;
+            height: 1px; margin: 4px 6px;
             background: linear-gradient(90deg, transparent, var(--card-border), transparent);
         }
 
-        /* ============ MAIN CONTENT ============ */
         .main-content {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-            width: 100%;
-            max-width: 620px;
-            padding: 0 20px;
-            margin-right: 130px;
+            position: relative; z-index: 2; text-align: center; width: 100%;
+            max-width: 620px; padding: 0 20px; margin-right: 130px;
         }
         .logo-image-wrap {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 18px;
-            min-height: 120px;
+            display: flex; justify-content: center; align-items: center;
+            margin-bottom: 18px; min-height: 120px;
             animation: logoDrop .6s cubic-bezier(.16,1,.3,1) both;
         }
         .farius-logo {
-            display: block;
-            width: auto;
-            height: auto;
-            max-width: min(420px, 70vw);
-            max-height: 220px;
-            object-fit: contain;
-            transition: transform .3s ease;
+            display: block; width: auto; height: auto;
+            max-width: min(420px, 70vw); max-height: 220px;
+            object-fit: contain; transition: transform .3s ease;
         }
         .logo-image-wrap:hover .farius-logo { transform: translateY(-4px) scale(1.03); }
 
         .tagline {
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 26px;
-            font-weight: 600;
+            font-size: 0.7rem; color: var(--text-dim); letter-spacing: 3px;
+            text-transform: uppercase; margin-bottom: 26px; font-weight: 600;
         }
         .search-container {
-            display: flex;
-            align-items: center;
-            max-width: 500px;
-            margin: 0 auto;
-            background: #0a0a0a;
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 5px;
+            display: flex; align-items: center; max-width: 500px; margin: 0 auto;
+            background: rgba(10,10,10,.85); border: 1px solid var(--card-border);
+            border-radius: 16px; padding: 5px;
             box-shadow: 0 14px 40px -16px var(--shadow);
-            animation: slideUp 0.4s ease;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            animation: slideUp 0.4s ease; transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .search-container:focus-within {
-            border-color: var(--input-border-focus);
-            box-shadow: 0 0 0 3px var(--ring);
-        }
+        .search-container:focus-within { border-color: var(--input-border-focus); box-shadow: 0 0 0 3px var(--ring); }
         .search-input {
-            flex: 1;
-            border: none;
-            padding: 12px 16px;
-            font-size: 0.9rem;
-            outline: none;
-            background: transparent;
-            color: var(--text);
-            font-family: inherit;
+            flex: 1; border: none; padding: 12px 16px; font-size: 0.9rem;
+            outline: none; background: transparent; color: var(--text); font-family: inherit;
         }
         .search-input::placeholder { color: var(--text-dim); }
         .search-button {
             background: linear-gradient(180deg, var(--accent), #5a6bff);
-            border: none;
-            border-radius: 12px;
-            padding: 11px 20px;
-            cursor: pointer;
-            outline: none;
-            color: white;
-            font-size: 14px;
-            font-weight: 700;
-            transition: transform 0.15s, box-shadow 0.15s;
-            font-family: inherit;
+            border: none; border-radius: 12px; padding: 11px 20px; cursor: pointer;
+            outline: none; color: white; font-size: 14px; font-weight: 700;
+            transition: transform 0.15s, box-shadow 0.15s; font-family: inherit;
             box-shadow: 0 8px 22px -8px var(--accent-glow);
         }
         .search-button:hover { transform: translateY(-1px); box-shadow: 0 12px 28px -8px var(--accent-glow); }
         .search-button:active { transform: scale(0.96); }
 
         .app-buttons {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-            gap: 10px;
-            flex-wrap: wrap;
-            animation: slideUp 0.4s ease 0.1s both;
+            display: flex; justify-content: center; margin-top: 20px; gap: 10px;
+            flex-wrap: wrap; animation: slideUp 0.4s ease 0.1s both;
         }
         .app-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 46px;
-            height: 46px;
-            border-radius: 13px;
-            background: #0a0a0a;
-            cursor: pointer;
-            outline: none;
-            border: 1px solid var(--card-border);
-            color: var(--text);
-            text-decoration: none;
-            transition: transform 0.2s, border-color 0.2s, background 0.2s;
+            display: flex; align-items: center; justify-content: center;
+            width: 46px; height: 46px; border-radius: 13px;
+            background: rgba(10,10,10,.85); cursor: pointer; outline: none;
+            border: 1px solid var(--card-border); color: var(--text);
+            text-decoration: none; transition: transform 0.2s, border-color 0.2s, background 0.2s;
             box-shadow: 0 6px 18px -8px var(--shadow);
         }
         .app-button:hover {
-            background: var(--card-hover);
-            border-color: var(--card-border-hover);
+            background: var(--card-hover); border-color: var(--card-border-hover);
             transform: translateY(-3px);
         }
         .app-button:active { transform: scale(0.92); }
         .app-button img { width: 24px; height: 24px; object-fit: contain; opacity: 0.9; }
         .app-button:hover img { opacity: 1; }
-        #add-app-button {
-            background: transparent;
-            border: 1.5px dashed var(--input-border);
-        }
+        #add-app-button { background: transparent; border: 1.5px dashed var(--input-border); }
         #add-app-button:hover { border-color: var(--accent); background: var(--card); }
         #add-app-button svg { stroke: var(--text) !important; }
 
-        /* ============ BROWSER OVERLAY ============ */
         .browser-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 200;
-            display: none;
-            flex-direction: column;
-            background: #000;
+            position: fixed; inset: 0; z-index: 200; display: none; flex-direction: column;
+            color: var(--text); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #000;
+            background-image: url('/assets/backgrounds/foggy-forest.png');
+            background-size: calc(100% * var(--bg-scale, 1)) auto;
+            background-position: var(--bg-pos-x, 50%) var(--bg-pos-y, 50%);
+            background-repeat: no-repeat; background-attachment: fixed;
+        }
+        .browser-overlay::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(180deg, var(--overlay-top) 0%, var(--overlay-bottom) 100%);
+            z-index: 0; pointer-events: none;
         }
         .browser-overlay.open { display: flex; }
+        .browser-overlay > * { position: relative; z-index: 1; }
 
         .tabs-bar {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 8px 12px 0;
-            background: #0a0a0a;
-            border-bottom: 1px solid var(--card-border);
-            overflow-x: auto;
-            flex-shrink: 0;
-            scrollbar-width: none;
+            display: flex; align-items: center; gap: 4px; padding: 8px 12px 0;
+            background: rgba(10,10,10,.82); backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--card-border);
+            overflow-x: auto; flex-shrink: 0; scrollbar-width: none;
         }
         .tabs-bar::-webkit-scrollbar { display: none; }
-
         .tab {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 10px 8px 12px;
-            border-radius: 10px 10px 0 0;
-            background: transparent;
-            border: 1px solid transparent;
-            border-bottom: none;
-            color: var(--text-dim);
-            cursor: pointer;
-            font-size: 12px;
-            white-space: nowrap;
-            max-width: 200px;
-            min-width: 90px;
-            transition: background 0.15s, color 0.15s;
-            flex-shrink: 0;
+            display: flex; align-items: center; gap: 8px; padding: 8px 10px 8px 12px;
+            border-radius: 10px 10px 0 0; background: transparent; border: 1px solid transparent;
+            border-bottom: none; color: var(--text-dim); cursor: pointer; font-size: 12px;
+            white-space: nowrap; max-width: 200px; min-width: 90px;
+            transition: background 0.15s, color 0.15s; flex-shrink: 0;
         }
         .tab:hover { background: var(--card); color: var(--text); }
         .tab.active {
-            background: var(--card);
-            color: var(--text);
-            border-color: var(--card-border);
-            font-weight: 600;
-            box-shadow: inset 0 2px 0 0 var(--accent);
+            background: var(--card); color: var(--text); border-color: var(--card-border);
+            font-weight: 600; box-shadow: inset 0 2px 0 0 var(--accent);
         }
-        .tab-favicon {
-            width: 14px; height: 14px;
-            border-radius: 3px;
-            flex-shrink: 0;
-            object-fit: contain;
-            background: rgba(255,255,255,.06);
-        }
+        .tab-favicon { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; object-fit: contain; background: rgba(255,255,255,.06); }
         .tab-favicon-placeholder {
-            width: 14px; height: 14px;
-            border-radius: 3px;
-            flex-shrink: 0;
+            width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0;
             background: linear-gradient(135deg, var(--accent), var(--accent-2));
-            display: grid;
-            place-items: center;
-            color: #fff;
-            font-size: 8px;
-            font-weight: 900;
+            display: grid; place-items: center; color: #fff; font-size: 8px; font-weight: 900;
         }
         .tab-title { overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
         .tab-close {
-            width: 16px; height: 16px;
-            border-radius: 50%;
-            border: none;
-            background: transparent;
-            color: var(--text-dim);
-            cursor: pointer;
-            font-size: 10px;
-            opacity: 0;
-            transition: opacity .15s;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
+            width: 16px; height: 16px; border-radius: 50%; border: none; background: transparent;
+            color: var(--text-dim); cursor: pointer; font-size: 10px; opacity: 0;
+            transition: opacity .15s; flex-shrink: 0; display: flex; align-items: center;
+            justify-content: center; line-height: 1;
         }
         .tab:hover .tab-close, .tab.active .tab-close { opacity: 1; }
         .tab-close:hover { background: rgba(220,38,38,0.22); color: #ff7b7b; }
 
         .new-tab-btn {
-            width: 26px; height: 26px;
-            border-radius: 8px;
-            border: 1px dashed var(--input-border);
-            background: transparent;
-            cursor: pointer;
-            color: var(--text-dim);
-            font-size: 15px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-left: 4px;
-            margin-bottom: 4px;
-            transition: border-color .15s, color .15s;
+            width: 26px; height: 26px; border-radius: 8px; border: 1px dashed var(--input-border);
+            background: transparent; cursor: pointer; color: var(--text-dim); font-size: 15px;
+            flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+            margin-left: 4px; margin-bottom: 4px; transition: border-color .15s, color .15s;
         }
         .new-tab-btn:hover { border-color: var(--accent); color: var(--text); }
 
         .browser-toolbar {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 10px 14px;
-            background: #0a0a0a;
-            border-bottom: 1px solid var(--card-border);
+            display: flex; align-items: center; gap: 6px; padding: 10px 14px;
+            background: rgba(10,10,10,.82); backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--card-border);
             flex-shrink: 0;
         }
         .browser-toolbar button {
-            width: 34px; height: 34px;
-            border-radius: 9px;
-            border: none;
-            background: transparent;
-            color: var(--text-dim-2);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background .15s, color .15s;
+            width: 34px; height: 34px; border-radius: 9px; border: none; background: transparent;
+            color: var(--text-dim-2); cursor: pointer; display: flex; align-items: center;
+            justify-content: center; transition: background .15s, color .15s;
         }
         .browser-toolbar button:hover:not(:disabled) { background: var(--card); color: var(--text); }
         .browser-toolbar button:active:not(:disabled) { transform: scale(0.94); }
         .browser-toolbar button:disabled { opacity: 0.25; cursor: not-allowed; }
         .browser-toolbar svg {
-            width: 16px; height: 16px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 1.9;
-            stroke-linecap: round;
-            stroke-linejoin: round;
+            width: 16px; height: 16px; fill: none; stroke: currentColor;
+            stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
         }
         .browser-address {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--input-bg);
-            border: 1.5px solid var(--input-border);
-            border-radius: 18px;
-            padding: 0 14px;
-            height: 36px;
+            flex: 1; display: flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,.05); border: 1.5px solid var(--input-border);
+            border-radius: 18px; padding: 0 14px; height: 36px;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .browser-address:focus-within {
-            border-color: var(--input-border-focus);
-            box-shadow: 0 0 0 3px var(--ring);
-        }
+        .browser-address:focus-within { border-color: var(--input-border-focus); box-shadow: 0 0 0 3px var(--ring); }
         .browser-address .lock-icon {
-            width: 13px; height: 13px;
-            stroke: var(--text-dim);
-            fill: none;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            flex-shrink: 0;
+            width: 13px; height: 13px; stroke: var(--text-dim); fill: none;
+            stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0;
         }
         .browser-address input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: var(--text);
-            font-size: 12.5px;
-            outline: none;
-            font-family: inherit;
-            font-weight: 500;
+            flex: 1; background: transparent; border: none; color: var(--text);
+            font-size: 12.5px; outline: none; font-family: inherit; font-weight: 500;
         }
         .browser-address input::placeholder { color: var(--text-dim); font-weight: 400; }
         .browser-loader {
-            width: 14px; height: 14px;
-            border: 2px solid var(--card-border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            flex-shrink: 0;
-            display: none;
+            width: 14px; height: 14px; border: 2px solid var(--card-border);
+            border-top-color: var(--accent); border-radius: 50%;
+            animation: spin 0.7s linear infinite; flex-shrink: 0; display: none;
         }
         .browser-loader.visible { display: block; }
 
-        .browser-frame-wrap {
-            flex: 1;
-            position: relative;
-            background: var(--bg-2);
-        }
+        .browser-frame-wrap { flex: 1; position: relative; background: transparent; }
         .browser-frame-wrap iframe {
-            width: 100%; height: 100%;
-            border: none;
-            background: #fff;
-            display: none;
+            width: 100%; height: 100%; border: none; background: #fff; display: none;
         }
         .browser-frame-wrap iframe.visible { display: block; }
 
         .new-tab-page {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: #050505;
-            z-index: 1;
+            position: absolute; inset: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; background: transparent; z-index: 1;
         }
         .new-tab-page.hidden { display: none; }
-        .new-tab-logo {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 14px;
-        }
+        .new-tab-logo { display: flex; justify-content: center; align-items: center; margin-bottom: 14px; }
         .new-tab-logo img {
-            width: auto; height: auto;
-            max-width: min(260px, 60vw);
-            max-height: 130px;
-            object-fit: contain;
+            width: auto; height: auto; max-width: min(260px, 60vw);
+            max-height: 130px; object-fit: contain;
         }
         .new-tab-sub {
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            letter-spacing: 2.5px;
-            text-transform: uppercase;
-            margin-bottom: 26px;
-            font-weight: 600;
+            font-size: 0.7rem; color: var(--text-dim); letter-spacing: 2.5px;
+            text-transform: uppercase; margin-bottom: 26px; font-weight: 600;
         }
-        .new-tab-search {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            max-width: 440px;
-            width: 85%;
-        }
+        .new-tab-search { display: flex; align-items: center; gap: 8px; max-width: 440px; width: 85%; }
         .new-tab-search input {
-            flex: 1;
-            background: var(--input-bg);
-            border: 1.5px solid var(--input-border);
-            border-radius: 14px;
-            padding: 13px 18px;
-            color: var(--text);
-            font-size: 13.5px;
-            outline: none;
-            font-family: inherit;
+            flex: 1; background: rgba(10,10,10,.85); border: 1.5px solid var(--input-border);
+            border-radius: 14px; padding: 13px 18px; color: var(--text);
+            font-size: 13.5px; outline: none; font-family: inherit;
             transition: border-color .2s, box-shadow .2s;
         }
         .new-tab-search input::placeholder { color: var(--text-dim); }
-        .new-tab-search input:focus {
-            border-color: var(--input-border-focus);
-            box-shadow: 0 0 0 3px var(--ring);
-        }
+        .new-tab-search input:focus { border-color: var(--input-border-focus); box-shadow: 0 0 0 3px var(--ring); }
         .new-tab-search button {
             background: linear-gradient(180deg, var(--accent), #5a6bff);
-            border: none;
-            border-radius: 14px;
-            padding: 13px 22px;
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 13.5px;
-            transition: transform .15s;
-            box-shadow: 0 8px 22px -8px var(--accent-glow);
+            border: none; border-radius: 14px; padding: 13px 22px; color: white;
+            font-weight: 700; cursor: pointer; font-family: inherit; font-size: 13.5px;
+            transition: transform .15s; box-shadow: 0 8px 22px -8px var(--accent-glow);
         }
         .new-tab-search button:hover { transform: translateY(-1px); }
         .new-tab-search button:active { transform: scale(0.96); }
 
         .venusFooter {
-            position: fixed;
-            bottom: 14px;
-            left: 22px;
-            color: var(--text-dim);
-            font-size: 10px;
-            text-decoration: none;
-            z-index: 10;
-            transition: color .2s;
+            position: fixed; bottom: 14px; left: 22px; color: var(--text-dim);
+            font-size: 10px; text-decoration: none; z-index: 10; transition: color .2s;
         }
         .venusFooter:hover { color: var(--text); }
 
         .page-slide {
-            position: fixed;
-            inset: 0;
-            z-index: 30000;
-            background: #000;
-            transform: translateX(100%);
-            transition: transform .45s cubic-bezier(.65, 0, .35, 1);
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: fixed; inset: 0; z-index: 30000; background: #000;
+            transform: translateX(100%); transition: transform .45s cubic-bezier(.65, 0, .35, 1);
+            pointer-events: none; display: flex; align-items: center; justify-content: center;
             will-change: transform;
         }
         .page-slide::after {
-            content: "";
-            width: 40px; height: 40px;
-            border: 3px solid var(--input-border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            opacity: 0;
+            content: ""; width: 40px; height: 40px; border: 3px solid var(--input-border);
+            border-top-color: var(--accent); border-radius: 50%; opacity: 0;
         }
         .page-slide.active { transform: translateX(0); pointer-events: auto; }
-        .page-slide.active::after {
-            opacity: 1;
-            animation: spin .8s linear infinite;
-        }
+        .page-slide.active::after { opacity: 1; animation: spin .8s linear infinite; }
         .page-slide.enter { transform: translateX(0); transition: none; }
         .page-slide.enter.leaving {
-            transform: translateX(-100%);
-            transition: transform .45s cubic-bezier(.65, 0, .35, 1);
+            transform: translateX(-100%); transition: transform .45s cubic-bezier(.65, 0, .35, 1);
         }
 
         @media (max-width: 720px) {
@@ -703,24 +452,602 @@
                 transition-duration: 0.01ms !important;
             }
         }
+
+        /* ============================================================
+           CHOOSER MODAL
+           ============================================================ */
+        .chooser-overlay {
+            position: fixed; inset: 0; z-index: 400; display: none;
+            align-items: center; justify-content: center;
+            background: rgba(0,0,0,.85); backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            animation: fadeIn .3s ease;
+        }
+        .chooser-overlay.open { display: flex; }
+        .chooser-card {
+            background: #1a1a1a;
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 8px;
+            padding: 40px 44px 36px;
+            max-width: 640px;
+            width: 92%;
+            text-align: center;
+            box-shadow: 0 32px 80px -20px rgba(0,0,0,.95);
+            animation: slideUp .3s cubic-bezier(.2,.9,.25,1.15);
+        }
+        .chooser-logo { display: flex; justify-content: center; margin-bottom: 18px; }
+        .chooser-logo img {
+            max-width: 200px; max-height: 100px; object-fit: contain;
+            filter: drop-shadow(0 0 24px rgba(124,140,255,.35));
+        }
+        .chooser-title {
+            font-size: 26px; font-weight: 700; margin-bottom: 8px;
+            letter-spacing: -0.4px;
+            color: #fff;
+        }
+        .chooser-sub {
+            color: #999; font-size: 13px;
+            margin-bottom: 32px; font-weight: 400;
+        }
+        .chooser-options { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+        .chooser-btn {
+            flex: 1; min-width: 200px; padding: 22px 20px 18px;
+            border-radius: 6px; border: 1px solid rgba(255,255,255,.1);
+            background: rgba(255,255,255,.04);
+            color: var(--text); font-weight: 600; font-size: 15px;
+            cursor: pointer; transition: background .15s, border-color .15s, transform .15s;
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+            font-family: inherit;
+        }
+        .chooser-btn:hover {
+            background: rgba(255,255,255,.08);
+            border-color: rgba(124,140,255,.6);
+            transform: translateY(-2px);
+        }
+        .chooser-btn:active { transform: scale(0.98); }
+        .chooser-btn svg {
+            width: 32px; height: 32px; stroke: var(--accent);
+            stroke-width: 1.6; fill: none;
+        }
+        .chooser-btn span {
+            font-size: 12px; font-weight: 400;
+            color: #888; letter-spacing: .2px;
+        }
+        .chooser-close {
+            margin-top: 28px; background: none; border: none;
+            color: #888; font-size: 13px; cursor: pointer;
+            font-weight: 500; padding: 8px 18px; border-radius: 4px;
+            transition: color .15s, background .15s; font-family: inherit;
+        }
+        .chooser-close:hover { color: #fff; background: rgba(255,255,255,.05); }
+
+        /* ============================================================
+           BROWSER OS — WINDOWS 11 DARK THEME
+           ============================================================ */
+        .os-desktop {
+            position: fixed; inset: 0; z-index: 300;
+            display: none; flex-direction: column;
+            background: #000;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            animation: fadeIn .3s ease;
+        }
+        .os-desktop.open { display: flex; }
+
+        /* ===== WINDOWS ===== */
+        .os-window {
+            position: absolute;
+            background: #202020;
+            border: 1px solid #3a3a3a;
+            border-radius: 0;
+            box-shadow: 0 8px 32px rgba(0,0,0,.7);
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            min-width: 280px; min-height: 160px;
+            z-index: 10;
+            animation: osWindowOpen .2s ease-out;
+        }
+        @keyframes osWindowOpen {
+            from { opacity: 0; transform: scale(.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .os-window.minimized { display: none; }
+        .os-window.maximized {
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: calc(100% - 40px) !important;
+            border-radius: 0;
+        }
+        .os-window.snapped-left {
+            top: 0 !important;
+            left: 0 !important;
+            width: 50% !important;
+            height: calc(100% - 40px) !important;
+        }
+        .os-window.snapped-right {
+            top: 0 !important;
+            left: 50% !important;
+            width: 50% !important;
+            height: calc(100% - 40px) !important;
+        }
+
+        /* Title bar */
+        .os-window-titlebar {
+            display: flex; align-items: center;
+            height: 32px;
+            background: #202020;
+            border-bottom: 1px solid #2e2e2e;
+            cursor: default; user-select: none;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .os-window-title {
+            flex: 1;
+            font-size: 12px;
+            font-weight: 400;
+            color: #d0d0d0;
+            padding: 0 12px;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            pointer-events: none;
+        }
+        .os-window-icon {
+            display: flex; align-items: center;
+            padding-left: 10px;
+            pointer-events: none;
+        }
+        .os-window-icon img { width: 16px; height: 16px; object-fit: contain; }
+        .os-window-icon svg {
+            width: 15px; height: 15px;
+            stroke: #d0d0d0; fill: none; stroke-width: 1.8;
+        }
+
+        /* Window controls (Windows-style: minimize, maximize, close on the right) */
+        .os-window-controls {
+            display: flex; align-items: stretch;
+            height: 100%;
+            margin-left: auto;
+        }
+        .os-window-control {
+            width: 46px; height: 100%;
+            border: none; background: transparent;
+            color: #d0d0d0;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background .1s, color .1s;
+            padding: 0;
+        }
+        .os-window-control svg {
+            width: 10px; height: 10px;
+            stroke: currentColor; fill: none;
+            stroke-width: 1.2;
+        }
+        .os-window-control.min:hover { background: rgba(255,255,255,.08); }
+        .os-window-control.max:hover { background: rgba(255,255,255,.08); }
+        .os-window-control.close:hover { background: #c42b1c; color: #fff; }
+        .os-window-control.close:hover svg { stroke: #fff; }
+
+        /* Window content */
+        .os-window-content {
+            flex: 1; position: relative; overflow: hidden;
+            background: #1a1a1a;
+        }
+        .os-window-content iframe {
+            width: 100%; height: 100%; border: none;
+            background: #fff; display: block;
+        }
+
+        /* ===== RESIZE HANDLES (real Windows-style edges) ===== */
+        .os-resize-handle { position: absolute; z-index: 20; }
+        .os-resize-handle.n  { top: -3px; left: 8px; right: 8px; height: 6px; cursor: ns-resize; }
+        .os-resize-handle.s  { bottom: -3px; left: 8px; right: 8px; height: 6px; cursor: ns-resize; }
+        .os-resize-handle.e  { right: -3px; top: 8px; bottom: 8px; width: 6px; cursor: ew-resize; }
+        .os-resize-handle.w  { left: -3px; top: 8px; bottom: 8px; width: 6px; cursor: ew-resize; }
+        .os-resize-handle.ne { top: -3px; right: -3px; width: 12px; height: 12px; cursor: nesw-resize; }
+        .os-resize-handle.nw { top: -3px; left: -3px; width: 12px; height: 12px; cursor: nwse-resize; }
+        .os-resize-handle.se { bottom: -3px; right: -3px; width: 12px; height: 12px; cursor: nwse-resize; }
+        .os-resize-handle.sw { bottom: -3px; left: -3px; width: 12px; height: 12px; cursor: nesw-resize; }
+
+        /* ===== TASKBAR (Windows 11 dark) ===== */
+        .os-taskbar {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 40px;
+            background: #1c1c1c;
+            border-top: 1px solid #2e2e2e;
+            display: flex; align-items: center;
+            z-index: 500;
+            user-select: none;
+        }
+        .os-taskbar-center {
+            display: flex; align-items: center; gap: 2px;
+            position: absolute;
+            left: 50%; transform: translateX(-50%);
+            height: 100%;
+        }
+        .os-taskbar-btn {
+            width: 40px; height: 40px;
+            border: none; background: transparent;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background .1s;
+            position: relative;
+            padding: 0;
+        }
+        .os-taskbar-btn:hover { background: rgba(255,255,255,.06); }
+        .os-taskbar-btn:active { background: rgba(255,255,255,.1); }
+        .os-taskbar-btn svg {
+            width: 20px; height: 20px;
+            stroke: #e0e0e0; fill: none;
+            stroke-width: 1.6;
+        }
+        .os-taskbar-btn img { width: 22px; height: 22px; object-fit: contain; }
+        .os-taskbar-btn .os-taskbar-tooltip {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%; transform: translateX(-50%);
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            color: #e0e0e0;
+            font-size: 11px; font-weight: 400;
+            padding: 4px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+            opacity: 0; pointer-events: none;
+            transition: opacity .12s;
+            font-family: inherit;
+        }
+        .os-taskbar-btn:hover .os-taskbar-tooltip { opacity: 1; }
+        /* Running indicator dot */
+        .os-taskbar-btn.running::after {
+            content: '';
+            position: absolute;
+            bottom: 3px; left: 50%; transform: translateX(-50%);
+            width: 6px; height: 2px;
+            background: #7c8cff;
+            border-radius: 1px;
+        }
+        .os-taskbar-btn.active-app {
+            background: rgba(255,255,255,.1);
+        }
+
+        /* Taskbar left (start / search) */
+        .os-taskbar-left {
+            display: flex; align-items: center;
+            padding: 0 6px;
+            height: 100%;
+        }
+        .os-taskbar-right {
+            display: flex; align-items: center;
+            padding: 0 10px;
+            height: 100%;
+            margin-left: auto;
+            gap: 4px;
+        }
+        .os-tray-btn {
+            height: 32px;
+            padding: 0 8px;
+            border: none; background: transparent;
+            color: #d0d0d0;
+            display: flex; align-items: center; gap: 6px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 11px; font-weight: 400;
+            transition: background .1s;
+            font-family: inherit;
+        }
+        .os-tray-btn:hover { background: rgba(255,255,255,.06); }
+        .os-tray-btn svg {
+            width: 14px; height: 14px;
+            stroke: currentColor; fill: none; stroke-width: 1.6;
+        }
+        .os-tray-clock {
+            display: flex; flex-direction: column;
+            align-items: flex-end;
+            padding: 0 8px;
+            font-size: 11px;
+            color: #d0d0d0;
+            line-height: 1.3;
+            font-weight: 400;
+            cursor: default;
+        }
+        .os-tray-clock .time { font-weight: 500; }
+        .os-tray-clock .date { font-size: 10px; color: #a0a0a0; }
+
+        /* ===== START MENU (Windows 11 style) ===== */
+        .os-start-menu {
+            position: absolute;
+            bottom: 48px;
+            left: 50%; transform: translateX(-50%) translateY(8px);
+            width: 560px; max-width: 92vw;
+            max-height: 640px;
+            background: #1f1f1f;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            box-shadow: 0 16px 48px rgba(0,0,0,.7);
+            padding: 28px 32px 24px;
+            z-index: 600;
+            display: none; flex-direction: column;
+            opacity: 0; pointer-events: none;
+            transition: opacity .15s, transform .15s;
+        }
+        .os-start-menu.open {
+            display: flex;
+            opacity: 1; pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+        .os-start-search {
+            display: flex; align-items: center; gap: 10px;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin-bottom: 24px;
+        }
+        .os-start-search svg { width: 15px; height: 15px; stroke: #888; fill: none; stroke-width: 1.8; }
+        .os-start-search input {
+            flex: 1; background: transparent; border: none;
+            color: #e0e0e0; font-size: 12.5px; outline: none;
+            font-family: inherit;
+        }
+        .os-start-search input::placeholder { color: #888; }
+
+        .os-start-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #a0a0a0;
+            margin-bottom: 12px;
+            letter-spacing: .3px;
+            text-transform: uppercase;
+        }
+
+        .os-start-apps {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+        }
+        .os-start-app {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 6px; padding: 14px 6px 10px;
+            border-radius: 4px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: background .1s;
+            font-family: inherit; color: #e0e0e0;
+        }
+        .os-start-app:hover { background: rgba(255,255,255,.06); }
+        .os-start-app:active { background: rgba(255,255,255,.1); }
+        .os-start-app svg { width: 26px; height: 26px; stroke: #c0c0c0; fill: none; stroke-width: 1.5; }
+        .os-start-app span { font-size: 11px; font-weight: 400; color: #c0c0c0; }
+        .os-start-app img { width: 26px; height: 26px; object-fit: contain; }
+
+        /* ===== CALCULATOR ===== */
+        .os-calc-display {
+            background: #1a1a1a;
+            border-bottom: 1px solid #2e2e2e;
+            padding: 14px 18px;
+            text-align: right;
+            font-size: 28px; font-weight: 400;
+            color: #e0e0e0; overflow: hidden;
+            text-overflow: ellipsis; white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+        .os-calc-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2px; padding: 8px;
+            flex: 1;
+            background: #1a1a1a;
+        }
+        .os-calc-btn {
+            background: #2a2a2a;
+            border: 1px solid #2e2e2e;
+            border-radius: 2px;
+            color: #e0e0e0; font-size: 15px; font-weight: 400;
+            cursor: pointer; font-family: inherit;
+            transition: background .1s;
+        }
+        .os-calc-btn:hover { background: #333; }
+        .os-calc-btn:active { background: #3a3a3a; }
+        .os-calc-btn.op { background: #2d2d2d; color: #a5b0ff; }
+        .os-calc-btn.op:hover { background: #363636; }
+        .os-calc-btn.eq { background: #7c8cff; color: #fff; }
+        .os-calc-btn.eq:hover { background: #6a7aee; }
+        .os-calc-btn.clr { background: #2d2d2d; color: #ff9b9b; }
+        .os-calc-btn.clr:hover { background: #363636; }
+
+        /* ===== CLOCK ===== */
+        .os-clock-display {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 6px; padding: 24px;
+            background: #1a1a1a;
+        }
+        .os-clock-time {
+            font-size: 48px; font-weight: 300;
+            letter-spacing: -1px;
+            color: #e0e0e0;
+            font-variant-numeric: tabular-nums;
+        }
+        .os-clock-date {
+            font-size: 14px; color: #a0a0a0;
+            font-weight: 400; letter-spacing: .3px;
+        }
+
+        /* ===== WALLPAPER GALLERY ===== */
+        .os-wallpaper-gallery {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 8px; padding: 14px; height: 100%;
+            overflow-y: auto;
+            background: #1a1a1a;
+        }
+        .os-wallpaper-gallery::-webkit-scrollbar { width: 8px; }
+        .os-wallpaper-gallery::-webkit-scrollbar-track { background: #1a1a1a; }
+        .os-wallpaper-gallery::-webkit-scrollbar-thumb { background: #3a3a3a; border-radius: 4px; }
+        .os-wallpaper-thumb {
+            aspect-ratio: 16/9;
+            border-radius: 2px;
+            border: 2px solid transparent;
+            background-size: cover; background-position: center;
+            cursor: pointer;
+            transition: border-color .15s;
+        }
+        .os-wallpaper-thumb:hover {
+            border-color: #7c8cff;
+        }
+        .os-wallpaper-actions {
+            padding: 12px 14px;
+            border-top: 1px solid #2e2e2e;
+            display: flex; gap: 8px;
+            background: #1f1f1f;
+        }
+        .os-wallpaper-actions button {
+            flex: 1; padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #3a3a3a;
+            background: #2a2a2a;
+            color: #e0e0e0; font-weight: 400;
+            cursor: pointer; font-size: 12px;
+            font-family: inherit;
+            transition: background .1s;
+        }
+        .os-wallpaper-actions button:hover { background: #333; }
+        .os-wallpaper-actions button.primary {
+            background: #7c8cff;
+            border-color: #7c8cff;
+            color: #fff;
+        }
+        .os-wallpaper-actions button.primary:hover { background: #6a7aee; }
+
+        /* ===== DESKTOP ICONS ===== */
+        .os-desktop-icons {
+            position: absolute; top: 16px; left: 16px;
+            display: flex; flex-direction: column; gap: 4px;
+            z-index: 5;
+        }
+        .os-desktop-icon {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 4px; width: 72px; padding: 8px 4px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: background .1s;
+            user-select: none;
+        }
+        .os-desktop-icon:hover { background: rgba(124,140,255,.2); outline: 1px solid rgba(124,140,255,.4); }
+        .os-desktop-icon svg {
+            width: 32px; height: 32px;
+            stroke: #fff; fill: none;
+            stroke-width: 1.4;
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,.8));
+        }
+        .os-desktop-icon span {
+            font-size: 11px; font-weight: 400;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0,0,0,.9);
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* ===== BROWSER IN OS ===== */
+        .os-browser-inner {
+            display: flex; flex-direction: column; height: 100%;
+            background: #1a1a1a;
+        }
+        .os-browser-bar {
+            display: flex; align-items: center; gap: 4px;
+            padding: 6px 8px;
+            background: #202020;
+            border-bottom: 1px solid #2e2e2e;
+            flex-shrink: 0;
+        }
+        .os-browser-bar button {
+            width: 30px; height: 30px; border-radius: 3px; border: none;
+            background: transparent; color: #c0c0c0;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: background .1s;
+        }
+        .os-browser-bar button:hover:not(:disabled) { background: rgba(255,255,255,.08); }
+        .os-browser-bar button:disabled { opacity: .3; cursor: not-allowed; }
+        .os-browser-bar svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .os-browser-url {
+            flex: 1; display: flex; align-items: center; gap: 6px;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 3px;
+            padding: 0 10px; height: 28px;
+        }
+        .os-browser-url input {
+            flex: 1; background: transparent; border: none;
+            color: #e0e0e0; font-size: 12px; outline: none;
+            font-family: inherit;
+        }
+        .os-browser-url input::placeholder { color: #888; }
+        .os-browser-iframe {
+            flex: 1; border: none; background: #fff; width: 100%;
+        }
+
+        /* ===== SNAP PREVIEW ===== */
+        .os-snap-preview {
+            position: absolute;
+            background: rgba(124,140,255,.15);
+            border: 2px solid rgba(124,140,255,.5);
+            pointer-events: none;
+            z-index: 400;
+            display: none;
+            transition: all .12s ease;
+        }
+        .os-snap-preview.show { display: block; }
+
+        /* ===== NOTIFICATION ===== */
+        .os-toast {
+            position: absolute;
+            bottom: 52px; right: 12px;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 6px;
+            padding: 12px 16px;
+            color: #e0e0e0;
+            font-size: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.6);
+            z-index: 700;
+            animation: slideUp .2s ease;
+            max-width: 320px;
+        }
+
+        /* ===== WALLPAPER INPUT ===== */
+        .os-wallpaper-input { display: none; }
+
+        @media (max-width: 720px) {
+            .chooser-card { padding: 28px 20px 24px; }
+            .chooser-title { font-size: 20px; }
+            .chooser-options { flex-direction: column; }
+            .chooser-btn { min-width: auto; }
+            .os-window { min-width: 240px; }
+            .os-start-apps { grid-template-columns: repeat(3, 1fr); }
+            .os-start-menu { width: 92vw; padding: 20px; }
+            .os-clock-time { font-size: 32px; }
+            .os-taskbar-center { gap: 0; }
+            .os-taskbar-btn { width: 36px; height: 36px; }
+            .os-tray-clock { display: none; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Background music — starts as soon as possible -->
     <audio id="bg-music" src="/Lamour-song.mp3" loop preload="auto" autoplay playsinline></audio>
 
-    <!-- Snow -->
     <div class="snow-layer" id="snowLayer" aria-hidden="true"></div>
 
-    <!-- Countdown -->
     <div class="countdown" id="xmasCountdown" aria-live="polite">
         <span class="label">🎄 Until Christmas</span>
         <div class="value"><span class="num" id="xmasNum">--</span><span class="unit" id="xmasUnit">days</span></div>
         <span class="sub" id="xmasSub">loading…</span>
     </div>
 
-    <!-- MAIN CONTENT -->
     <div class="main-content" id="main-content">
         <div class="logo-image-wrap"><img class="farius-logo" src="/logo.gif" alt="Farium"></div>
         <div class="tagline">Browse Freely</div>
@@ -747,7 +1074,6 @@
         </div>
     </div>
 
-    <!-- RIGHT SIDE PANEL -->
     <nav class="side-dock" aria-label="Site navigation">
         <a href="/" class="dock-btn active" title="Home">
             <span class="label">Home</span>
@@ -767,7 +1093,7 @@
         </a>
     </nav>
 
-    <!-- BROWSER OVERLAY -->
+    <!-- ============ SIMPLE BROWSER OVERLAY ============ -->
     <div class="browser-overlay" id="browser-overlay">
         <div class="tabs-bar" id="tabs-bar">
             <button class="new-tab-btn" id="new-tab-btn" title="New Tab">+</button>
@@ -814,11 +1140,162 @@
         </div>
     </div>
 
+    <!-- ============ CHOOSER OVERLAY ============ -->
+    <div class="chooser-overlay" id="chooser-overlay">
+        <div class="chooser-card">
+            <div class="chooser-logo">
+                <img src="/assets/BrowserLogo.png" alt="Farium" onerror="this.src='/logo.gif'">
+            </div>
+            <div class="chooser-title">What will you choose?</div>
+            <div class="chooser-sub">Pick the classic proxy browser or the full Browser OS desktop</div>
+            <div class="chooser-options">
+                <button class="chooser-btn" id="choose-simple">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="2" y1="12" x2="22" y2="12"/>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                    Simple Browser
+                    <span>Classic proxy browser with tabs</span>
+                </button>
+                <button class="chooser-btn" id="choose-os">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="2" y="3" width="20" height="14" rx="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                    Browser OS
+                    <span>Full Windows-style desktop</span>
+                </button>
+            </div>
+            <button class="chooser-close" id="chooser-close">Cancel</button>
+        </div>
+    </div>
+
+    <!-- ============ BROWSER OS — WINDOWS 11 DARK ============ -->
+    <div class="os-desktop" id="os-desktop">
+        <!-- Snap preview -->
+        <div class="os-snap-preview" id="os-snap-preview"></div>
+
+        <!-- Desktop icons -->
+        <div class="os-desktop-icons">
+            <div class="os-desktop-icon" data-os-app="browser">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                <span>Browser</span>
+            </div>
+            <div class="os-desktop-icon" data-os-app="calculator">
+                <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="12" x2="10" y2="12"/><line x1="14" y1="12" x2="16" y2="12"/><line x1="8" y1="17" x2="10" y2="17"/><line x1="14" y1="17" x2="16" y2="17"/></svg>
+                <span>Calculator</span>
+            </div>
+            <div class="os-desktop-icon" data-os-app="clock">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>Clock</span>
+            </div>
+            <div class="os-desktop-icon" data-os-app="wallpaper">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span>Wallpaper</span>
+            </div>
+            <div class="os-desktop-icon" data-os-app="settings">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                <span>Settings</span>
+            </div>
+        </div>
+
+        <!-- Windows container -->
+        <div id="os-windows-container"></div>
+
+        <!-- Start menu -->
+        <div class="os-start-menu" id="os-start-menu">
+            <div class="os-start-search">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="os-start-search-input" placeholder="Type here to search">
+            </div>
+            <div class="os-start-section-title">Pinned</div>
+            <div class="os-start-apps" id="os-start-apps">
+                <button class="os-start-app" data-os-app="browser">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    <span>Browser</span>
+                </button>
+                <button class="os-start-app" data-os-app="calculator">
+                    <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="12" x2="10" y2="12"/><line x1="14" y1="12" x2="16" y2="12"/><line x1="8" y1="17" x2="10" y2="17"/><line x1="14" y1="17" x2="16" y2="17"/></svg>
+                    <span>Calculator</span>
+                </button>
+                <button class="os-start-app" data-os-app="clock">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span>Clock</span>
+                </button>
+                <button class="os-start-app" data-os-app="wallpaper">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <span>Wallpaper</span>
+                </button>
+                <button class="os-start-app" data-os-app="settings">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                    <span>Settings</span>
+                </button>
+                <button class="os-start-app" data-os-app="exit">
+                    <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    <span>Exit OS</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Taskbar -->
+        <div class="os-taskbar">
+            <div class="os-taskbar-left">
+                <!-- Windows-style start button (4 squares) -->
+                <button class="os-taskbar-btn" data-os-app="start" title="Start">
+                    <svg viewBox="0 0 24 24" style="stroke:none;fill:#e0e0e0;">
+                        <rect x="3" y="3" width="8" height="8" rx="0.5" fill="#e0e0e0" stroke="none"/>
+                        <rect x="13" y="3" width="8" height="8" rx="0.5" fill="#e0e0e0" stroke="none"/>
+                        <rect x="3" y="13" width="8" height="8" rx="0.5" fill="#e0e0e0" stroke="none"/>
+                        <rect x="13" y="13" width="8" height="8" rx="0.5" fill="#e0e0e0" stroke="none"/>
+                    </svg>
+                    <span class="os-taskbar-tooltip">Start</span>
+                </button>
+            </div>
+
+            <div class="os-taskbar-center">
+                <button class="os-taskbar-btn" data-os-app="browser" title="Browser">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    <span class="os-taskbar-tooltip">Browser</span>
+                </button>
+                <button class="os-taskbar-btn" data-os-app="calculator" title="Calculator">
+                    <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="12" x2="10" y2="12"/><line x1="14" y1="12" x2="16" y2="12"/><line x1="8" y1="17" x2="10" y2="17"/><line x1="14" y1="17" x2="16" y2="17"/></svg>
+                    <span class="os-taskbar-tooltip">Calculator</span>
+                </button>
+                <button class="os-taskbar-btn" data-os-app="clock" title="Clock">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span class="os-taskbar-tooltip">Clock</span>
+                </button>
+                <button class="os-taskbar-btn" data-os-app="wallpaper" title="Wallpaper">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <span class="os-taskbar-tooltip">Wallpaper</span>
+                </button>
+            </div>
+
+            <div class="os-taskbar-right">
+                <button class="os-tray-btn" title="Network">
+                    <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                </button>
+                <button class="os-tray-btn" title="Volume">
+                    <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                </button>
+                <div class="os-tray-clock" id="os-tray-clock">
+                    <span class="time" id="os-tray-time">--:--</span>
+                    <span class="date" id="os-tray-date">--/--/----</span>
+                </div>
+            </div>
+        </div>
+
+        <input type="file" class="os-wallpaper-input" id="os-wallpaper-input" accept="image/*">
+    </div>
+
     <a href="#" class="venusFooter">Venus integration</a>
 
     <div class="page-slide" id="pageSlide"></div>
 
     <script>
+        /* ============ ORIGINAL SCRIPT ============ */
         let tabs = [];
         let activeTabId = null;
 
@@ -1038,7 +1515,46 @@
             } catch (err) {}
         }
 
-        /* ============ BACKGROUND MUSIC — starts on entry ============ */
+        (function initBackground() {
+            const DEFAULT_BG = '/assets/backgrounds/foggy-forest.png';
+            const DEFAULT_DARKNESS = 72;
+            const DEFAULT_SCALE = 1;
+            const DEFAULT_X = 50;
+            const DEFAULT_Y = 50;
+
+            const bg = localStorage.getItem('bg') || DEFAULT_BG;
+            const scale = parseFloat(localStorage.getItem('bgScale')) || DEFAULT_SCALE;
+            const posX = parseFloat(localStorage.getItem('bgX'));
+            const posY = parseFloat(localStorage.getItem('bgY'));
+            const finalX = isNaN(posX) ? DEFAULT_X : posX;
+            const finalY = isNaN(posY) ? DEFAULT_Y : posY;
+
+            document.documentElement.style.setProperty('--bg-scale', scale);
+            document.documentElement.style.setProperty('--bg-pos-x', finalX + '%');
+            document.documentElement.style.setProperty('--bg-pos-y', finalY + '%');
+
+            const applyTo = (el) => {
+                el.style.backgroundColor = '#000';
+                el.style.backgroundImage = `url('${bg}')`;
+                el.style.backgroundSize = `calc(100% * ${scale}) auto`;
+                el.style.backgroundPosition = `${finalX}% ${finalY}%`;
+                el.style.backgroundRepeat = 'no-repeat';
+                el.style.backgroundAttachment = 'fixed';
+            };
+            applyTo(document.body);
+            const overlay = document.getElementById('browser-overlay');
+            if (overlay) applyTo(overlay);
+
+            const raw = localStorage.getItem('bgDarkness');
+            const percent = raw !== null ? Number(raw) : DEFAULT_DARKNESS;
+            const p = Math.max(0, Math.min(100, percent));
+            const alpha = p / 100;
+            const alphaBottom = Math.min(1, alpha * 1.15);
+
+            document.documentElement.style.setProperty('--overlay-top', `rgba(0, 0, 0, ${alpha.toFixed(3)})`);
+            document.documentElement.style.setProperty('--overlay-bottom', `rgba(0, 0, 0, ${alphaBottom.toFixed(3)})`);
+        })();
+
         (function initBackgroundMusic() {
             const music = document.getElementById('bg-music');
             if (!music) return;
@@ -1049,15 +1565,12 @@
                 const p = music.play();
                 if (p && typeof p.catch === 'function') p.catch(() => {});
             }
-
-            // Try immediately at various stages
             tryPlay();
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', tryPlay, { once: true });
             }
             window.addEventListener('load', tryPlay, { once: true });
 
-            // Fallback: start on the first user interaction
             function startOnce() {
                 tryPlay();
                 document.removeEventListener('click', startOnce);
@@ -1074,12 +1587,10 @@
             document.addEventListener('scroll', startOnce);
             document.addEventListener('pointerdown', startOnce);
 
-            // Auto-recover if it gets paused
             music.addEventListener('pause', () => { setTimeout(() => { if (music.paused) tryPlay(); }, 200); });
             music.addEventListener('ended', () => { music.currentTime = 0; tryPlay(); });
         })();
 
-        /* ============ SNOW ============ */
         (function initSnow() {
             const layer = document.getElementById('snowLayer');
             if (!layer) return;
@@ -1110,7 +1621,6 @@
             layer.appendChild(frag);
         })();
 
-        /* ============ CHRISTMAS COUNTDOWN ============ */
         (function initCountdown() {
             const numEl  = document.getElementById('xmasNum');
             const unitEl = document.getElementById('xmasUnit');
@@ -1154,7 +1664,6 @@
             setInterval(tick, 1000);
         })();
 
-        /* ============ FULLSCREEN TOGGLE ============ */
         (function initFullscreenToggle() {
             const btn = document.getElementById('browser-fullscreen');
             if (!btn) return;
@@ -1219,22 +1728,56 @@
             }
 
             initProxy();
-            const defaultBg = '/assets/backgrounds/foggy-forest.png';
-            const savedBg = localStorage.getItem('bg') || defaultBg;
-            document.body.style.backgroundImage = `url('${savedBg}')`;
 
+            // Search triggers chooser
             document.getElementById('search-go').addEventListener('click', () => {
-                const url = normalizeUrl(document.getElementById('search-input').value);
-                if (url) openBrowser(url);
+                const raw = document.getElementById('search-input').value.trim();
+                if (!raw) return;
+                document.getElementById('chooser-overlay').classList.add('open');
+                document.getElementById('chooser-overlay').dataset.pendingUrl = raw;
             });
             document.getElementById('search-input').addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') document.getElementById('search-go').click();
+                if (e.key === 'Enter') {
+                    const raw = e.target.value.trim();
+                    if (!raw) return;
+                    document.getElementById('chooser-overlay').classList.add('open');
+                    document.getElementById('chooser-overlay').dataset.pendingUrl = raw;
+                }
             });
 
+            // Chooser actions
+            document.getElementById('chooser-close').addEventListener('click', () => {
+                document.getElementById('chooser-overlay').classList.remove('open');
+            });
+            document.getElementById('chooser-overlay').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) {
+                    document.getElementById('chooser-overlay').classList.remove('open');
+                }
+            });
+
+            document.getElementById('choose-simple').addEventListener('click', () => {
+                const pending = document.getElementById('chooser-overlay').dataset.pendingUrl;
+                document.getElementById('chooser-overlay').classList.remove('open');
+                if (pending) {
+                    const url = normalizeUrl(pending);
+                    if (url) openBrowser(url);
+                }
+            });
+
+            document.getElementById('choose-os').addEventListener('click', () => {
+                document.getElementById('chooser-overlay').classList.remove('open');
+                openBrowserOS();
+            });
+
+            // App buttons trigger chooser
             document.querySelectorAll('#app-buttons .app-button[data-url]').forEach(btn => {
-                btn.addEventListener('click', () => openBrowser(btn.dataset.url));
+                btn.addEventListener('click', () => {
+                    document.getElementById('chooser-overlay').classList.add('open');
+                    document.getElementById('chooser-overlay').dataset.pendingUrl = btn.dataset.url;
+                });
             });
 
+            // Simple browser controls
             document.getElementById('browser-close').addEventListener('click', closeBrowser);
             document.getElementById('browser-home').addEventListener('click', closeBrowser);
             document.getElementById('browser-back').addEventListener('click', () => {
@@ -1299,11 +1842,775 @@
                 btn.className = 'app-button';
                 btn.dataset.url = fullUrl;
                 btn.innerHTML = `<img src="https://www.google.com/s2/favicons?domain=${domain}&sz=64" alt="${name}">`;
-                btn.addEventListener('click', () => openBrowser(fullUrl));
+                btn.addEventListener('click', () => {
+                    document.getElementById('chooser-overlay').classList.add('open');
+                    document.getElementById('chooser-overlay').dataset.pendingUrl = fullUrl;
+                });
                 btn.addEventListener('contextmenu', (e) => { e.preventDefault(); btn.remove(); });
                 document.getElementById('app-buttons').insertBefore(btn, document.getElementById('add-app-button'));
             });
+
+            // Browser OS
+            initBrowserOS();
         });
+
+        /* ============================================================
+           BROWSER OS — WINDOWS 11 DARK
+           ============================================================ */
+        let osWindows = [];
+        let osWindowZ = 100;
+        let osMinimized = [];
+        let osSnapPreviewTimer = null;
+
+        function openBrowserOS() {
+            const desktop = document.getElementById('os-desktop');
+            desktop.classList.add('open');
+
+            const savedWall = localStorage.getItem('os-wallpaper');
+            if (savedWall) {
+                desktop.style.backgroundImage = `url('${savedWall}')`;
+            } else {
+                desktop.style.backgroundImage = `url('/assets/backgrounds/foggy-forest.png')`;
+            }
+
+            updateOSTrayClock();
+            setInterval(updateOSTrayClock, 1000);
+            updateTaskbarRunning();
+
+            const pending = document.getElementById('chooser-overlay').dataset.pendingUrl;
+            if (pending) {
+                const url = normalizeUrl(pending);
+                if (url) {
+                    setTimeout(() => createOSWindow('browser', { url }), 150);
+                }
+            }
+        }
+
+        function closeBrowserOS() {
+            document.getElementById('os-desktop').classList.remove('open');
+            document.querySelectorAll('.os-window').forEach(w => w.remove());
+            osWindows = [];
+            osMinimized = [];
+            updateTaskbarRunning();
+        }
+
+        function updateOSTrayClock() {
+            const timeEl = document.getElementById('os-tray-time');
+            const dateEl = document.getElementById('os-tray-date');
+            if (!timeEl || !dateEl) return;
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            timeEl.textContent = `${h}:${m}`;
+            const dd = String(now.getDate()).padStart(2, '0');
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const yyyy = now.getFullYear();
+            dateEl.textContent = `${dd}/${mm}/${yyyy}`;
+        }
+
+        function updateTaskbarRunning() {
+            document.querySelectorAll('.os-taskbar-btn[data-os-app]').forEach(btn => {
+                const app = btn.dataset.osApp;
+                if (app === 'start') return;
+                const isRunning = osWindows.some(w => w.type === app);
+                btn.classList.toggle('running', isRunning);
+                btn.classList.toggle('active-app', isRunning && osWindows.some(w => w.type === app && !w.minimized));
+            });
+        }
+
+        function createOSWindow(type, opts = {}) {
+            const container = document.getElementById('os-windows-container');
+            const id = 'osw-' + Date.now() + Math.random().toString(36).substr(2, 4);
+
+            const win = document.createElement('div');
+            win.className = 'os-window';
+            win.id = id;
+            win.style.zIndex = ++osWindowZ;
+
+            const offset = (osWindows.length % 6) * 26;
+            const w = opts.width || 780;
+            const h = opts.height || 520;
+            win.style.width = w + 'px';
+            win.style.height = h + 'px';
+            win.style.left = Math.max(16, (window.innerWidth - w) / 2 + offset - 80) + 'px';
+            win.style.top = Math.max(16, (window.innerHeight - h) / 2 + offset - 60) + 'px';
+
+            // Titlebar
+            const titlebar = document.createElement('div');
+            titlebar.className = 'os-window-titlebar';
+
+            const icon = document.createElement('div');
+            icon.className = 'os-window-icon';
+            icon.innerHTML = getOSIconSVG(type);
+
+            const title = document.createElement('div');
+            title.className = 'os-window-title';
+            title.textContent = opts.title || getOSTitle(type);
+
+            const controls = document.createElement('div');
+            controls.className = 'os-window-controls';
+
+            const minBtn = document.createElement('button');
+            minBtn.className = 'os-window-control min';
+            minBtn.title = 'Minimize';
+            minBtn.innerHTML = '<svg viewBox="0 0 12 12"><line x1="2" y1="6" x2="10" y2="6"/></svg>';
+            minBtn.addEventListener('click', (e) => { e.stopPropagation(); minimizeOSWindow(id); });
+
+            const maxBtn = document.createElement('button');
+            maxBtn.className = 'os-window-control max';
+            maxBtn.title = 'Maximize';
+            maxBtn.innerHTML = '<svg viewBox="0 0 12 12"><rect x="2.5" y="2.5" width="7" height="7" rx="0.5"/></svg>';
+            maxBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMaximizeOSWindow(id); });
+
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'os-window-control close';
+            closeBtn.title = 'Close';
+            closeBtn.innerHTML = '<svg viewBox="0 0 12 12"><line x1="3" y1="3" x2="9" y2="9"/><line x1="9" y1="3" x2="3" y2="9"/></svg>';
+            closeBtn.addEventListener('click', (e) => { e.stopPropagation(); closeOSWindow(id); });
+
+            controls.appendChild(minBtn);
+            controls.appendChild(maxBtn);
+            controls.appendChild(closeBtn);
+
+            titlebar.appendChild(icon);
+            titlebar.appendChild(title);
+            titlebar.appendChild(controls);
+
+            // Content
+            const content = document.createElement('div');
+            content.className = 'os-window-content';
+            content.appendChild(buildOSContent(type, opts, id));
+
+            // Resize handles
+            ['n','s','e','w','ne','nw','se','sw'].forEach(dir => {
+                const handle = document.createElement('div');
+                handle.className = 'os-resize-handle ' + dir;
+                handle.dataset.dir = dir;
+                win.appendChild(handle);
+            });
+
+            win.appendChild(titlebar);
+            win.appendChild(content);
+            container.appendChild(win);
+
+            makeDraggable(win, titlebar, id);
+            makeResizable(win);
+
+            win.addEventListener('mousedown', () => {
+                win.style.zIndex = ++osWindowZ;
+            });
+
+            osWindows.push({ id, type, el: win, opts, minimized: false });
+            updateTaskbarRunning();
+            return win;
+        }
+
+        function getOSTitle(type) {
+            const titles = {
+                browser: 'Browser',
+                calculator: 'Calculator',
+                clock: 'Clock',
+                wallpaper: 'Wallpaper',
+                settings: 'Settings'
+            };
+            return titles[type] || 'Window';
+        }
+
+        function getOSIconSVG(type) {
+            if (type === 'browser') {
+                return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
+            } else if (type === 'calculator') {
+                return '<svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="12" x2="10" y2="12"/><line x1="14" y1="12" x2="16" y2="12"/><line x1="8" y1="17" x2="10" y2="17"/><line x1="14" y1="17" x2="16" y2="17"/></svg>';
+            } else if (type === 'clock') {
+                return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+            } else if (type === 'wallpaper') {
+                return '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+            } else if (type === 'settings') {
+                return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+            }
+            return '';
+        }
+
+        function buildOSContent(type, opts, winId) {
+            if (type === 'browser') return buildOSBrowser(opts);
+            if (type === 'calculator') return buildOSCalculator();
+            if (type === 'clock') return buildOSClock();
+            if (type === 'wallpaper') return buildOSWallpaper();
+            if (type === 'settings') return buildOSSettings();
+            return document.createElement('div');
+        }
+
+        function buildOSBrowser(opts) {
+            const wrap = document.createElement('div');
+            wrap.className = 'os-browser-inner';
+
+            const bar = document.createElement('div');
+            bar.className = 'os-browser-bar';
+
+            const back = document.createElement('button');
+            back.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>';
+            back.title = 'Back';
+
+            const forward = document.createElement('button');
+            forward.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>';
+            forward.title = 'Forward';
+
+            const refresh = document.createElement('button');
+            refresh.innerHTML = '<svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>';
+            refresh.title = 'Refresh';
+
+            const urlWrap = document.createElement('div');
+            urlWrap.className = 'os-browser-url';
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = 'Search or enter URL...';
+            input.value = opts.url || '';
+
+            urlWrap.appendChild(input);
+
+            const goBtn = document.createElement('button');
+            goBtn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+            goBtn.title = 'Go';
+            goBtn.style.width = '26px';
+            goBtn.style.height = '26px';
+
+            bar.appendChild(back);
+            bar.appendChild(forward);
+            bar.appendChild(refresh);
+            bar.appendChild(urlWrap);
+            bar.appendChild(goBtn);
+
+            const iframe = document.createElement('iframe');
+            iframe.className = 'os-browser-iframe';
+            iframe.referrerPolicy = 'no-referrer';
+            iframe.allowFullscreen = true;
+
+            let history = [];
+            let historyIdx = -1;
+
+            function navigate(raw) {
+                const url = normalizeUrl(raw);
+                if (!url) return;
+                if (historyIdx < history.length - 1) {
+                    history = history.slice(0, historyIdx + 1);
+                }
+                history.push(url);
+                historyIdx = history.length - 1;
+                input.value = url;
+                iframe.src = getProxyUrl(url);
+                updateNav();
+            }
+
+            function updateNav() {
+                back.disabled = historyIdx <= 0;
+                forward.disabled = historyIdx >= history.length - 1;
+            }
+
+            back.addEventListener('click', () => {
+                if (historyIdx > 0) {
+                    historyIdx--;
+                    input.value = history[historyIdx];
+                    iframe.src = getProxyUrl(history[historyIdx]);
+                    updateNav();
+                }
+            });
+            forward.addEventListener('click', () => {
+                if (historyIdx < history.length - 1) {
+                    historyIdx++;
+                    input.value = history[historyIdx];
+                    iframe.src = getProxyUrl(history[historyIdx]);
+                    updateNav();
+                }
+            });
+            refresh.addEventListener('click', () => {
+                if (history[historyIdx]) {
+                    iframe.src = getProxyUrl(history[historyIdx]);
+                }
+            });
+            goBtn.addEventListener('click', () => navigate(input.value));
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') navigate(input.value);
+            });
+
+            if (opts.url) {
+                setTimeout(() => navigate(opts.url), 100);
+            }
+
+            wrap.appendChild(bar);
+            wrap.appendChild(iframe);
+            return wrap;
+        }
+
+        function buildOSCalculator() {
+            const wrap = document.createElement('div');
+            wrap.style.display = 'flex';
+            wrap.style.flexDirection = 'column';
+            wrap.style.height = '100%';
+
+            const display = document.createElement('div');
+            display.className = 'os-calc-display';
+            display.textContent = '0';
+
+            const grid = document.createElement('div');
+            grid.className = 'os-calc-grid';
+
+            let current = '0';
+            let previous = null;
+            let op = null;
+            let reset = false;
+
+            const buttons = [
+                { t: 'C', c: 'clr' }, { t: '⌫', c: '' }, { t: '%', c: 'op' }, { t: '÷', c: 'op', v: '/' },
+                { t: '7', c: '' }, { t: '8', c: '' }, { t: '9', c: '' }, { t: '×', c: 'op', v: '*' },
+                { t: '4', c: '' }, { t: '5', c: '' }, { t: '6', c: '' }, { t: '−', c: 'op', v: '-' },
+                { t: '1', c: '' }, { t: '2', c: '' }, { t: '3', c: '' }, { t: '+', c: 'op', v: '+' },
+                { t: '±', c: '' }, { t: '0', c: '' }, { t: '.', c: '' }, { t: '=', c: 'eq' }
+            ];
+
+            function update() { display.textContent = current; }
+
+            function handle(action) {
+                if (/[0-9]/.test(action) && action.length === 1) {
+                    if (reset) { current = action; reset = false; }
+                    else { current = current === '0' ? action : current + action; }
+                } else if (action === '.') {
+                    if (reset) { current = '0.'; reset = false; }
+                    else if (!current.includes('.')) current += '.';
+                } else if (action === 'C') {
+                    current = '0'; previous = null; op = null; reset = false;
+                } else if (action === '⌫') {
+                    current = current.length > 1 ? current.slice(0, -1) : '0';
+                } else if (action === '±') {
+                    current = current.startsWith('-') ? current.slice(1) : '-' + current;
+                } else if (action === '%') {
+                    current = String(parseFloat(current) / 100);
+                } else if (['+','-','*','/'].includes(action)) {
+                    if (op !== null && !reset) compute();
+                    previous = current; op = action; reset = true;
+                } else if (action === '=') {
+                    compute();
+                }
+                update();
+            }
+
+            function compute() {
+                if (op === null || previous === null) return;
+                const a = parseFloat(previous), b = parseFloat(current);
+                let r = 0;
+                if (op === '+') r = a + b;
+                else if (op === '-') r = a - b;
+                else if (op === '*') r = a * b;
+                else if (op === '/') r = b === 0 ? NaN : a / b;
+                current = String(r);
+                previous = null; op = null; reset = true;
+                update();
+            }
+
+            buttons.forEach(b => {
+                const btn = document.createElement('button');
+                btn.className = 'os-calc-btn ' + b.c;
+                btn.textContent = b.t;
+                btn.addEventListener('click', () => handle(b.v || b.t));
+                grid.appendChild(btn);
+            });
+
+            wrap.appendChild(display);
+            wrap.appendChild(grid);
+            return wrap;
+        }
+
+        function buildOSClock() {
+            const wrap = document.createElement('div');
+            wrap.className = 'os-clock-display';
+
+            const time = document.createElement('div');
+            time.className = 'os-clock-time';
+            time.textContent = '--:--:--';
+
+            const date = document.createElement('div');
+            date.className = 'os-clock-date';
+            date.textContent = '';
+
+            function update() {
+                const now = new Date();
+                const h = String(now.getHours()).padStart(2, '0');
+                const m = String(now.getMinutes()).padStart(2, '0');
+                const s = String(now.getSeconds()).padStart(2, '0');
+                time.textContent = `${h}:${m}:${s}`;
+                date.textContent = now.toLocaleDateString(undefined, {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                });
+            }
+            update();
+            setInterval(update, 1000);
+
+            wrap.appendChild(time);
+            wrap.appendChild(date);
+            return wrap;
+        }
+
+        function buildOSWallpaper() {
+            const wrap = document.createElement('div');
+            wrap.style.display = 'flex';
+            wrap.style.flexDirection = 'column';
+            wrap.style.height = '100%';
+
+            const gallery = document.createElement('div');
+            gallery.className = 'os-wallpaper-gallery';
+
+            const presets = [
+                '/assets/backgrounds/foggy-forest.png',
+                'https://picsum.photos/seed/mountain/800/450',
+                'https://picsum.photos/seed/ocean/800/450',
+                'https://picsum.photos/seed/city/800/450',
+                'https://picsum.photos/seed/space/800/450',
+                'https://picsum.photos/seed/forest/800/450',
+                'https://picsum.photos/seed/desert/800/450',
+                'https://picsum.photos/seed/abstract/800/450',
+                'https://picsum.photos/seed/night/800/450'
+            ];
+
+            presets.forEach(url => {
+                const thumb = document.createElement('div');
+                thumb.className = 'os-wallpaper-thumb';
+                thumb.style.backgroundImage = `url('${url}')`;
+                thumb.addEventListener('click', () => setOSWallpaper(url));
+                gallery.appendChild(thumb);
+            });
+
+            const actions = document.createElement('div');
+            actions.className = 'os-wallpaper-actions';
+
+            const uploadBtn = document.createElement('button');
+            uploadBtn.className = 'primary';
+            uploadBtn.textContent = 'Import from device';
+            uploadBtn.addEventListener('click', () => {
+                document.getElementById('os-wallpaper-input').click();
+            });
+
+            const resetBtn = document.createElement('button');
+            resetBtn.textContent = 'Reset to default';
+            resetBtn.addEventListener('click', () => {
+                setOSWallpaper('/assets/backgrounds/foggy-forest.png');
+            });
+
+            actions.appendChild(uploadBtn);
+            actions.appendChild(resetBtn);
+
+            wrap.appendChild(gallery);
+            wrap.appendChild(actions);
+            return wrap;
+        }
+
+        function buildOSSettings() {
+            const wrap = document.createElement('div');
+            wrap.style.padding = '24px';
+            wrap.style.overflowY = 'auto';
+            wrap.style.height = '100%';
+            wrap.style.background = '#1a1a1a';
+            wrap.style.color = '#e0e0e0';
+
+            const title = document.createElement('h2');
+            title.textContent = 'System Settings';
+            title.style.fontSize = '20px';
+            title.style.fontWeight = '600';
+            title.style.marginBottom = '20px';
+            title.style.color = '#fff';
+
+            const section = document.createElement('div');
+            section.style.marginBottom = '20px';
+
+            const label = document.createElement('div');
+            label.textContent = 'Desktop Wallpaper';
+            label.style.fontSize = '13px';
+            label.style.fontWeight = '600';
+            label.style.marginBottom = '10px';
+            label.style.color = '#a0a0a0';
+
+            const changeBtn = document.createElement('button');
+            changeBtn.textContent = 'Change wallpaper';
+            changeBtn.style.padding = '8px 16px';
+            changeBtn.style.background = '#7c8cff';
+            changeBtn.style.border = 'none';
+            changeBtn.style.borderRadius = '4px';
+            changeBtn.style.color = '#fff';
+            changeBtn.style.cursor = 'pointer';
+            changeBtn.style.fontFamily = 'inherit';
+            changeBtn.style.fontSize = '12px';
+            changeBtn.addEventListener('click', () => {
+                document.getElementById('os-wallpaper-input').click();
+            });
+
+            section.appendChild(label);
+            section.appendChild(changeBtn);
+            wrap.appendChild(title);
+            wrap.appendChild(section);
+
+            return wrap;
+        }
+
+        function setOSWallpaper(url) {
+            const desktop = document.getElementById('os-desktop');
+            desktop.style.backgroundImage = `url('${url}')`;
+            localStorage.setItem('os-wallpaper', url);
+        }
+
+        /* ===== DRAGGING ===== */
+        function makeDraggable(win, handle, winId) {
+            let startX, startY, startLeft, startTop;
+            let isDragging = false;
+            let snapSide = null;
+
+            function onDown(e) {
+                if (e.target.closest('.os-window-control')) return;
+                if (e.target.closest('.os-resize-handle')) return;
+                if (win.classList.contains('maximized')) return;
+                e.preventDefault();
+                const rect = win.getBoundingClientRect();
+                startX = e.clientX;
+                startY = e.clientY;
+                startLeft = rect.left;
+                startTop = rect.top;
+                isDragging = true;
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            }
+
+            function onMove(e) {
+                if (!isDragging) return;
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                const newLeft = startLeft + dx;
+                const newTop = Math.max(0, startTop + dy);
+
+                // Snap detection
+                const preview = document.getElementById('os-snap-preview');
+                const threshold = 20;
+                const screenW = window.innerWidth;
+                const screenH = window.innerHeight - 40;
+
+                clearTimeout(osSnapPreviewTimer);
+
+                if (e.clientX < threshold) {
+                    snapSide = 'left';
+                    preview.style.display = 'block';
+                    preview.style.left = '0';
+                    preview.style.top = '0';
+                    preview.style.width = '50%';
+                    preview.style.height = screenH + 'px';
+                } else if (e.clientX > screenW - threshold) {
+                    snapSide = 'right';
+                    preview.style.display = 'block';
+                    preview.style.left = '50%';
+                    preview.style.top = '0';
+                    preview.style.width = '50%';
+                    preview.style.height = screenH + 'px';
+                } else {
+                    snapSide = null;
+                    preview.style.display = 'none';
+                }
+
+                win.style.left = newLeft + 'px';
+                win.style.top = newTop + 'px';
+            }
+
+            function onUp() {
+                isDragging = false;
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onUp);
+
+                const preview = document.getElementById('os-snap-preview');
+                if (snapSide) {
+                    win.classList.remove('snapped-left', 'snapped-right');
+                    win.classList.add('snapped-' + snapSide);
+                    preview.style.display = 'none';
+                    snapSide = null;
+                } else {
+                    // Un-snap if dragged away
+                    if (win.classList.contains('snapped-left') || win.classList.contains('snapped-right')) {
+                        win.classList.remove('snapped-left', 'snapped-right');
+                    }
+                }
+            }
+
+            handle.addEventListener('mousedown', onDown);
+
+            // Double-click titlebar to maximize
+            handle.addEventListener('dblclick', (e) => {
+                if (e.target.closest('.os-window-control')) return;
+                toggleMaximizeOSWindow(winId);
+            });
+        }
+
+        /* ===== RESIZING ===== */
+        function makeResizable(win) {
+            const handles = win.querySelectorAll('.os-resize-handle');
+            handles.forEach(handle => {
+                handle.addEventListener('mousedown', (e) => {
+                    if (win.classList.contains('maximized')) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const dir = handle.dataset.dir;
+                    const rect = win.getBoundingClientRect();
+                    const startX = e.clientX;
+                    const startY = e.clientY;
+                    const startW = rect.width;
+                    const startH = rect.height;
+                    const startL = rect.left;
+                    const startT = rect.top;
+
+                    function onMove(e) {
+                        let newW = startW, newH = startH, newL = startL, newT = startT;
+
+                        if (dir.includes('e')) newW = Math.max(280, startW + (e.clientX - startX));
+                        if (dir.includes('w')) {
+                            newW = Math.max(280, startW - (e.clientX - startX));
+                            newL = startL + (startW - newW);
+                        }
+                        if (dir.includes('s')) newH = Math.max(160, startH + (e.clientY - startY));
+                        if (dir.includes('n')) {
+                            newH = Math.max(160, startH - (e.clientY - startY));
+                            newT = startT + (startH - newH);
+                        }
+
+                        win.style.width = newW + 'px';
+                        win.style.height = newH + 'px';
+                        win.style.left = newL + 'px';
+                        win.style.top = newT + 'px';
+                    }
+
+                    function onUp() {
+                        document.removeEventListener('mousemove', onMove);
+                        document.removeEventListener('mouseup', onUp);
+                    }
+
+                    document.addEventListener('mousemove', onMove);
+                    document.addEventListener('mouseup', onUp);
+                });
+            });
+        }
+
+        /* ===== WINDOW CONTROLS ===== */
+        function closeOSWindow(id) {
+            const win = osWindows.find(w => w.id === id);
+            if (win) {
+                win.el.remove();
+                osWindows = osWindows.filter(w => w.id !== id);
+                osMinimized = osMinimized.filter(m => m !== id);
+                updateTaskbarRunning();
+            }
+        }
+
+        function minimizeOSWindow(id) {
+            const win = osWindows.find(w => w.id === id);
+            if (!win) return;
+            win.el.classList.add('minimized');
+            win.minimized = true;
+            if (!osMinimized.includes(id)) osMinimized.push(id);
+            updateTaskbarRunning();
+        }
+
+        function restoreOSWindow(id) {
+            const win = osWindows.find(w => w.id === id);
+            if (!win) return;
+            win.el.classList.remove('minimized');
+            win.minimized = false;
+            win.el.style.zIndex = ++osWindowZ;
+            osMinimized = osMinimized.filter(m => m !== id);
+            updateTaskbarRunning();
+        }
+
+        function toggleMaximizeOSWindow(id) {
+            const win = osWindows.find(w => w.id === id);
+            if (!win) return;
+            win.el.classList.toggle('maximized');
+        }
+
+        /* ===== INIT OS ===== */
+        function initBrowserOS() {
+            setInterval(() => {
+                if (document.getElementById('os-desktop').classList.contains('open')) {
+                    updateOSTrayClock();
+                }
+            }, 1000);
+
+            // Taskbar and desktop icons
+            document.querySelectorAll('.os-taskbar-btn[data-os-app], .os-desktop-icon[data-os-app]').forEach(el => {
+                el.addEventListener('click', () => {
+                    const app = el.dataset.osApp;
+                    handleOSApp(app);
+                });
+            });
+
+            // Start menu apps
+            document.querySelectorAll('.os-start-app').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const app = btn.dataset.osApp;
+                    handleOSApp(app);
+                    document.getElementById('os-start-menu').classList.remove('open');
+                });
+            });
+
+            // Wallpaper input
+            document.getElementById('os-wallpaper-input').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => setOSWallpaper(ev.target.result);
+                reader.readAsDataURL(file);
+            });
+
+            // Close start menu on outside click
+            document.addEventListener('click', (e) => {
+                const menu = document.getElementById('os-start-menu');
+                const startBtn = document.querySelector('.os-taskbar-btn[data-os-app="start"]');
+                if (menu.classList.contains('open') &&
+                    !menu.contains(e.target) &&
+                    !startBtn.contains(e.target)) {
+                    menu.classList.remove('open');
+                }
+            });
+
+            // Escape closes start menu
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.getElementById('os-start-menu').classList.remove('open');
+                }
+            });
+        }
+
+        function handleOSApp(app) {
+            if (app === 'start') {
+                document.getElementById('os-start-menu').classList.toggle('open');
+                return;
+            }
+            if (app === 'exit') {
+                closeBrowserOS();
+                return;
+            }
+
+            // If window of this type already exists, restore/focus it
+            const existing = osWindows.find(w => w.type === app);
+            if (existing) {
+                if (existing.minimized) restoreOSWindow(existing.id);
+                existing.el.style.zIndex = ++osWindowZ;
+                return;
+            }
+
+            if (app === 'browser') {
+                createOSWindow('browser', { width: 820, height: 540 });
+            } else if (app === 'calculator') {
+                createOSWindow('calculator', { width: 320, height: 460, title: 'Calculator' });
+            } else if (app === 'clock') {
+                createOSWindow('clock', { width: 380, height: 260, title: 'Clock' });
+            } else if (app === 'wallpaper') {
+                createOSWindow('wallpaper', { width: 540, height: 440, title: 'Wallpaper' });
+            } else if (app === 'settings') {
+                createOSWindow('settings', { width: 520, height: 400, title: 'Settings' });
+            }
+        }
     </script>
 </body>
 </html>

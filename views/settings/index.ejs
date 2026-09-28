@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xylara - Settings</title>
     <script src="https://app.rybbit.io/api/script.js" data-site-id="8b65ec526edf" defer></script>
-    <link rel="icon" type="image/png" href="/logo.gif">
+    <link rel="icon" type="image/gif" href="/logo.gif">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -31,11 +31,17 @@
             --accent-2: #b47cff;
             --accent-glow: rgba(124,140,255,.28);
             --ring: rgba(124,140,255,.28);
+
+            /* Background editor state — set from JS */
+            --bg-scale: 1;
+            --bg-pos-x: 50%;
+            --bg-pos-y: 50%;
         }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes popIn { from { opacity: 0; transform: scale(.95); } to { opacity: 1; transform: scale(1); } }
         @keyframes logoDrop {
             0% { opacity:0; transform:translateY(-40px) scale(.8); }
             70% { opacity:1; transform:translateY(4px) scale(1.02); }
@@ -61,32 +67,35 @@
             position: relative;
             overflow-x: hidden;
 
-            /* Foggy forest background image, fixed and covering */
             background-color: #000;
             background-image: url('/assets/backgrounds/foggy-forest.png');
-            background-size: cover;
-            background-position: center;
+            background-size: calc(100% * var(--bg-scale, 1));
+            background-position: var(--bg-pos-x, 50%) var(--bg-pos-y, 50%);
             background-repeat: no-repeat;
             background-attachment: fixed;
         }
 
-        /* Dark overlay so text stays readable over the background */
         body::before {
             content: '';
             position: fixed;
             inset: 0;
             background:
-                linear-gradient(180deg, rgba(0,0,0,.72) 0%, rgba(0,0,0,.82) 100%),
+                linear-gradient(
+                    180deg,
+                    var(--overlay-top, rgba(0,0,0,.72)) 0%,
+                    var(--overlay-bottom, rgba(0,0,0,.82)) 100%
+                ),
                 radial-gradient(700px 500px at 50% 30%, rgba(124,140,255,.06), transparent 65%);
             z-index: 0;
             pointer-events: none;
+            transition: background .15s ease;
         }
 
         /* ============ SETTINGS WRAPPER ============ */
         .settings-wrapper {
             position: relative;
             z-index: 2;
-            width: min(100%, 580px);
+            width: min(100%, 780px);
             padding: 40px 22px 60px;
             display: flex;
             flex-direction: column;
@@ -94,7 +103,6 @@
             margin-right: 130px;
         }
 
-        /* Logo */
         .logo-area {
             display: flex;
             flex-direction: column;
@@ -128,7 +136,6 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Title */
         .page-title {
             text-align: center;
             margin: 0 4px 6px;
@@ -152,10 +159,10 @@
             animation: slideUp 0.4s 0.1s ease both;
         }
 
-        /* ============ SETTING CARD — now semi-transparent so background shows ============ */
+        /* ============ SETTING CARD ============ */
         .settings-container {
             position: relative;
-            background: rgba(10,10,10,.72);
+            background: rgba(10,10,10,.78);
             padding: 22px 24px;
             border-radius: 16px;
             border: 1px solid var(--card-border);
@@ -180,7 +187,7 @@
 
         .settings-container:hover {
             border-color: var(--card-border-hover);
-            background: rgba(15,15,15,.82);
+            background: rgba(15,15,15,.85);
             transform: translateY(-2px);
         }
         .settings-container:hover::before { opacity: 1; }
@@ -204,11 +211,11 @@
         }
 
         .setting-item select,
-        .setting-item input {
+        .setting-item input[type="text"] {
             min-height: 40px;
             border-radius: 10px;
             border: 1.5px solid var(--input-border);
-            background: rgba(5,5,5,.7);
+            background: rgba(5,5,5,.75);
             color: var(--text);
             font-size: 0.8rem;
             font-family: inherit;
@@ -223,19 +230,19 @@
             cursor: pointer;
         }
 
-        .setting-item input {
+        .setting-item input[type="text"] {
             width: 245px;
             padding: 8px 13px;
         }
 
         .setting-item select:hover,
-        .setting-item input:hover {
+        .setting-item input[type="text"]:hover {
             border-color: var(--card-border-hover);
-            background: rgba(8,8,8,.85);
+            background: rgba(8,8,8,.9);
         }
 
         .setting-item select:focus,
-        .setting-item input:focus {
+        .setting-item input[type="text"]:focus {
             border-color: var(--input-border-focus);
             background: #0d0d0d;
             box-shadow: 0 0 0 3px var(--ring);
@@ -248,6 +255,416 @@
 
         .setting-item input::placeholder {
             color: var(--text-dim);
+        }
+
+        /* ============ BACKGROUND PICKER ============ */
+        .bg-section-title {
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin: 4px 0 14px;
+        }
+
+        .bg-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .bg-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 12px;
+            border: 1.5px solid var(--card-border);
+            background: rgba(5,5,5,.75);
+            cursor: pointer;
+            transition: border-color .2s ease, background .2s ease, transform .2s ease;
+            text-align: left;
+        }
+        .bg-card:hover {
+            border-color: var(--card-border-hover);
+            background: rgba(15,15,15,.9);
+            transform: translateY(-2px);
+        }
+        .bg-card.selected {
+            border-color: var(--accent);
+            background: rgba(124,140,255,.1);
+            box-shadow: 0 0 0 3px var(--ring);
+        }
+
+        .bg-thumb {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 8px;
+            background: #000;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+        }
+
+        .bg-name {
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: var(--text);
+            padding: 0 2px;
+            line-height: 1.3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .bg-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #fff;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity .2s ease;
+            pointer-events: none;
+        }
+        .bg-card.selected .bg-badge { opacity: 1; }
+
+        .bg-actions-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+        .bg-reset,
+        .bg-adjust {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1.5px solid var(--input-border);
+            background: rgba(5,5,5,.75);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .15s ease, background .15s ease, border-color .15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .bg-reset:hover,
+        .bg-adjust:hover {
+            transform: translateY(-1px);
+            background: rgba(15,15,15,.9);
+            border-color: var(--card-border-hover);
+        }
+        .bg-adjust {
+            background: linear-gradient(135deg, rgba(124,140,255,.18), rgba(180,124,255,.14));
+            border-color: rgba(124,140,255,.4);
+        }
+        .bg-adjust:hover {
+            background: linear-gradient(135deg, rgba(124,140,255,.28), rgba(180,124,255,.22));
+        }
+        .bg-adjust svg, .bg-reset svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* ============ BACKGROUND EDITOR (HUD) ============ */
+        .bg-editor-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 25000;
+            background: rgba(0,0,0,.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            animation: fadeIn .25s ease;
+        }
+        .bg-editor-overlay.open { display: flex; }
+
+        .bg-editor {
+            width: min(100%, 900px);
+            background: #0a0a0a;
+            border: 1.5px solid var(--card-border);
+            border-radius: 18px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            animation: popIn .3s cubic-bezier(.2,.9,.25,1.15);
+            box-shadow: 0 30px 80px -20px rgba(0,0,0,.9);
+        }
+
+        .bg-editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+        .bg-editor-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.3px;
+        }
+        .bg-editor-sub {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 3px;
+        }
+        .bg-editor-close {
+            width: 34px; height: 34px;
+            border-radius: 9px;
+            border: 1.5px solid var(--input-border);
+            background: rgba(5,5,5,.75);
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: background .15s ease, transform .15s ease;
+        }
+        .bg-editor-close:hover {
+            background: rgba(30,30,30,.9);
+            transform: rotate(90deg);
+        }
+
+        /* The preview canvas — where you drag the background */
+        .bg-editor-preview {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: #000;
+            background-image: url('/assets/backgrounds/foggy-forest.png');
+            background-size: calc(100% * var(--preview-scale, 1));
+            background-position: var(--preview-x, 50%) var(--preview-y, 50%);
+            background-repeat: no-repeat;
+            cursor: grab;
+            user-select: none;
+            border: 1px solid var(--card-border);
+            touch-action: none;
+        }
+        .bg-editor-preview.dragging { cursor: grabbing; }
+
+        /* Grid lines overlay */
+        .bg-editor-preview::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(to right, rgba(255,255,255,.10) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,.10) 1px, transparent 1px);
+            background-size: 8.333% 8.333%;
+            z-index: 1;
+        }
+        /* Center crosshair */
+        .bg-editor-preview::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 40px; height: 40px;
+            transform: translate(-50%, -50%);
+            border: 1px solid rgba(124,140,255,.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 2;
+            box-shadow: 0 0 20px rgba(124,140,255,.3);
+        }
+
+        .bg-editor-preview-hint {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,.7);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 11px;
+            color: var(--text-dim-2);
+            letter-spacing: .3px;
+            pointer-events: none;
+            z-index: 3;
+            backdrop-filter: blur(10px);
+        }
+
+        .bg-editor-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .bg-editor-control {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .bg-editor-control-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-dim-2);
+            font-weight: 600;
+        }
+        .bg-editor-control-value {
+            color: var(--accent);
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Sliders in editor */
+        .bg-editor-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,.08);
+            outline: none;
+            cursor: pointer;
+        }
+        .bg-editor-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            cursor: pointer;
+            box-shadow: 0 0 0 3px rgba(124,140,255,.25);
+            transition: transform .15s ease;
+        }
+        .bg-editor-slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
+        .bg-editor-slider::-moz-range-thumb {
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 0 3px rgba(124,140,255,.25);
+        }
+
+        .bg-editor-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+            padding-top: 16px;
+            border-top: 1px solid var(--card-border);
+        }
+        .bg-editor-btn {
+            flex: 1;
+            padding: 12px 18px;
+            border-radius: 11px;
+            border: 1.5px solid var(--input-border);
+            background: rgba(5,5,5,.75);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.84rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .15s ease, background .15s ease;
+        }
+        .bg-editor-btn:hover {
+            transform: translateY(-1px);
+            background: rgba(15,15,15,.9);
+        }
+        .bg-editor-btn.primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 10px 26px -10px var(--accent-glow);
+        }
+        .bg-editor-btn.primary:hover {
+            box-shadow: 0 14px 32px -10px var(--accent-glow);
+        }
+
+        /* ============ DARKNESS SLIDER ============ */
+        .darkness-row {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .darkness-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+        .darkness-header label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: 0.3px;
+        }
+        .darkness-value {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--accent);
+            font-variant-numeric: tabular-nums;
+            min-width: 48px;
+            text-align: right;
+        }
+        .darkness-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, #000 0%, #000 100%);
+            outline: none;
+            cursor: pointer;
+        }
+        .darkness-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            cursor: pointer;
+            box-shadow: 0 0 0 3px rgba(124,140,255,.25), 0 4px 12px -4px rgba(0,0,0,.8);
+            transition: transform .15s ease;
+        }
+        .darkness-slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
+        .darkness-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 0 3px rgba(124,140,255,.25), 0 4px 12px -4px rgba(0,0,0,.8);
+            transition: transform .15s ease;
+        }
+        .darkness-slider::-moz-range-thumb:hover { transform: scale(1.1); }
+
+        .darkness-ticks {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            letter-spacing: 0.3px;
         }
 
         /* ============ ACTION BAR ============ */
@@ -268,7 +685,7 @@
             gap: 8px;
             padding: 13px 28px;
             border-radius: 12px;
-            background: rgba(10,10,10,.72);
+            background: rgba(10,10,10,.78);
             border: 1.5px solid var(--input-border);
             color: var(--text);
             font-family: inherit;
@@ -303,7 +720,7 @@
         .action-btn:hover svg { transform: translateX(-3px); }
         .action-btn:active { transform: translateY(-1px) scale(0.98); }
 
-        /* ============ RIGHT SIDE PANEL — TOP-TO-BOTTOM, FLUSH ============ */
+        /* ============ RIGHT SIDE PANEL ============ */
         .side-dock {
             position: fixed;
             top: 0;
@@ -317,7 +734,7 @@
             justify-content: center;
             gap: 6px;
             padding: 18px 12px;
-            background: rgba(10,10,10,.85);
+            background: #0a0a0a;
             border-left: 1px solid var(--card-border);
             animation: slideRight .4s cubic-bezier(.2,.9,.25,1.15) both;
         }
@@ -353,10 +770,7 @@
             will-change: transform;
         }
 
-        .dock-btn .label {
-            flex: 1;
-            text-align: left;
-        }
+        .dock-btn .label { flex: 1; text-align: left; }
 
         .dock-btn svg {
             width: 17px;
@@ -458,16 +872,20 @@
             .setting-item { gap: 12px; }
             .setting-item label { font-size: 0.76rem; }
             .setting-item select { min-width: 132px; max-width: 52%; padding-left: 10px; padding-right: 25px; }
-            .setting-item input { width: 52%; min-width: 0; }
+            .setting-item input[type="text"] { width: 52%; min-width: 0; }
             #custom-wisp-server-container { align-items: flex-start; }
             .action-bar { gap: 8px; }
             .action-btn { padding: 11px 20px; font-size: 0.8rem; }
+            .bg-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+            .bg-editor { padding: 16px; }
+            .bg-editor-preview-hint { font-size: 10px; padding: 4px 8px; }
         }
 
         @media (max-width: 360px) {
             .setting-item { align-items: flex-start; flex-direction: column; }
             .setting-item select,
-            .setting-item input { width: 100%; max-width: none; }
+            .setting-item input[type="text"] { width: 100%; max-width: none; }
+            .bg-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -481,12 +899,10 @@
 </head>
 <body>
 
-    <!-- Background music — loops forever, hidden -->
-    <audio id="bg-music" src="/Lamour-song.mp3" loop preload="auto" autoplay></audio>
+    <audio id="bg-music" src="/Lamour-song.mp3" loop preload="auto" autoplay playsinline></audio>
 
     <div class="settings-wrapper">
 
-        <!-- LOGO -->
         <div class="logo-area">
             <img src="/logo.gif" alt="Farius" class="farius-logo"
                  onerror="this.style.display='none'; document.querySelector('.logo-fallback').style.display='block';">
@@ -496,7 +912,37 @@
         <h1 class="page-title">Settings</h1>
         <p class="page-subtitle">Make sure to use DuckDuckGo — Google ain't workin :sob</p>
 
+        <!-- ============ BACKGROUND PICKER ============ -->
         <div class="settings-container" style="animation-delay: 0.05s;">
+            <div class="bg-section-title">Background</div>
+            <div class="bg-grid" id="bgGrid"></div>
+            <div class="bg-actions-row">
+                <button class="bg-adjust" id="bgAdjust" type="button">
+                    <svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="4"/></svg>
+                    Adjust Fit
+                </button>
+                <button class="bg-reset" id="bgReset" type="button">Reset to default</button>
+            </div>
+        </div>
+
+        <!-- ============ BACKGROUND DARKNESS ============ -->
+        <div class="settings-container" style="animation-delay: 0.08s;">
+            <div class="bg-section-title">Background Darkness</div>
+            <div class="darkness-row">
+                <div class="darkness-header">
+                    <label for="darknessSlider">Overlay opacity</label>
+                    <span class="darkness-value" id="darknessValue">72%</span>
+                </div>
+                <input type="range" class="darkness-slider" id="darknessSlider" min="0" max="100" step="1" value="72">
+                <div class="darkness-ticks">
+                    <span>Clear</span>
+                    <span>Dark</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ PROXY TYPE ============ -->
+        <div class="settings-container" style="animation-delay: 0.1s;">
             <div class="setting-item">
                 <label for="type">Proxy Type</label>
                 <select id="type">
@@ -506,7 +952,8 @@
             </div>
         </div>
 
-        <div class="settings-container" style="animation-delay: 0.1s;">
+        <!-- ============ SEARCH ENGINE ============ -->
+        <div class="settings-container" style="animation-delay: 0.15s;">
             <div class="setting-item">
                 <label for="search-engine">Search Engine</label>
                 <select id="search-engine">
@@ -519,7 +966,8 @@
             </div>
         </div>
 
-        <div class="settings-container" style="animation-delay: 0.15s;">
+        <!-- ============ TRANSPORT ============ -->
+        <div class="settings-container" style="animation-delay: 0.2s;">
             <div class="setting-item">
                 <label for="transport-type">Transport</label>
                 <select id="transport-type">
@@ -529,7 +977,8 @@
             </div>
         </div>
 
-        <div class="settings-container" style="animation-delay: 0.2s;">
+        <!-- ============ WISP SERVER ============ -->
+        <div class="settings-container" style="animation-delay: 0.25s;">
             <div class="setting-item">
                 <label for="wisp-server-type">Wisp Server</label>
                 <select id="wisp-server-type">
@@ -543,7 +992,7 @@
             </div>
         </div>
 
-        <!-- SINGLE ACTION BUTTON -->
+        <!-- ============ ACTION BAR ============ -->
         <div class="action-bar">
             <a href="/" class="action-btn">
                 <svg viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM9 20v-6h6v6"/></svg>
@@ -551,6 +1000,53 @@
             </a>
         </div>
 
+    </div>
+
+    <!-- ============ BACKGROUND EDITOR HUD ============ -->
+    <div class="bg-editor-overlay" id="bgEditorOverlay">
+        <div class="bg-editor">
+            <div class="bg-editor-header">
+                <div>
+                    <div class="bg-editor-title">Adjust Background Fit</div>
+                    <div class="bg-editor-sub">Drag the preview to move · Scroll to zoom · Or use the sliders below</div>
+                </div>
+                <button class="bg-editor-close" id="bgEditorClose" type="button" aria-label="Close">×</button>
+            </div>
+
+            <div class="bg-editor-preview" id="bgEditorPreview">
+                <div class="bg-editor-preview-hint">Drag me · Scroll to zoom</div>
+            </div>
+
+            <div class="bg-editor-controls">
+                <div class="bg-editor-control">
+                    <div class="bg-editor-control-header">
+                        <span>Zoom</span>
+                        <span class="bg-editor-control-value" id="editorScaleValue">100%</span>
+                    </div>
+                    <input type="range" class="bg-editor-slider" id="editorScale" min="50" max="300" step="1" value="100">
+                </div>
+                <div class="bg-editor-control">
+                    <div class="bg-editor-control-header">
+                        <span>Horizontal</span>
+                        <span class="bg-editor-control-value" id="editorXValue">50%</span>
+                    </div>
+                    <input type="range" class="bg-editor-slider" id="editorX" min="0" max="100" step="1" value="50">
+                </div>
+                <div class="bg-editor-control">
+                    <div class="bg-editor-control-header">
+                        <span>Vertical</span>
+                        <span class="bg-editor-control-value" id="editorYValue">50%</span>
+                    </div>
+                    <input type="range" class="bg-editor-slider" id="editorY" min="0" max="100" step="1" value="50">
+                </div>
+            </div>
+
+            <div class="bg-editor-actions">
+                <button class="bg-editor-btn" id="bgEditorCancel" type="button">Cancel</button>
+                <button class="bg-editor-btn" id="bgEditorReset" type="button">Reset</button>
+                <button class="bg-editor-btn primary" id="bgEditorSave" type="button">Save</button>
+            </div>
+        </div>
     </div>
 
     <!-- RIGHT SIDE PANEL -->
@@ -573,12 +1069,38 @@
         </a>
     </nav>
 
-    <!-- PAGE SLIDE OVERLAY -->
     <div class="page-slide" id="pageSlide"></div>
 
     <script>
+        /* ============================================================
+           BACKGROUNDS — real filenames
+           ============================================================ */
+        const BG_BASE = '/assets/backgrounds/';
+
+        const BACKGROUNDS = [
+            { name: 'Foggy Forest',       file: 'foggy-forest.png' },
+            { name: 'Mountain Guy',       file: 'mountainguy.png' },
+            { name: 'Mountain Guy 2',     file: 'MountainGuy2.png' },
+            { name: 'Carry Sunset',       file: 'VinlandSagaThorfinn.png' },
+            { name: 'Fallen Knight',      file: 'FallenKnight.png' },
+            { name: 'Floating Tree',      file: 'floating-tree.png' },
+            { name: 'Touching Hands',     file: 'TouchingHands.png' },
+            { name: 'End of the World',   file: 'end-of-the-world.png' },
+            { name: 'Dwelling Cat',       file: 'DwrellingCat.png' },
+            { name: 'Vega Bong',          file: 'VegaBong.png' },
+            { name: 'Backgroundly 2',     file: 'backgroundly2.png' }
+        ];
+
+        const DEFAULT_BG = BG_BASE + 'foggy-forest.png';
+        const DEFAULT_DARKNESS = 72;
+        const DEFAULT_SCALE = 1;    // 1 = cover (100%)
+        const DEFAULT_X = 50;       // 50% = center
+        const DEFAULT_Y = 50;       // 50% = center
+
+        /* ============ SETTINGS LOGIC ============ */
         document.addEventListener('DOMContentLoaded', () => {
-            /* ============ PAGE SLIDE — ENTER ANIMATION ============ */
+
+            /* ---------- PAGE SLIDE ENTER ---------- */
             (function () {
                 const slide = document.getElementById("pageSlide");
                 if (sessionStorage.getItem("slideFrom")) {
@@ -595,7 +1117,7 @@
                 }
             })();
 
-            /* ============ PAGE SLIDE — EXIT (Games button) ============ */
+            /* ---------- PAGE SLIDE EXIT ---------- */
             const gamesBtn = document.getElementById("gamesBtn");
             if (gamesBtn) {
                 gamesBtn.addEventListener("click", (e) => {
@@ -609,7 +1131,7 @@
                 });
             }
 
-            /* ============ BACKGROUND MUSIC ============ */
+            /* ---------- BACKGROUND MUSIC ---------- */
             (function initBackgroundMusic() {
                 const music = document.getElementById('bg-music');
                 if (!music) return;
@@ -621,6 +1143,10 @@
                     if (p && typeof p.catch === 'function') p.catch(() => {});
                 }
                 tryPlay();
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', tryPlay, { once: true });
+                }
+                window.addEventListener('load', tryPlay, { once: true });
 
                 function startOnce() {
                     tryPlay();
@@ -628,44 +1154,288 @@
                     document.removeEventListener('touchstart', startOnce);
                     document.removeEventListener('keydown', startOnce);
                     document.removeEventListener('mousemove', startOnce);
+                    document.removeEventListener('pointerdown', startOnce);
                 }
                 document.addEventListener('click', startOnce);
                 document.addEventListener('touchstart', startOnce);
                 document.addEventListener('keydown', startOnce);
                 document.addEventListener('mousemove', startOnce);
+                document.addEventListener('pointerdown', startOnce);
 
                 music.addEventListener('pause', () => { setTimeout(() => { if (music.paused) tryPlay(); }, 200); });
                 music.addEventListener('ended', () => { music.currentTime = 0; tryPlay(); });
             })();
 
-            /* ============ SETTINGS LOGIC ============ */
-            const defaultBg = '/assets/backgrounds/foggy-forest.png';
-            let bg = localStorage.getItem('bg');
-            if (!bg) {
-                bg = defaultBg;
-                localStorage.setItem('bg', bg);
+            /* ---------- APPLY BACKGROUND + TRANSFORMS ----------
+               scale:  1.0 = 100% width (cover), 0.5 = half, 3.0 = 3x
+               posX / posY: 0..100% (background-position values)
+            */
+            function applyBackground(url, scale, posX, posY) {
+                document.body.style.backgroundColor = '#000';
+                document.body.style.backgroundImage = `url('${url}')`;
+                document.body.style.backgroundSize = `calc(100% * ${scale}) auto`;
+                document.body.style.backgroundPosition = `${posX}% ${posY}%`;
+                document.body.style.backgroundRepeat = 'no-repeat';
+                document.body.style.backgroundAttachment = 'fixed';
             }
 
-            // Apply any saved background override (from localStorage) on top of the default
-            if (bg && bg !== defaultBg) {
-                document.body.style.backgroundImage = `url('${bg}')`;
+            /* ---------- APPLY DARKNESS ---------- */
+            function applyDarkness(percent) {
+                const p = Math.max(0, Math.min(100, Number(percent)));
+                const alpha = p / 100;
+                const alphaBottom = Math.min(1, alpha * 1.15);
+                document.body.style.setProperty('--overlay-top', `rgba(0, 0, 0, ${alpha.toFixed(3)})`);
+                document.body.style.setProperty('--overlay-bottom', `rgba(0, 0, 0, ${alphaBottom.toFixed(3)})`);
             }
 
+            /* ---------- STATE ---------- */
+            const state = {
+                bg: localStorage.getItem('bg') || DEFAULT_BG,
+                scale: parseFloat(localStorage.getItem('bgScale')) || DEFAULT_SCALE,
+                x: parseFloat(localStorage.getItem('bgX')) || DEFAULT_X,
+                y: parseFloat(localStorage.getItem('bgY')) || DEFAULT_Y
+            };
+
+            /* ---------- BACKGROUND PICKER GRID ---------- */
+            const bgGrid = document.getElementById('bgGrid');
+            const bgReset = document.getElementById('bgReset');
+            const bgAdjust = document.getElementById('bgAdjust');
+
+            BACKGROUNDS.forEach(item => {
+                const url = BG_BASE + item.file;
+
+                const card = document.createElement('div');
+                card.className = 'bg-card';
+                card.dataset.path = url;
+                if (url === state.bg) card.classList.add('selected');
+
+                const thumb = document.createElement('div');
+                thumb.className = 'bg-thumb';
+                thumb.style.backgroundImage = `url('${url}')`;
+
+                const name = document.createElement('div');
+                name.className = 'bg-name';
+                name.textContent = item.name;
+
+                const badge = document.createElement('div');
+                badge.className = 'bg-badge';
+                badge.textContent = 'Active';
+
+                card.appendChild(thumb);
+                card.appendChild(name);
+                card.appendChild(badge);
+
+                card.addEventListener('click', () => {
+                    state.bg = url;
+                    // Reset transform when a new wallpaper is picked
+                    state.scale = DEFAULT_SCALE;
+                    state.x = DEFAULT_X;
+                    state.y = DEFAULT_Y;
+                    localStorage.setItem('bg', state.bg);
+                    localStorage.setItem('bgScale', state.scale);
+                    localStorage.setItem('bgX', state.x);
+                    localStorage.setItem('bgY', state.y);
+                    applyBackground(state.bg, state.scale, state.x, state.y);
+                    document.querySelectorAll('.bg-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                });
+
+                bgGrid.appendChild(card);
+            });
+
+            bgReset.addEventListener('click', () => {
+                state.bg = DEFAULT_BG;
+                state.scale = DEFAULT_SCALE;
+                state.x = DEFAULT_X;
+                state.y = DEFAULT_Y;
+                localStorage.setItem('bg', state.bg);
+                localStorage.setItem('bgScale', state.scale);
+                localStorage.setItem('bgX', state.x);
+                localStorage.setItem('bgY', state.y);
+                applyBackground(state.bg, state.scale, state.x, state.y);
+                document.querySelectorAll('.bg-card').forEach(c => {
+                    c.classList.toggle('selected', c.dataset.path === DEFAULT_BG);
+                });
+            });
+
+            /* ---------- DARKNESS SLIDER ---------- */
+            const darknessSlider = document.getElementById('darknessSlider');
+            const darknessValue = document.getElementById('darknessValue');
+
+            const savedDarkness = localStorage.getItem('bgDarkness');
+            const initialDarkness = savedDarkness !== null ? Number(savedDarkness) : DEFAULT_DARKNESS;
+            darknessSlider.value = String(initialDarkness);
+            darknessValue.textContent = initialDarkness + '%';
+            applyDarkness(initialDarkness);
+
+            darknessSlider.addEventListener('input', (e) => {
+                const val = Number(e.target.value);
+                darknessValue.textContent = val + '%';
+                applyDarkness(val);
+                localStorage.setItem('bgDarkness', val);
+            });
+
+            /* ---------- INITIAL APPLY ---------- */
+            applyBackground(state.bg, state.scale, state.x, state.y);
+
+            /* ============================================================
+               BACKGROUND EDITOR (HUD)
+               ============================================================ */
+            const overlay = document.getElementById('bgEditorOverlay');
+            const preview = document.getElementById('bgEditorPreview');
+            const editorClose = document.getElementById('bgEditorClose');
+            const editorCancel = document.getElementById('bgEditorCancel');
+            const editorReset = document.getElementById('bgEditorReset');
+            const editorSave = document.getElementById('bgEditorSave');
+
+            const scaleSlider = document.getElementById('editorScale');
+            const xSlider = document.getElementById('editorX');
+            const ySlider = document.getElementById('editorY');
+            const scaleValue = document.getElementById('editorScaleValue');
+            const xValue = document.getElementById('editorXValue');
+            const yValue = document.getElementById('editorYValue');
+
+            // Working copy while the editor is open — doesn't touch page until Save
+            let editor = { scale: state.scale, x: state.x, y: state.y };
+
+            function renderEditorPreview() {
+                preview.style.setProperty('--preview-scale', editor.scale);
+                preview.style.setProperty('--preview-x', editor.x + '%');
+                preview.style.setProperty('--preview-y', editor.y + '%');
+                preview.style.backgroundImage = `url('${state.bg}')`;
+
+                scaleSlider.value = String(Math.round(editor.scale * 100));
+                xSlider.value = String(Math.round(editor.x));
+                ySlider.value = String(Math.round(editor.y));
+                scaleValue.textContent = Math.round(editor.scale * 100) + '%';
+                xValue.textContent = Math.round(editor.x) + '%';
+                yValue.textContent = Math.round(editor.y) + '%';
+            }
+
+            function openEditor() {
+                editor = { scale: state.scale, x: state.x, y: state.y };
+                renderEditorPreview();
+                overlay.classList.add('open');
+            }
+
+            function closeEditor() {
+                overlay.classList.remove('open');
+            }
+
+            bgAdjust.addEventListener('click', openEditor);
+            editorClose.addEventListener('click', closeEditor);
+            editorCancel.addEventListener('click', closeEditor);
+
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) closeEditor();
+            });
+
+            editorReset.addEventListener('click', () => {
+                editor = { scale: DEFAULT_SCALE, x: DEFAULT_X, y: DEFAULT_Y };
+                renderEditorPreview();
+            });
+
+            editorSave.addEventListener('click', () => {
+                state.scale = editor.scale;
+                state.x = editor.x;
+                state.y = editor.y;
+                localStorage.setItem('bgScale', state.scale);
+                localStorage.setItem('bgX', state.x);
+                localStorage.setItem('bgY', state.y);
+                applyBackground(state.bg, state.scale, state.x, state.y);
+                closeEditor();
+            });
+
+            /* ---------- SLIDERS ---------- */
+            scaleSlider.addEventListener('input', (e) => {
+                editor.scale = Number(e.target.value) / 100;
+                renderEditorPreview();
+            });
+            xSlider.addEventListener('input', (e) => {
+                editor.x = Number(e.target.value);
+                renderEditorPreview();
+            });
+            ySlider.addEventListener('input', (e) => {
+                editor.y = Number(e.target.value);
+                renderEditorPreview();
+            });
+
+            /* ---------- DRAG TO MOVE ---------- */
+            let dragging = false;
+            let dragStart = null;
+
+            preview.addEventListener('pointerdown', (e) => {
+                dragging = true;
+                dragStart = {
+                    mouseX: e.clientX,
+                    mouseY: e.clientY,
+                    x: editor.x,
+                    y: editor.y
+                };
+                preview.classList.add('dragging');
+                preview.setPointerCapture(e.pointerId);
+            });
+
+            preview.addEventListener('pointermove', (e) => {
+                if (!dragging) return;
+                const rect = preview.getBoundingClientRect();
+                const dx = e.clientX - dragStart.mouseX;
+                const dy = e.clientY - dragStart.mouseY;
+
+                // Convert pixel movement to percentage of the preview box,
+                // negative because moving the mouse right should move the image left
+                const pctX = (dx / rect.width) * 100;
+                const pctY = (dy / rect.height) * 100;
+
+                editor.x = Math.max(0, Math.min(100, dragStart.x - pctX));
+                editor.y = Math.max(0, Math.min(100, dragStart.y - pctY));
+                renderEditorPreview();
+            });
+
+            preview.addEventListener('pointerup', (e) => {
+                dragging = false;
+                preview.classList.remove('dragging');
+                try { preview.releasePointerCapture(e.pointerId); } catch (err) {}
+            });
+            preview.addEventListener('pointercancel', () => {
+                dragging = false;
+                preview.classList.remove('dragging');
+            });
+
+            /* ---------- SCROLL TO ZOOM ---------- */
+            preview.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const step = e.deltaY > 0 ? -0.05 : 0.05;
+                editor.scale = Math.max(0.5, Math.min(3, editor.scale + step));
+                renderEditorPreview();
+            }, { passive: false });
+
+            /* ---------- KEYBOARD ---------- */
+            document.addEventListener('keydown', (e) => {
+                if (!overlay.classList.contains('open')) return;
+                if (e.key === 'Escape') closeEditor();
+                if (e.key === 'Enter') editorSave.click();
+            });
+
+            /* ---------- PROXY TYPE ---------- */
             const proxyTypeSelect = document.getElementById('type');
             if (!localStorage.getItem('proxy')) localStorage.setItem('proxy', 'ultraviolet');
             proxyTypeSelect.value = localStorage.getItem('proxy');
             proxyTypeSelect.addEventListener('change', (event) => localStorage.setItem('proxy', event.target.value));
 
+            /* ---------- SEARCH ENGINE ---------- */
             const searchEngineSelect = document.getElementById('search-engine');
             if (!localStorage.getItem('search')) localStorage.setItem('search', 'https://duckduckgo.com/?q=');
             searchEngineSelect.value = localStorage.getItem('search');
             searchEngineSelect.addEventListener('change', (event) => localStorage.setItem('search', event.target.value));
 
+            /* ---------- TRANSPORT ---------- */
             const transportTypeSelect = document.getElementById('transport-type');
             if (!localStorage.getItem('transport')) localStorage.setItem('transport', 'libcurl');
             transportTypeSelect.value = localStorage.getItem('transport');
             transportTypeSelect.addEventListener('change', (event) => localStorage.setItem('transport', event.target.value));
 
+            /* ---------- WISP SERVER ---------- */
             const wispServerTypeSelect = document.getElementById('wisp-server-type');
             const customWispServerContainer = document.getElementById('custom-wisp-server-container');
             const customWispServerInput = document.getElementById('custom-wisp-server-input');

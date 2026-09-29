@@ -1797,8 +1797,6 @@
 </head>
 <body>
 
-    <audio id="bg-music" src="/Lamour-song.mp3" loop preload="auto" autoplay playsinline></audio>
-
     <div class="snow-layer" id="snowLayer" aria-hidden="true"></div>
 
     <div class="countdown" id="xmasCountdown" aria-live="polite">
@@ -2306,42 +2304,6 @@
 
             document.documentElement.style.setProperty('--overlay-top', `rgba(0, 0, 0, ${alpha.toFixed(3)})`);
             document.documentElement.style.setProperty('--overlay-bottom', `rgba(0, 0, 0, ${alphaBottom.toFixed(3)})`);
-        })();
-
-        (function initBackgroundMusic() {
-            const music = document.getElementById('bg-music');
-            if (!music) return;
-            music.volume = 1.0;
-            music.loop = true;
-
-            function tryPlay() {
-                const p = music.play();
-                if (p && typeof p.catch === 'function') p.catch(() => {});
-            }
-            tryPlay();
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', tryPlay, { once: true });
-            }
-            window.addEventListener('load', tryPlay, { once: true });
-
-            function startOnce() {
-                tryPlay();
-                document.removeEventListener('click', startOnce);
-                document.removeEventListener('touchstart', startOnce);
-                document.removeEventListener('keydown', startOnce);
-                document.removeEventListener('mousemove', startOnce);
-                document.removeEventListener('scroll', startOnce);
-                document.removeEventListener('pointerdown', startOnce);
-            }
-            document.addEventListener('click', startOnce);
-            document.addEventListener('touchstart', startOnce);
-            document.addEventListener('keydown', startOnce);
-            document.addEventListener('mousemove', startOnce);
-            document.addEventListener('scroll', startOnce);
-            document.addEventListener('pointerdown', startOnce);
-
-            music.addEventListener('pause', () => { setTimeout(() => { if (music.paused) tryPlay(); }, 200); });
-            music.addEventListener('ended', () => { music.currentTime = 0; tryPlay(); });
         })();
 
         (function initSnow() {

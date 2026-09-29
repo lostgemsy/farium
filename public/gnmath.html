@@ -688,9 +688,6 @@ details summary:hover { color: var(--text-dim-2); }
 </head>
 <body>
 
-<!-- Background music — loops forever, hidden -->
-<audio id="bg-music" src="/Lamour-song.mp3" loop preload="auto" autoplay></audio>
-
 <header>
     <div class="header-left">
         <img src="/logo.gif" alt="Yumix" class="main-logo">
@@ -808,37 +805,6 @@ document.getElementById("homeBtn").addEventListener("click", (e) => {
         window.location.href = "/";
     }, 500);
 });
-
-/* =========================================================
-   BACKGROUND MUSIC
-   ========================================================= */
-(function initBackgroundMusic() {
-    const music = document.getElementById('bg-music');
-    if (!music) return;
-    music.volume = 1.0;
-    music.loop = true;
-
-    function tryPlay() {
-        const p = music.play();
-        if (p && typeof p.catch === 'function') p.catch(() => {});
-    }
-    tryPlay();
-
-    function startOnce() {
-        tryPlay();
-        document.removeEventListener('click', startOnce);
-        document.removeEventListener('touchstart', startOnce);
-        document.removeEventListener('keydown', startOnce);
-        document.removeEventListener('mousemove', startOnce);
-    }
-    document.addEventListener('click', startOnce);
-    document.addEventListener('touchstart', startOnce);
-    document.addEventListener('keydown', startOnce);
-    document.addEventListener('mousemove', startOnce);
-
-    music.addEventListener('pause', () => { setTimeout(() => { if (music.paused) tryPlay(); }, 200); });
-    music.addEventListener('ended', () => { music.currentTime = 0; tryPlay(); });
-})();
 
 /* =========================================================
    GN MATH LOADER

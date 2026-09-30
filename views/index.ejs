@@ -1,3648 +1,3321 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Farium</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/chat.css">
-
-<style>
-:root{
-  --bg:#07080a;
-  --bg2:#0a0b0e;
-  --panel:#0e1014;
-  --panel2:#13161b;
-  --panel3:#191d23;
-
-  --white:#f5f6f8;
-  --silver:#c8ccd3;
-  --muted:#858b95;
-  --dim:#5e646e;
-
-  --line:rgba(255,255,255,.075);
-  --line2:rgba(255,255,255,.14);
-  --hover:rgba(255,255,255,.065);
-  --glow:rgba(255,255,255,.10);
-
-  --ease:cubic-bezier(.2,.9,.3,1);
-  --spring:cubic-bezier(.22,1.55,.55,1);
-}
-
-*{
-  box-sizing:border-box;
-}
-
-html,
-body{
-  width:100%;
-  height:100%;
-  margin:0;
-  overflow:hidden;
-  background:var(--bg);
-  color:var(--white);
-  font-family:Inter,sans-serif;
-}
-
-button,
-input{
-  font:inherit;
-}
-
-button{
-  cursor:pointer;
-}
-
-svg{
-  display:block;
-}
-
-
-/* =========================================================
-   BACKGROUND
-========================================================= */
-
-#bg{
-  position:fixed;
-  inset:0;
-  z-index:0;
-  overflow:hidden;
-  background:
-      radial-gradient(
-        circle at 15% 10%,
-        rgba(255,255,255,.06),
-        transparent 30%
-      ),
-      radial-gradient(
-        circle at 85% 90%,
-        rgba(255,255,255,.04),
-        transparent 35%
-      ),
-      radial-gradient(
-        ellipse at 50% 0%,
-        rgba(255,255,255,.015),
-        transparent 50%
-      ),
-      linear-gradient(
-        135deg,
-        #060709,
-        #0a0b0e 50%,
-        #060709
-      );
-}
-
-#shader{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  opacity:.55;
-}
-
-#lines{
-  position:absolute;
-  inset:0;
-  opacity:.5;
-}
-
-.noise{
-  position:absolute;
-  inset:0;
-  opacity:.025;
-  pointer-events:none;
-
-  background-image:url(
-    "data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"
-  );
-}
-
-.glow{
-  position:absolute;
-  width:650px;
-  height:650px;
-  border-radius:50%;
-
-  background:
-    radial-gradient(
-      circle,
-      rgba(255,255,255,.10),
-      transparent 68%
-    );
-
-  filter:blur(70px);
-
-  left:-230px;
-  top:-250px;
-
-  transition:transform .8s var(--ease);
-}
-
-.glow.b{
-  left:auto;
-  top:auto;
-  right:-240px;
-  bottom:-260px;
-
-  background:
-    radial-gradient(
-      circle,
-      rgba(255,255,255,.05),
-      transparent 68%
-    );
-}
-
-.vignette{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  background:
-    radial-gradient(
-      ellipse at center,
-      transparent 50%,
-      rgba(0,0,0,.55) 100%
-    );
-}
-
-
-/* =========================================================
-   INTRO
-========================================================= */
-
-#intro{
-  position:fixed;
-  inset:0;
-  z-index:1000;
-
-  display:grid;
-  place-items:center;
-
-  background:
-    radial-gradient(
-      circle at center,
-      #101216,
-      #050608 70%
-    );
-
-  transition:
-    opacity .8s ease,
-    visibility .8s ease;
-}
-
-.introbox{
-  text-align:center;
-}
-
-.intrologo{
-  font:
-    700 62px
-    "Space Grotesk";
-
-  letter-spacing:11px;
-
-  color:#f7f8fa;
-
-  text-shadow:
-    0 0 25px rgba(255,255,255,.08),
-    0 0 70px rgba(255,255,255,.05);
-
-  animation:
-    introLogo 1s var(--spring) both;
-}
-
-.intrologo span{
-  color:#fff;
-}
-
-.introline{
-  width:270px;
-  height:2px;
-
-  margin:22px auto 0;
-
-  overflow:hidden;
-
-  border-radius:10px;
-
-  background:#191c21;
-}
-
-.introline i{
-  display:block;
-
-  width:0;
-  height:100%;
-
-  background:
-    linear-gradient(
-      90deg,
-      #555b65,
-      #fff
-    );
-
-  box-shadow:
-    0 0 20px rgba(255,255,255,.3);
-
-  animation:
-    loading 1.8s var(--ease) forwards;
-}
-
-.introcap{
-  margin-top:14px;
-
-  color:#656b75;
-
-  font-size:10px;
-  letter-spacing:2px;
-
-  text-transform:uppercase;
-}
-
-@keyframes loading{
-  to{
-    width:100%;
-  }
-}
-
-@keyframes introLogo{
-  from{
-    opacity:0;
-    transform:
-      translateY(45px)
-      scale(.8);
-
-    filter:blur(12px);
-  }
-
-  to{
-    opacity:1;
-    transform:none;
-    filter:none;
-  }
-}
-
-
-/* =========================================================
-   HOME
-========================================================= */
-
-.home{
-  position:relative;
-  z-index:2;
-
-  width:100%;
-  height:100%;
-
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
-
-.top{
-  width:100%;
-
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-
-  padding:20px 28px;
-}
-
-.brand{
-  font:
-    600 13px
-    "Space Grotesk";
-
-  color:#c9cdd3;
-
-  letter-spacing:1px;
-}
-
-.nav{
-  position:relative;
-  display:flex;
-  gap:4px;
-
-  padding:4px;
-
-  border:
-    1px solid var(--line);
-
-  border-radius:25px;
-
-  background:
-    rgba(12,14,17,.78);
-
-  backdrop-filter:blur(20px);
-
-  box-shadow:
-    0 15px 45px rgba(0,0,0,.35);
-}
-
-.nav-indicator{
-  position:absolute;
-  top:4px;
-  bottom:4px;
-  border-radius:18px;
-  background:#f1f2f4;
-  box-shadow:0 0 20px rgba(255,255,255,.15),0 8px 25px rgba(255,255,255,.09);
-  pointer-events:none;
-  transition:left .35s cubic-bezier(.22,.9,.35,1),width .35s cubic-bezier(.22,.9,.35,1);
-  z-index:0;
-}
-
-.nav button{
-  position:relative;
-  border:0;
-  z-index:1;
-
-  padding:8px 15px;
-
-  border-radius:18px;
-
-  background:transparent;
-
-  color:var(--muted);
-
-  font-size:12px;
-
-  transition:
-    .25s var(--spring);
-}
-
-.nav button:hover{
-  color:#fff;
-  background:var(--hover);
-
-  transform:
-    translateY(-2px);
-}
-
-.nav button.active{
-  color:#08090b;
-
-  background:transparent;
-
-  box-shadow:none;
-}
-
-
-/* =========================================================
-   HERO
-========================================================= */
-
-.hero{
-  width:min(760px,92%);
-
-  margin-top:8vh;
-
-  text-align:center;
-}
-
-.hero h1{
-  margin:0 0 32px;
-
-  font:
-    700 clamp(42px,7vw,78px)
-    "Space Grotesk";
-
-  letter-spacing:10px;
-
-  color:#f2f3f5;
-
-  text-shadow:
-    0 0 45px rgba(255,255,255,.08);
-
-  user-select:none;
-}
-
-.hero h1 span{
-  color:#fff;
-}
-
-
-/* =========================================================
-   SEARCH
-========================================================= */
-
-.search{
-  width:100%;
-
-  display:flex;
-  align-items:center;
-
-  gap:11px;
-
-  padding:15px 17px;
-
-  border:
-    1px solid var(--line2);
-
-  border-radius:16px;
-
-  background:
-    rgba(13,15,18,.9);
-
-  backdrop-filter:blur(25px);
-
-  box-shadow:
-    0 30px 80px rgba(0,0,0,.5),
-    inset 0 1px rgba(255,255,255,.025);
-
-  transition:
-    .35s var(--ease);
-}
-
-.search:hover{
-  border-color:
-    rgba(255,255,255,.19);
-}
-
-.search:focus-within{
-  border-color:
-    rgba(255,255,255,.3);
-
-  box-shadow:
-    0 0 0 5px rgba(255,255,255,.035),
-    0 25px 80px rgba(0,0,0,.6);
-}
-
-.search svg{
-  width:17px;
-  color:#777e88;
-}
-
-.search input{
-  flex:1;
-
-  min-width:0;
-
-  border:0;
-  outline:0;
-
-  background:transparent;
-
-  color:#f2f3f5;
-
-  font-size:14px;
-}
-
-.search input::placeholder{
-  color:#606670;
-}
-
-.engine{
-  padding:6px 9px;
-
-  border:
-    1px solid var(--line2);
-
-  border-radius:7px;
-
-  color:#aeb3bb;
-
-  background:
-    rgba(255,255,255,.025);
-
-  font-size:9px;
-  font-weight:700;
-
-  letter-spacing:.8px;
-}
-
-
-/* =========================================================
-   SHORTCUTS
-========================================================= */
-
-.short-title{
-  margin:
-    28px 0 11px;
-
-  text-align:left;
-
-  color:#626872;
-
-  font-size:10px;
-
-  letter-spacing:1.5px;
-
-  text-transform:uppercase;
-}
-
-.shortcuts{
-  display:flex;
-
-  justify-content:center;
-
-  flex-wrap:wrap;
-
-  gap:12px;
-}
-
-.shortcut{
-  width:82px;
-}
-
-.shortcut .ico{
-  height:54px;
-
-  display:grid;
-  place-items:center;
-
-  border:
-    1px solid var(--line);
-
-  border-radius:15px;
-
-  background:
-    rgba(13,15,18,.82);
-
-  color:#d9dce1;
-
-  font-size:18px;
-
-  box-shadow:
-    inset 0 1px rgba(255,255,255,.02);
-
-  transition:
-    .3s var(--spring);
-}
-
-.shortcut:hover .ico{
-  transform:
-    translateY(-7px)
-    rotate(-3deg)
-    scale(1.03);
-
-  border-color:
-    rgba(255,255,255,.17);
-
-  background:#181b20;
-
-  box-shadow:
-    0 20px 40px rgba(0,0,0,.45),
-    0 0 25px rgba(255,255,255,.025);
-}
-
-.shortcut small{
-  display:block;
-
-  margin-top:7px;
-
-  overflow:hidden;
-
-  text-overflow:ellipsis;
-
-  white-space:nowrap;
-
-  color:#777e88;
-
-  font-size:10px;
-}
-
-.footer{
-  position:absolute;
-
-  bottom:30px;
-
-  color:#4e545e;
-
-  font-size:11px;
-}
-
-
-/* =========================================================
-   FALLING ANIMATION
-========================================================= */
-
-.fall{
-  opacity:0;
-
-  animation:
-    fall .85s var(--spring) forwards;
-}
-
-.fall:nth-child(1){
-  animation-delay:.08s;
-}
-
-.fall:nth-child(2){
-  animation-delay:.15s;
-}
-
-.fall:nth-child(3){
-  animation-delay:.22s;
-}
-
-.fall:nth-child(4){
-  animation-delay:.29s;
-}
-
-.fall:nth-child(5){
-  animation-delay:.36s;
-}
-
-.fall:nth-child(6){
-  animation-delay:.43s;
-}
-
-@keyframes fall{
-  0%{
-    opacity:0;
-
-    transform:
-      translateY(-140px)
-      rotate(-9deg)
-      scale(.75);
-  }
-
-  60%{
-    opacity:1;
-
-    transform:
-      translateY(13px)
-      rotate(2deg)
-      scale(1.05);
-  }
-
-  80%{
-    transform:
-      translateY(-6px)
-      rotate(-1deg);
-  }
-
-  100%{
-    opacity:1;
-    transform:none;
-  }
-}
-
-
-/* =========================================================
-   SETTINGS
-========================================================= */
-
-.settings{
-  position:fixed;
-  inset:0;
-
-  z-index:500;
-
-  display:none;
-
-  align-items:center;
-  justify-content:center;
-
-  background:
-    rgba(0,0,0,.72);
-
-  backdrop-filter:blur(13px);
-}
-
-.settings.open{
-  display:flex;
-}
-
-.card{
-  width:min(460px,92%);
-  max-height:85vh;
-
-  overflow:auto;
-
-  padding:23px;
-
-  border:
-    1px solid var(--line2);
-
-  border-radius:21px;
-
-  background:
-    linear-gradient(
-      180deg,
-      #15181d,
-      #0b0d10
-    );
-
-  box-shadow:
-    0 40px 120px rgba(0,0,0,.75);
-
-  animation:
-    settingsPop .45s var(--spring);
-}
-
-@keyframes settingsPop{
-  from{
-    opacity:0;
-
-    transform:
-      translateY(35px)
-      scale(.9);
-  }
-
-  to{
-    opacity:1;
-    transform:none;
-  }
-}
-
-.head{
-  display:flex;
-
-  justify-content:space-between;
-  align-items:center;
-}
-
-.head h2{
-  margin:0;
-
-  font:
-    600 17px
-    "Space Grotesk";
-}
-
-.x{
-  width:32px;
-  height:32px;
-
-  border:
-    1px solid var(--line);
-
-  border-radius:9px;
-
-  background:transparent;
-
-  color:#7c838d;
-
-  transition:.2s;
-}
-
-.x:hover{
-  background:#1a1d22;
-  color:#fff;
-}
-
-.section{
-  margin-top:22px;
-}
-
-.section h3{
-  margin:0 0 9px;
-
-  color:#676e78;
-
-  font-size:10px;
-
-  letter-spacing:1px;
-
-  text-transform:uppercase;
-}
-
-.seg{
-  display:grid;
-
-  grid-template-columns:repeat(2,1fr);
-
-  gap:5px;
-
-  padding:4px;
-
-  border:
-    1px solid var(--line);
-
-  border-radius:12px;
-
-  background:#080a0d;
-}
-
-.seg button{
-  border:0;
-
-  padding:10px 5px;
-
-  border-radius:9px;
-
-  background:transparent;
-
-  color:#7c838d;
-
-  font-size:11px;
-
-  transition:.2s var(--spring);
-}
-
-.seg button:hover{
-  background:#171a1f;
-  color:#fff;
-}
-
-.seg button.active{
-  color:#08090b;
-
-  background:#f0f1f3;
-
-  box-shadow:
-    0 7px 20px rgba(255,255,255,.09);
-}
-
-.row{
-  display:flex;
-
-  justify-content:space-between;
-  align-items:center;
-
-  padding:14px 2px;
-
-  border-top:
-    1px solid var(--line);
-}
-
-.row:first-of-type{
-  border-top:0;
-}
-
-.row b{
-  font-size:12px;
-}
-
-.row span{
-  display:block;
-
-  margin-top:3px;
-
-  color:#626973;
-
-  font-size:10px;
-}
-
-.switch{
-  width:42px;
-  height:24px;
-
-  padding:2px;
-
-  border:
-    1px solid var(--line);
-
-  border-radius:20px;
-
-  background:#171a1f;
-}
-
-.switch i{
-  display:block;
-
-  width:18px;
-  height:18px;
-
-  border-radius:50%;
-
-  background:#626974;
-
-  transition:
-    .3s var(--spring);
-}
-
-.switch.on{
-  background:
-    rgba(255,255,255,.11);
-
-  border-color:
-    rgba(255,255,255,.18);
-}
-
-.switch.on i{
-  transform:translateX(17px);
-
-  background:#f4f5f7;
-
-  box-shadow:
-    0 0 14px rgba(255,255,255,.35);
-}
-
-
-/* =========================================================
-   BROWSER
-========================================================= */
-
-.browser{
-  position:fixed;
-  inset:0;
-
-  z-index:20;
-
-  display:none;
-
-  flex-direction:column;
-
-  background:#08090b;
-
-  animation:
-    browserIn .5s var(--ease);
-}
-
-.browser.show{
-  display:flex;
-}
-
-@keyframes browserIn{
-  from{
-    opacity:0;
-    transform:scale(.975);
-  }
-
-  to{
-    opacity:1;
-    transform:none;
-  }
-}
-
-.chrome,
-.tabs,
-.bar{
-  border-bottom:
-    1px solid var(--line);
-
-  background:#0d0f12;
-}
-
-.chrome{
-  height:47px;
-
-  display:flex;
-  align-items:center;
-
-  gap:12px;
-
-  padding:0 15px;
-}
-
-.traffic{
-  display:flex;
-  gap:8px;
-}
-
-.traffic i{
-  width:11px;
-  height:11px;
-
-  border-radius:50%;
-
-  background:#393d44;
-}
-
-.traffic i:first-child{
-  background:#684646;
-}
-
-.traffic i:nth-child(2){
-  background:#625d45;
-}
-
-.traffic i:last-child{
-  background:#45554c;
-}
-
-.bbrand{
-  color:#858b95;
-
-  font:
-    600 12px
-    "Space Grotesk";
-}
-
-.spacer{
-  flex:1;
-}
-
-.bar{
-  display:flex;
-
-  align-items:center;
-
-  gap:7px;
-
-  padding:9px 13px;
-
-  background:#111419;
-}
-
-.ib{
-  width:31px;
-  height:31px;
-
-  border:1px solid transparent;
-
-  border-radius:9px;
-
-  background:transparent;
-
-  color:#7b828d;
-
-  font-size:17px;
-
-  transition:.2s var(--spring);
-}
-
-.ib:hover{
-  color:#fff;
-
-  background:#1a1d23;
-
-  transform:
-    translateY(-2px);
-}
-
-.address{
-  flex:1;
-
-  min-width:0;
-
-  display:flex;
-  align-items:center;
-
-  gap:8px;
-
-  padding:8px 11px;
-
-  border:
-    1px solid var(--line);
-
-  border-radius:10px;
-
-  background:#080a0d;
-}
-
-.address span{
-  color:#6d747e;
-}
-
-.address input{
-  flex:1;
-
-  min-width:0;
-
-  border:0;
-  outline:0;
-
-  background:transparent;
-
-  color:#e9ebee;
-
-  font-size:12px;
-}
-
-.go{
-  height:34px;
-
-  padding:0 15px;
-
-  border:0;
-
-  border-radius:9px;
-
-  background:#f0f1f3;
-
-  color:#08090b;
-
-  font-weight:700;
-
-  transition:
-    .2s var(--spring);
-}
-
-.go:hover{
-  transform:translateY(-2px);
-
-  box-shadow:
-    0 10px 25px rgba(255,255,255,.10);
-}
-
-
-/* =========================================================
-   TABS
-========================================================= */
-
-.tabs{
-  display:flex;
-
-  gap:4px;
-
-  padding:7px 10px 0;
-
-  overflow:auto;
-}
-
-.tab{
-  min-width:140px;
-  max-width:210px;
-
-  display:flex;
-  align-items:center;
-
-  gap:8px;
-
-  padding:9px 11px;
-
-  border:
-    1px solid transparent;
-
-  border-bottom:0;
-
-  border-radius:9px 9px 0 0;
-
-  background:transparent;
-
-  color:#68707a;
-
-  font-size:11px;
-
-  transition:.2s;
-}
-
-.tab:hover{
-  background:#111419;
-  color:#aeb3ba;
-}
-
-.tab.active{
-  color:#eef0f3;
-
-  background:#15181d;
-
-  border-color:var(--line);
-}
-
-.tab button{
-  margin-left:auto;
-
-  border:0;
-
-  background:transparent;
-
-  color:#646b75;
-
-  font-size:14px;
-}
-
-.tab button:hover{
-  color:#fff;
-}
-
-
-/* =========================================================
-   WEB VIEW
-========================================================= */
-
-.view{
-  position:relative;
-
-  flex:1;
-
-  overflow:hidden;
-
-  background:#fff;
-}
-
-.view iframe{
-  width:100%;
-  height:100%;
-
-  border:0;
-
-  background:#fff;
-}
-
-.browserHome{
-  position:absolute;
-  inset:0;
-
-  display:grid;
-  place-items:center;
-
-  background:
-    radial-gradient(
-      circle at center,
-      #111419,
-      #07080a 65%
-    );
-}
-
-.browserHome h2{
-  color:#747b85;
-
-  font:
-    600 22px
-    "Space Grotesk";
-
-  letter-spacing:5px;
-}
-
-.status{
-  position:absolute;
-
-  top:11px;
-  left:50%;
-
-  z-index:10;
-
-  display:none;
-
-  padding:7px 12px;
-
-  border:
-    1px solid var(--line);
-
-  border-radius:9px;
-
-  background:#101318;
-
-  color:#777e88;
-
-  font-size:10px;
-
-  box-shadow:
-    0 15px 35px rgba(0,0,0,.4);
-}
-
-.status.show{
-  display:block;
-}
-
-.status b{
-  color:#e9ebee;
-}
-
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media(max-width:600px){
-
-  .top{
-    padding:16px;
-  }
-
-  .hero{
-    margin-top:11vh;
-  }
-
-  .hero h1{
-    letter-spacing:6px;
-  }
-
-  .shortcut{
-    width:70px;
-  }
-
-  .shortcut .ico{
-    height:48px;
-  }
-
-  .traffic,
-  .bbrand{
-    display:none;
-  }
-
-  .bar{
-    padding:7px;
-  }
-
-  .go{
-    padding:0 11px;
-  }
-}
-
-
-/* =========================================================
-   REDUCED MOTION
-========================================================= */
-
-body.reduced-motion *,
-body.reduced-motion *::before,
-body.reduced-motion *::after{
-  animation-duration:.001ms !important;
-  animation-iteration-count:1 !important;
-  transition-duration:.001ms !important;
-  scroll-behavior:auto !important;
-}
-
-/* =========================================================
-   PAGE SLIDE
-========================================================= */
-
-.page-slide{
-  position:fixed;
-  inset:0;
-  z-index:30000;
-  background:var(--bg);
-  transform:translateX(100%);
-  transition:transform .45s cubic-bezier(.65,0,.35,1);
-  pointer-events:none;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  will-change:transform;
-}
-</style>
-</head>
-
-<body>
-
-<!-- BACKGROUND -->
-<div id="bg">
-  <canvas id="shader"></canvas>
-  <canvas id="lines"></canvas>
-
-  <div class="glow" id="g1"></div>
-  <div class="glow b" id="g2"></div>
-
-  <div class="vignette"></div>
-
-  <div class="noise"></div>
-</div>
-
-
-<!-- INTRO -->
-<div id="intro">
-  <div class="introbox">
-
-    <div class="intrologo">
-      FARI<span>UM</span>
-    </div>
-
-    <div class="introline">
-      <i></i>
-    </div>
-
-    <div class="introcap">
-      Initializing secure browser
-    </div>
-
-  </div>
-</div>
-
-
-<!-- HOME -->
-<section class="home" id="home">
-
-  <header class="top fall">
-
-    <div class="brand">
-      Farium
-    </div>
-
-    <nav class="nav" id="nav">
-
-      <div class="nav-indicator" id="navIndicator"></div>
-
-      <button
-        id="searchNav"
-        class="active">
-        Search
-      </button>
-
-      <button
-        id="settingsNav">
-        Settings
-      </button>
-
-      <button
-        id="chatOpen">
-        Chat
-      </button>
-
-      <button
-        id="gamesNav">
-        Games
-      </button>
-
-    </nav>
-
-  </header>
-
-
-  <main class="hero">
-
-    <h1 class="fall">
-      FARI<span>UM</span>
-    </h1>
-
-
-    <div class="search fall">
-
-      <span id="searchIcon"></span>
-
-      <input
-        id="homeInput"
-        autocomplete="off"
-        placeholder="Enter a URL or search">
-
-      <span
-        class="engine"
-        id="homeEngine">
-        GOOGLE
-      </span>
-
-    </div>
-
-
-    <div class="short-title fall">
-      Shortcuts
-    </div>
-
-
-    <div
-      class="shortcuts"
-      id="shortcuts">
-    </div>
-
-  </main>
-
-
-  <div class="footer fall">
-    Built for the web · Farium
-  </div>
-
-</section>
-
-
-<!-- SETTINGS -->
-<div
-  class="settings"
-  id="settings">
-
-  <div class="card">
-
-    <div class="head">
-
-      <h2>
-        Farium Settings
-      </h2>
-
-      <button
-        class="x"
-        id="closeSettings">
-        ×
-      </button>
-
-    </div>
-
-
-    <!-- PROXY ENGINE -->
-    <div class="section">
-
-      <h3>
-        Browser engine
-      </h3>
-
-      <div
-        class="seg"
-        id="engines">
-
-        <button
-          data-e="scramjet"
-          class="active">
-          Scramjet
-        </button>
-
-        <button
-          data-e="uv">
-          Ultraviolet
-        </button>
-
-      </div>
-
-    </div>
-
-
-    <!-- SEARCH ENGINE -->
-    <div class="section">
-
-      <h3>
-        Search engine
-      </h3>
-
-      <div
-        class="seg"
-        id="searchEngines">
-
-        <button
-          data-s="google"
-          class="active">
-          Google
-        </button>
-
-        <button
-          data-s="duck">
-          DuckDuckGo
-        </button>
-
-        <button
-          data-s="brave">
-          Brave
-        </button>
-
-      </div>
-
-    </div>
-
-
-    <!-- EFFECTS -->
-    <div class="section">
-
-      <h3>
-        Effects
-      </h3>
-
-
-      <div class="row">
-
-        <div>
-          <b>Motion</b>
-          <span>
-            Animations and cursor response
-          </span>
-        </div>
-
-        <div
-          class="switch on"
-          data-toggle="motion">
-
-          <i></i>
-
-        </div>
-
-      </div>
-
-
-      <div class="row">
-
-        <div>
-          <b>Reactive shaders</b>
-
-          <span>
-            Animated background effects
-          </span>
-        </div>
-
-        <div
-          class="switch on"
-          data-toggle="shader">
-
-          <i></i>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- ABOUT -->
-    <div class="section">
-
-      <h3>
-        About
-      </h3>
-
-      <div
-        style="
-          color:#707781;
-          font-size:11px;
-          line-height:1.7;
-        ">
-
-        Farium routes supported pages through
-        the selected proxy engine.
-
-        Scramjet is the primary engine while
-        Ultraviolet remains available as a
-        compatibility option.
-
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- CHAT -->
-<div class="chat-modal" id="chatModal">
-  <div class="chat-card">
-    <div class="chat-head"><h2>Farium Chat</h2><small id="chatUserName"></small><button class="x chat-close" id="chatClose">×</button></div>
-    <div class="chat-auth" id="chatAuth">
-      <h3 id="chatAuthTitle">Sign in to Farium Chat</h3>
-      <form id="chatAuthForm"><input id="chatUsername" autocomplete="username" placeholder="Username" required><input id="chatPassword" type="password" autocomplete="current-password" placeholder="Password" required><button id="chatAuthSubmit" type="submit">Sign in</button></form>
-      <button class="chat-switch" id="chatAuthSwitch" type="button">Need an account? Sign up</button>
-      <div class="chat-error" id="chatError"></div>
-    </div>
-    <div class="chat-body" id="chatApp" hidden>
-      <aside class="chat-side">
-        <h3>Find friends</h3><input id="chatSearch" placeholder="Search usernames"><div id="chatSearchResults"></div>
-        <h3>Requests</h3><div id="chatRequests"></div><h3>Friends</h3><div id="chatFriends"></div>
-        <form class="chat-profile" id="chatProfileForm"><h3>Profile</h3><input id="chatDisplayName" placeholder="Display name"><textarea id="chatBio" placeholder="Bio"></textarea><input id="chatAvatarPreview" type="hidden"><label class="chat-file">Profile picture <input id="chatAvatarFile" type="file" accept="image/*"></label><button class="chat-primary" type="submit">Save profile</button></form>
-        <button class="chat-switch" id="chatSignout" type="button">Sign out</button>
-        <div id="chatOwnerTools" hidden><h3>Owner moderation</h3><input id="chatModerateUser" placeholder="Username"><input id="chatModerateMinutes" type="number" min="1" placeholder="Mute minutes"><input id="chatModerateDays" type="number" min="1" placeholder="Ban days"><textarea id="chatModerateReason" placeholder="Ban reason"></textarea><div class="chat-tools"><button id="chatMute" type="button">Mute</button><button id="chatBanUser" type="button">Ban</button><button id="chatUnban" type="button">Unban</button></div></div>
-      </aside>
-      <main class="chat-main"><div class="chat-messages" id="chatMessages"></div><div class="chat-error" id="chatError"></div><form class="chat-compose" id="chatCompose"><input id="chatMessage" maxlength="1000" placeholder="Write a message..."><button type="submit">Send</button></form></main>
-    </div>
-  </div>
-</div>
-<div class="chat-ban" id="chatBan"><div><h1>ACCESS RESTRICTED</h1><p id="chatBanReason"></p><div class="chat-countdown" id="chatCountdown"></div><p>You cannot browse or use Farium until the timer ends.</p></div></div>
-
-
-<!-- BROWSER -->
-<div
-  class="browser"
-  id="browser">
-
-
-  <!-- TOP CHROME -->
-  <div class="chrome">
-
-    <div class="traffic">
-      <i></i>
-      <i></i>
-      <i></i>
-    </div>
-
-    <div class="bbrand">
-      Farium
-    </div>
-
-    <div class="spacer"></div>
-
-    <button
-      class="ib"
-      id="closeBrowser">
-      ×
-    </button>
-
-  </div>
-
-
-  <!-- TABS -->
-  <div
-    class="tabs"
-    id="tabs">
-  </div>
-
-
-  <!-- ADDRESS BAR -->
-  <div class="bar">
-
-    <button
-      class="ib"
-      id="back">
-      ‹
-    </button>
-
-    <button
-      class="ib"
-      id="forward">
-      ›
-    </button>
-
-    <button
-      class="ib"
-      id="reload">
-      ↻
-    </button>
-
-
-    <div class="address">
-
-      <span>
-        ⌕
-      </span>
-
-      <input
-        id="addressInput"
-        autocomplete="off"
-        placeholder="Search Farium or enter a URL">
-
-    </div>
-
-
-    <button
-      class="go"
-      id="go">
-      Go
-    </button>
-
-  </div>
-
-
-  <!-- PAGE -->
-  <div
-    class="view"
-    id="view">
-  </div>
-
-</div>
-
-
-<!-- =========================================================
-     ULTRAVIOLET & SCRAMJET
-     DO NOT REMOVE THESE
-========================================================= -->
-
-<script src="/scram/scramjet.js"></script>
-<script src="/controller/controller.api.js"></script>
-<script src="/epoxy/index.js"></script>
-<script src="/baremux/index.js"></script>
-<script src="/uv/uv.bundle.js"></script>
-<script src="/uv/uv.config.js"></script>
-
-
-<script>
-/* =========================================================
-   HELPERS
-========================================================= */
-
-const $ = selector =>
-  document.querySelector(selector);
-
-const $$ = selector =>
-  [...document.querySelectorAll(selector)];
-
-
-/* =========================================================
-   INTRO
-========================================================= */
-
-function dismissIntro(){
-
-  const intro = $('#intro');
-
-  if(!intro) return;
-
-  intro.style.opacity = '0';
-  intro.style.visibility = 'hidden';
-  intro.style.pointerEvents = 'none';
-}
-
-setTimeout(
-  dismissIntro,
-  3000
-);
-
-
-/* =========================================================
-   STATE
-========================================================= */
-
-const state = {
-
-  engine:
-    localStorage.fariumEngine || 'scramjet',
-
-  search:
-    localStorage.fariumSearch || 'google',
-
-  motion:true,
-
-  shader:true,
-
-  controller:null,
-
-  frame:null,
-
-  tabs:[],
-
-  active:null
-
-};
-
-
-/* =========================================================
-   SEARCH ENGINES
-========================================================= */
-
-const searches = {
-
-  google:
-    q =>
-      'https://www.google.com/search?q=' +
-      encodeURIComponent(q),
-
-  duck:
-    q =>
-      'https://duckduckgo.com/?q=' +
-      encodeURIComponent(q),
-
-  brave:
-    q =>
-      'https://search.brave.com/search?q=' +
-      encodeURIComponent(q)
-
-};
-
-
-const searchNames = {
-
-  google:'GOOGLE',
-
-  duck:'DUCKDUCKGO',
-
-  brave:'BRAVE'
-
-};
-
-
-/* =========================================================
-   SEARCH ICON
-========================================================= */
-
-function icon(name){
-
-  if(name === 'search'){
-
-    return `
-      <svg
-        viewBox="0 0 24 24"
-        fill="none">
-
-        <circle
-          cx="11"
-          cy="11"
-          r="6.5"
-          stroke="currentColor"
-          stroke-width="1.8"/>
-
-        <path
-          d="M20 20l-4-4"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"/>
-
-      </svg>
-    `;
-
-  }
-
-  return '◉';
-}
-
-
-$('#searchIcon').innerHTML =
-  icon('search');
-
-$('#homeEngine').textContent =
-  searchNames[state.search];
-
-
-/* =========================================================
-   SHORTCUTS
-========================================================= */
-
-const apps = [
-
-  ['Google','https://google.com'],
-
-  ['YouTube','https://youtube.com'],
-
-  ['Discord','https://discord.com'],
-
-  ['Spotify','https://spotify.com'],
-
-  ['Reddit','https://reddit.com'],
-
-  ['Add','']
-
-];
-
-
-function renderApps(){
-
-  const wrap = $('#shortcuts');
-
-  wrap.innerHTML = '';
-
-  apps.forEach((app,index)=>{
-
-    const element =
-      document.createElement('div');
-
-    element.className =
-      'shortcut fall';
-
-    element.style.animationDelay =
-      (.12 + index * .07) + 's';
-
-    element.innerHTML = `
-
-      <div class="ico">
-        ${app[0] === 'Add' ? '+' : '◉'}
-      </div>
-
-      <small>
-        ${app[0]}
-      </small>
-
-    `;
-
-    if(app[1]){
-
-      element.onclick = () =>
-        navigate(
-          app[1],
-          app[0]
-        );
-
-    }
-
-    wrap.appendChild(element);
-
-  });
-
-}
-
-renderApps();
-
-
-/* =========================================================
-   URL DETECTION
-========================================================= */
-
-function looksUrl(value){
-
-  return (
-    /^https?:\/\//i.test(value) ||
-
-    /^[\w-]+(\.[\w-]+)+(\/.*)?$/i.test(value)
-  );
-
-}
-
-
-function normalize(value){
-
-  if(/^https?:\/\//i.test(value)){
-
-    return value;
-
-  }
-
-  return 'https://' + value;
-
-}
-
-
-/* =========================================================
-   SCRAMJET
-========================================================= */
-
-/*
-  IMPORTANT:
-
-  This uses the Scramjet bootstrap/controller
-  instead of putting the raw website URL directly
-  into the iframe.
-
-  DO NOT replace this with:
-
-      iframe.src = url;
-
-  because that bypasses the proxy.
-*/
-
-async function initScramjet(){
-
-  if(state.controller){
-
-    return state.controller;
-
-  }
-
-  await loadScript(
-    '/bootstrap-init.js'
-  );
-
-  state.controller =
-    await window.initBootstrap();
-
-  await state.controller.wait();
-
-  return state.controller;
-
-}
-
-
-function loadScript(src){
-
-  return new Promise(
-    (resolve,reject)=>{
-
-      const script =
-        document.createElement('script');
-
-      script.src = src;
-
-      script.onload = resolve;
-
-      script.onerror = () =>
-        reject(
-          new Error(
-            'Could not load ' + src
-          )
-        );
-
-      document.head.appendChild(script);
-
-    }
-  );
-
-}
-
-
-/* =========================================================
-   TABS
-========================================================= */
-
-function tabNew(){
-
-  const id =
-    Math.random()
-      .toString(36)
-      .slice(2);
-
-  state.tabs.push({
-
-    id,
-
-    title:'New Tab',
-
-    url:''
-
-  });
-
-  state.active = id;
-
-  renderTabs();
-
-  showHomeView();
-
-}
-
-
-function renderTabs(){
-
-  const tabs =
-    $('#tabs');
-
-  tabs.innerHTML = '';
-
-
-  state.tabs.forEach(tab=>{
-
-    const element =
-      document.createElement('div');
-
-    element.className =
-      'tab ' +
-      (
-        tab.id === state.active
-          ? 'active'
-          : ''
-      );
-
-
-    element.innerHTML = `
-
-      <span>◉</span>
-
-      <span>
-        ${escapeHtml(tab.title)}
-      </span>
-
-      <button>
-        ×
-      </button>
-
-    `;
-
-
-    element.onclick = event => {
-
-      if(
-        event.target.tagName ===
-        'BUTTON'
-      ){
-
-        state.tabs =
-          state.tabs.filter(
-            item =>
-              item.id !== tab.id
-          );
-
-
-        if(!state.tabs.length){
-
-          tabNew();
-
-        }else{
-
-          state.active =
-            state.tabs[
-              Math.max(
-                0,
-                state.tabs.length - 1
-              )
-            ].id;
-
-          renderTabs();
-
-          loadTab(
-            state.tabs.find(
-              item =>
-                item.id === state.active
-            )
-          );
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farium · Browse Freely</title>
+
+    <!-- External proxy libraries (keep as is) -->
+    <script src="/scram/scramjet.js"></script>
+    <script src="/controller/controller.api.js"></script>
+    <script src="/epoxy/index.js"></script>
+    <script src="/baremux/index.js"></script>
+    <script src="/uv/uv.bundle.js"></script>
+    <script src="/uv/uv.config.js"></script>
+
+    <link rel="icon" type="image/gif" href="/logo.gif">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============ RESET & DESIGN TOKENS ============ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        return;
+        :root {
+            --bg: #000000;
+            --bg-2: #08080a;
+            --bg-3: #101014;
+            --text: #f8f8fc;
+            --text-dim: rgba(255, 255, 255, 0.5);
+            --text-dim-2: rgba(255, 255, 255, 0.78);
+            --card: rgba(255, 255, 255, 0.045);
+            --card-hover: rgba(255, 255, 255, 0.09);
+            --card-border: rgba(255, 255, 255, 0.09);
+            --card-border-hover: rgba(255, 255, 255, 0.28);
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --input-border: rgba(255, 255, 255, 0.12);
+            --input-border-focus: rgba(255, 255, 255, 0.45);
+            --shadow: rgba(0, 0, 0, 0.8);
+            --accent: #7c8cff;
+            --accent-2: #b47cff;
+            --accent-glow: rgba(124, 140, 255, 0.35);
+            --ring: rgba(124, 140, 255, 0.35);
 
-      }
+            --bg-scale: 1;
+            --bg-pos-x: 50%;
+            --bg-pos-y: 50%;
 
+            --overlay-top: rgba(0, 0, 0, 0.62);
+            --overlay-bottom: rgba(0, 0, 0, 0.82);
 
-      state.active = tab.id;
+            --radius-card: 20px;
+            --radius-btn: 14px;
+            --transition-smooth: cubic-bezier(0.22, 0.98, 0.36, 1);
+        }
 
-      renderTabs();
+        /* ============ GLOBAL & SCROLLBAR ============ */
+        html {
+            background: #000;
+            scroll-behavior: smooth;
+        }
 
-      loadTab(tab);
+        body {
+            margin: 0;
+            padding: 0;
+            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background-color: #000;
+            background-image: url('/assets/backgrounds/foggy-forest.png');
+            background-size: calc(100% * var(--bg-scale, 1)) auto;
+            background-position: var(--bg-pos-x, 50%) var(--bg-pos-y, 50%);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
 
-    };
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                linear-gradient(180deg, var(--overlay-top) 0%, var(--overlay-bottom) 100%),
+                radial-gradient(900px 600px at 50% 40%, rgba(124, 140, 255, 0.06), transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+            transition: background 0.2s ease;
+        }
 
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
 
-    tabs.appendChild(element);
+        /* ============ ANIMATIONS ============ */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideRight {
+            from { opacity: 0; transform: translateX(24px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes logoDrop {
+            0% { opacity: 0; transform: translateY(-40px) scale(0.82); }
+            70% { opacity: 1; transform: translateY(4px) scale(1.02); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes snowFall {
+            0% { transform: translate3d(0, -30px, 0); }
+            100% { transform: translate3d(var(--drift, 0px), 110vh, 0); }
+        }
+        @keyframes osWindowOpen {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px -4px var(--accent-glow); }
+            50% { box-shadow: 0 0 40px -2px var(--accent-glow); }
+        }
 
-  });
+        /* ============ SNOW LAYER ============ */
+        .snow-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+            contain: strict;
+        }
+        .snowflake {
+            position: absolute;
+            top: -30px;
+            width: var(--size, 10px);
+            height: var(--size, 10px);
+            background-image: url('/snowParticle.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: var(--opacity, 0.75);
+            will-change: transform;
+            animation: snowFall linear infinite;
+            animation-duration: var(--dur, 8s);
+            animation-delay: var(--delay, 0s);
+        }
 
+        /* ============ COUNTDOWN ============ */
+        .countdown {
+            position: fixed;
+            top: 18px;
+            left: 18px;
+            z-index: 110;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            padding: 12px 18px;
+            border-radius: var(--radius-btn);
+            background: rgba(12, 12, 16, 0.88);
+            border: 1px solid var(--card-border);
+            color: var(--text);
+            font-size: 12px;
+            font-weight: 600;
+            pointer-events: none;
+            user-select: none;
+            animation: fadeIn 0.5s ease;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 8px 28px -10px rgba(0, 0, 0, 0.9);
+        }
+        .countdown .label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1.6px;
+            color: var(--text-dim);
+            font-weight: 700;
+        }
+        .countdown .value {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .countdown .value .num {
+            font-size: 22px;
+            line-height: 1;
+            letter-spacing: -0.5px;
+        }
+        .countdown .value .unit {
+            font-size: 10px;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+        .countdown .sub {
+            font-size: 10px;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
 
-  const add =
-    document.createElement('button');
+        /* ============ SIDE DOCK ============ */
+        .side-dock {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            z-index: 100;
+            width: 148px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: center;
+            gap: 8px;
+            padding: 20px 14px;
+            background: rgba(10, 10, 14, 0.88);
+            border-left: 1px solid var(--card-border);
+            animation: slideRight 0.45s var(--transition-smooth) both;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .side-dock::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 18%;
+            bottom: 18%;
+            width: 2px;
+            background: linear-gradient(180deg, transparent, var(--accent), var(--accent-2), transparent);
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .dock-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            height: 48px;
+            padding: 0 16px;
+            border-radius: var(--radius-btn);
+            text-decoration: none;
+            color: var(--text-dim-2);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            background: transparent;
+            border: 1px solid transparent;
+            transition: all 0.25s var(--transition-smooth);
+            cursor: pointer;
+            will-change: transform;
+            font-family: inherit;
+        }
+        .dock-btn .label {
+            flex: 1;
+            text-align: left;
+        }
+        .dock-btn svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.9;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex-shrink: 0;
+            transition: stroke 0.2s ease, transform 0.25s ease;
+        }
+        .dock-btn:hover {
+            color: var(--text);
+            background: var(--card-hover);
+            border-color: var(--card-border-hover);
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 12px 28px -12px var(--shadow);
+        }
+        .dock-btn:hover svg {
+            stroke: var(--accent);
+            transform: scale(1.1);
+        }
+        .dock-btn:active {
+            transform: translateY(-1px) scale(1.01);
+        }
+        .dock-btn.active {
+            color: var(--text);
+            background: var(--card);
+            border-color: var(--card-border);
+        }
+        .dock-btn.games-btn {
+            background: linear-gradient(135deg, rgba(124, 140, 255, 0.18), rgba(180, 124, 255, 0.14));
+            border: 1px solid rgba(124, 140, 255, 0.35);
+            color: var(--text);
+        }
+        .dock-btn.games-btn svg {
+            stroke: var(--accent);
+        }
+        .dock-btn.games-btn:hover {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            border-color: transparent;
+            color: #fff;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 14px 32px -10px var(--accent-glow);
+        }
+        .dock-btn.games-btn:hover svg {
+            stroke: #fff;
+        }
+        .dock-sep {
+            height: 1px;
+            margin: 6px 8px;
+            background: linear-gradient(90deg, transparent, var(--card-border), transparent);
+        }
 
-  add.className = 'tab';
+        /* ============ MAIN CONTENT ============ */
+        .main-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            width: 100%;
+            max-width: 660px;
+            padding: 0 24px;
+            margin-right: 148px;
+        }
+        .logo-image-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            min-height: 130px;
+            animation: logoDrop 0.7s var(--transition-smooth) both;
+        }
+        .farius-logo {
+            display: block;
+            width: auto;
+            height: auto;
+            max-width: min(440px, 72vw);
+            max-height: 240px;
+            object-fit: contain;
+            transition: transform 0.35s var(--transition-smooth);
+            filter: drop-shadow(0 8px 32px rgba(124, 140, 255, 0.15));
+        }
+        .logo-image-wrap:hover .farius-logo {
+            transform: translateY(-6px) scale(1.04);
+            filter: drop-shadow(0 12px 40px rgba(124, 140, 255, 0.28));
+        }
+        .tagline {
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            letter-spacing: 3.5px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        .search-container {
+            display: flex;
+            align-items: center;
+            max-width: 520px;
+            margin: 0 auto;
+            background: rgba(12, 12, 16, 0.88);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 6px;
+            box-shadow: 0 16px 44px -18px var(--shadow);
+            animation: slideUp 0.45s var(--transition-smooth);
+            transition: border-color 0.25s, box-shadow 0.25s;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .search-container:focus-within {
+            border-color: var(--input-border-focus);
+            box-shadow: 0 0 0 4px var(--ring), 0 16px 44px -18px var(--shadow);
+        }
+        .search-input {
+            flex: 1;
+            border: none;
+            padding: 14px 18px;
+            font-size: 0.92rem;
+            outline: none;
+            background: transparent;
+            color: var(--text);
+            font-family: inherit;
+            font-weight: 500;
+        }
+        .search-input::placeholder {
+            color: var(--text-dim);
+            font-weight: 400;
+        }
+        .search-button {
+            background: linear-gradient(180deg, var(--accent), #5a6bff);
+            border: none;
+            border-radius: 14px;
+            padding: 12px 24px;
+            cursor: pointer;
+            outline: none;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.2s var(--transition-smooth);
+            font-family: inherit;
+            box-shadow: 0 8px 24px -8px var(--accent-glow);
+            letter-spacing: 0.3px;
+        }
+        .search-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 32px -8px var(--accent-glow);
+            filter: brightness(1.08);
+        }
+        .search-button:active {
+            transform: scale(0.96);
+        }
 
-  add.style.minWidth = '34px';
+        /* ============ APP BUTTONS ============ */
+        .app-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 24px;
+            gap: 12px;
+            flex-wrap: wrap;
+            animation: slideUp 0.45s ease 0.1s both;
+        }
+        .app-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-btn);
+            background: rgba(12, 12, 16, 0.88);
+            cursor: pointer;
+            outline: none;
+            border: 1px solid var(--card-border);
+            color: var(--text);
+            text-decoration: none;
+            transition: all 0.25s var(--transition-smooth);
+            box-shadow: 0 8px 20px -10px var(--shadow);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .app-button:hover {
+            background: var(--card-hover);
+            border-color: var(--card-border-hover);
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 14px 28px -10px var(--shadow);
+        }
+        .app-button:active {
+            transform: scale(0.94);
+        }
+        .app-button img {
+            width: 26px;
+            height: 26px;
+            object-fit: contain;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+        .app-button:hover img {
+            opacity: 1;
+        }
+        #add-app-button {
+            background: transparent;
+            border: 1.5px dashed var(--input-border);
+        }
+        #add-app-button:hover {
+            border-color: var(--accent);
+            background: var(--card);
+        }
+        #add-app-button svg {
+            stroke: var(--text) !important;
+        }
 
-  add.textContent = '+';
+        /* ============ BROWSER OVERLAY ============ */
+        .browser-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #000;
+            background-image: url('/assets/backgrounds/foggy-forest.png');
+            background-size: calc(100% * var(--bg-scale, 1)) auto;
+            background-position: var(--bg-pos-x, 50%) var(--bg-pos-y, 50%);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        .browser-overlay::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, var(--overlay-top) 0%, var(--overlay-bottom) 100%);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .browser-overlay.open {
+            display: flex;
+        }
+        .browser-overlay > * {
+            position: relative;
+            z-index: 1;
+        }
 
-  add.onclick = tabNew;
+        /* Tabs */
+        .tabs-bar {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 14px 0;
+            background: rgba(10, 10, 14, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--card-border);
+            overflow-x: auto;
+            flex-shrink: 0;
+            scrollbar-width: none;
+        }
+        .tabs-bar::-webkit-scrollbar {
+            display: none;
+        }
+        .tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 12px 9px 14px;
+            border-radius: 12px 12px 0 0;
+            background: transparent;
+            border: 1px solid transparent;
+            border-bottom: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 12.5px;
+            white-space: nowrap;
+            max-width: 220px;
+            min-width: 100px;
+            transition: all 0.18s ease;
+            flex-shrink: 0;
+        }
+        .tab:hover {
+            background: var(--card);
+            color: var(--text);
+        }
+        .tab.active {
+            background: var(--card);
+            color: var(--text);
+            border-color: var(--card-border);
+            font-weight: 600;
+            box-shadow: inset 0 3px 0 0 var(--accent);
+        }
+        .tab-favicon {
+            width: 15px;
+            height: 15px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            object-fit: contain;
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .tab-favicon-placeholder {
+            width: 15px;
+            height: 15px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            display: grid;
+            place-items: center;
+            color: #fff;
+            font-size: 8px;
+            font-weight: 900;
+        }
+        .tab-title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            min-width: 0;
+        }
+        .tab-close {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 11px;
+            opacity: 0;
+            transition: opacity 0.15s, background 0.15s;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .tab:hover .tab-close,
+        .tab.active .tab-close {
+            opacity: 1;
+        }
+        .tab-close:hover {
+            background: rgba(220, 38, 38, 0.25);
+            color: #ff7b7b;
+        }
+        .new-tab-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 10px;
+            border: 1px dashed var(--input-border);
+            background: transparent;
+            cursor: pointer;
+            color: var(--text-dim);
+            font-size: 16px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 6px;
+            margin-bottom: 5px;
+            transition: all 0.2s;
+        }
+        .new-tab-btn:hover {
+            border-color: var(--accent);
+            color: var(--text);
+            background: var(--card);
+        }
 
-  tabs.appendChild(add);
+        /* Toolbar */
+        .browser-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 16px;
+            background: rgba(10, 10, 14, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--card-border);
+            flex-shrink: 0;
+        }
+        .browser-toolbar button {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            color: var(--text-dim-2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.18s;
+        }
+        .browser-toolbar button:hover:not(:disabled) {
+            background: var(--card);
+            color: var(--text);
+        }
+        .browser-toolbar button:active:not(:disabled) {
+            transform: scale(0.92);
+        }
+        .browser-toolbar button:disabled {
+            opacity: 0.25;
+            cursor: not-allowed;
+        }
+        .browser-toolbar svg {
+            width: 17px;
+            height: 17px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.9;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .browser-address {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1.5px solid var(--input-border);
+            border-radius: 20px;
+            padding: 0 16px;
+            height: 38px;
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+        .browser-address:focus-within {
+            border-color: var(--input-border-focus);
+            box-shadow: 0 0 0 4px var(--ring);
+        }
+        .browser-address .lock-icon {
+            width: 14px;
+            height: 14px;
+            stroke: var(--text-dim);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex-shrink: 0;
+        }
+        .browser-address input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: 13px;
+            outline: none;
+            font-family: inherit;
+            font-weight: 500;
+        }
+        .browser-address input::placeholder {
+            color: var(--text-dim);
+            font-weight: 400;
+        }
+        .browser-loader {
+            width: 15px;
+            height: 15px;
+            border: 2px solid var(--card-border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            flex-shrink: 0;
+            display: none;
+        }
+        .browser-loader.visible {
+            display: block;
+        }
 
-}
+        /* Frame */
+        .browser-frame-wrap {
+            flex: 1;
+            position: relative;
+            background: transparent;
+        }
+        .browser-frame-wrap iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #fff;
+            display: none;
+        }
+        .browser-frame-wrap iframe.visible {
+            display: block;
+        }
+        .new-tab-page {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            z-index: 1;
+        }
+        .new-tab-page.hidden {
+            display: none;
+        }
+        .new-tab-logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .new-tab-logo img {
+            width: auto;
+            height: auto;
+            max-width: min(280px, 62vw);
+            max-height: 140px;
+            object-fit: contain;
+        }
+        .new-tab-sub {
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        .new-tab-search {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 480px;
+            width: 88%;
+        }
+        .new-tab-search input {
+            flex: 1;
+            background: rgba(12, 12, 16, 0.9);
+            border: 1.5px solid var(--input-border);
+            border-radius: 16px;
+            padding: 15px 20px;
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+        .new-tab-search input::placeholder {
+            color: var(--text-dim);
+        }
+        .new-tab-search input:focus {
+            border-color: var(--input-border-focus);
+            box-shadow: 0 0 0 4px var(--ring);
+        }
+        .new-tab-search button {
+            background: linear-gradient(180deg, var(--accent), #5a6bff);
+            border: none;
+            border-radius: 16px;
+            padding: 15px 26px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.2s;
+            box-shadow: 0 8px 24px -8px var(--accent-glow);
+        }
+        .new-tab-search button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px -8px var(--accent-glow);
+        }
+        .new-tab-search button:active {
+            transform: scale(0.96);
+        }
 
+        /* ============ CHOOSER MODAL ============ */
+        .chooser-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 400;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.86);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            animation: fadeIn 0.3s ease;
+        }
+        .chooser-overlay.open {
+            display: flex;
+        }
+        .chooser-card {
+            background: #16161c;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 48px 52px 40px;
+            max-width: 680px;
+            width: 92%;
+            text-align: center;
+            box-shadow: 0 40px 100px -24px rgba(0, 0, 0, 0.98);
+            animation: slideUp 0.35s var(--transition-smooth);
+        }
+        .chooser-logo {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 22px;
+        }
+        .chooser-logo img {
+            max-width: 220px;
+            max-height: 110px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 32px rgba(124, 140, 255, 0.4));
+        }
+        .chooser-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+            color: #fff;
+        }
+        .chooser-sub {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 36px;
+            font-weight: 400;
+        }
+        .chooser-options {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .chooser-btn {
+            flex: 1;
+            min-width: 220px;
+            padding: 26px 24px 22px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.25s var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            font-family: inherit;
+        }
+        .chooser-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(124, 140, 255, 0.7);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -16px rgba(124, 140, 255, 0.3);
+        }
+        .chooser-btn:active {
+            transform: scale(0.98);
+        }
+        .chooser-btn svg {
+            width: 36px;
+            height: 36px;
+            stroke: var(--accent);
+            stroke-width: 1.6;
+            fill: none;
+        }
+        .chooser-btn span {
+            font-size: 12px;
+            font-weight: 400;
+            color: #888;
+            letter-spacing: 0.2px;
+        }
+        .chooser-close {
+            margin-top: 32px;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 500;
+            padding: 10px 22px;
+            border-radius: 10px;
+            transition: all 0.18s;
+            font-family: inherit;
+        }
+        .chooser-close:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.06);
+        }
 
-function escapeHtml(value){
+        /* ============ BROWSER OS — WINDOWS 11 DARK ============ */
+        .os-desktop {
+            position: fixed;
+            inset: 0;
+            z-index: 300;
+            display: none;
+            flex-direction: column;
+            background: #000;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            animation: fadeIn 0.3s ease;
+        }
+        .os-desktop.open {
+            display: flex;
+        }
+        .os-window {
+            position: absolute;
+            background: #1e1e1e;
+            border: 1px solid #383838;
+            border-radius: 8px;
+            box-shadow: 0 16px 56px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 280px;
+            min-height: 160px;
+            z-index: 10;
+            animation: osWindowOpen 0.22s ease-out;
+        }
+        .os-window.minimized {
+            display: none;
+        }
+        .os-window.maximized {
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: calc(100% - 42px) !important;
+            border-radius: 0;
+        }
+        .os-window.snapped-left {
+            top: 0 !important;
+            left: 0 !important;
+            width: 50% !important;
+            height: calc(100% - 42px) !important;
+        }
+        .os-window.snapped-right {
+            top: 0 !important;
+            left: 50% !important;
+            width: 50% !important;
+            height: calc(100% - 42px) !important;
+        }
 
-  return String(value).replace(
-    /[&<>"']/g,
+        /* Title bar */
+        .os-window-titlebar {
+            display: flex;
+            align-items: center;
+            height: 34px;
+            background: #1e1e1e;
+            border-bottom: 1px solid #2c2c2c;
+            cursor: default;
+            user-select: none;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .os-window-title {
+            flex: 1;
+            font-size: 12px;
+            font-weight: 400;
+            color: #d0d0d0;
+            padding: 0 12px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+        .os-window-icon {
+            display: flex;
+            align-items: center;
+            padding-left: 12px;
+            pointer-events: none;
+        }
+        .os-window-icon img {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+        }
+        .os-window-icon svg {
+            width: 15px;
+            height: 15px;
+            stroke: #d0d0d0;
+            fill: none;
+            stroke-width: 1.8;
+        }
+        .os-window-controls {
+            display: flex;
+            align-items: stretch;
+            height: 100%;
+            margin-left: auto;
+        }
+        .os-window-control {
+            width: 46px;
+            height: 100%;
+            border: none;
+            background: transparent;
+            color: #d0d0d0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.1s, color 0.1s;
+            padding: 0;
+        }
+        .os-window-control svg {
+            width: 10px;
+            height: 10px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.2;
+        }
+        .os-window-control.min:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .os-window-control.max:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .os-window-control.close:hover {
+            background: #c42b1c;
+            color: #fff;
+        }
+        .os-window-control.close:hover svg {
+            stroke: #fff;
+        }
 
-    character => ({
+        /* Window content */
+        .os-window-content {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: #181818;
+        }
+        .os-window-content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #fff;
+            display: block;
+        }
 
-      '&':'&amp;',
+        /* Resize handles */
+        .os-resize-handle {
+            position: absolute;
+            z-index: 20;
+        }
+        .os-resize-handle.n { top: -3px; left: 8px; right: 8px; height: 6px; cursor: ns-resize; }
+        .os-resize-handle.s { bottom: -3px; left: 8px; right: 8px; height: 6px; cursor: ns-resize; }
+        .os-resize-handle.e { right: -3px; top: 8px; bottom: 8px; width: 6px; cursor: ew-resize; }
+        .os-resize-handle.w { left: -3px; top: 8px; bottom: 8px; width: 6px; cursor: ew-resize; }
+        .os-resize-handle.ne { top: -3px; right: -3px; width: 12px; height: 12px; cursor: nesw-resize; }
+        .os-resize-handle.nw { top: -3px; left: -3px; width: 12px; height: 12px; cursor: nwse-resize; }
+        .os-resize-handle.se { bottom: -3px; right: -3px; width: 12px; height: 12px; cursor: nwse-resize; }
+        .os-resize-handle.sw { bottom: -3px; left: -3px; width: 12px; height: 12px; cursor: nesw-resize; }
 
-      '<':'&lt;',
+        /* Taskbar */
+        .os-taskbar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 42px;
+            background: #1a1a1a;
+            border-top: 1px solid #2c2c2c;
+            display: flex;
+            align-items: center;
+            z-index: 500;
+            user-select: none;
+        }
+        .os-taskbar-center {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 100%;
+        }
+        .os-taskbar-btn {
+            width: 42px;
+            height: 42px;
+            border: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background 0.12s;
+            position: relative;
+            padding: 0;
+        }
+        .os-taskbar-btn:hover {
+            background: rgba(255, 255, 255, 0.07);
+        }
+        .os-taskbar-btn:active {
+            background: rgba(255, 255, 255, 0.12);
+        }
+        .os-taskbar-btn svg {
+            width: 21px;
+            height: 21px;
+            stroke: #e0e0e0;
+            fill: none;
+            stroke-width: 1.6;
+        }
+        .os-taskbar-btn img {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+        }
+        .os-taskbar-btn .os-taskbar-tooltip {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            color: #e0e0e0;
+            font-size: 11px;
+            font-weight: 400;
+            padding: 5px 12px;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s;
+            font-family: inherit;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+        }
+        .os-taskbar-btn:hover .os-taskbar-tooltip {
+            opacity: 1;
+        }
+        .os-taskbar-btn.running::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 2px;
+            background: #7c8cff;
+            border-radius: 1px;
+        }
+        .os-taskbar-btn.active-app {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .os-taskbar-left {
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            height: 100%;
+        }
+        .os-taskbar-right {
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            height: 100%;
+            margin-left: auto;
+            gap: 4px;
+        }
+        .os-tray-btn {
+            height: 34px;
+            padding: 0 10px;
+            border: none;
+            background: transparent;
+            color: #d0d0d0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 400;
+            transition: background 0.12s;
+            font-family: inherit;
+        }
+        .os-tray-btn:hover {
+            background: rgba(255, 255, 255, 0.07);
+        }
+        .os-tray-btn svg {
+            width: 15px;
+            height: 15px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.6;
+        }
+        .os-tray-clock {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            padding: 0 10px;
+            font-size: 11px;
+            color: #d0d0d0;
+            line-height: 1.35;
+            font-weight: 400;
+            cursor: default;
+        }
+        .os-tray-clock .time {
+            font-weight: 500;
+        }
+        .os-tray-clock .date {
+            font-size: 10px;
+            color: #a0a0a0;
+        }
 
-      '>':'&gt;',
+        /* Start menu */
+        .os-start-menu {
+            position: absolute;
+            bottom: 52px;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            width: 600px;
+            max-width: 92vw;
+            max-height: 660px;
+            background: #1c1c1e;
+            border: 1px solid #3a3a3c;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            padding: 32px 36px 28px;
+            z-index: 600;
+            display: none;
+            flex-direction: column;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.18s, transform 0.18s;
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+        }
+        .os-start-menu.open {
+            display: flex;
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+        .os-start-search {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #2a2a2c;
+            border: 1px solid #3a3a3c;
+            border-radius: 8px;
+            padding: 10px 16px;
+            margin-bottom: 28px;
+        }
+        .os-start-search svg {
+            width: 16px;
+            height: 16px;
+            stroke: #888;
+            fill: none;
+            stroke-width: 1.8;
+        }
+        .os-start-search input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #e0e0e0;
+            font-size: 13px;
+            outline: none;
+            font-family: inherit;
+        }
+        .os-start-search input::placeholder {
+            color: #888;
+        }
+        .os-start-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #a0a0a0;
+            margin-bottom: 14px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+        .os-start-apps {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+        .os-start-app {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 8px 12px;
+            border-radius: 8px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: background 0.12s;
+            font-family: inherit;
+            color: #e0e0e0;
+        }
+        .os-start-app:hover {
+            background: rgba(255, 255, 255, 0.07);
+        }
+        .os-start-app:active {
+            background: rgba(255, 255, 255, 0.12);
+        }
+        .os-start-app svg {
+            width: 28px;
+            height: 28px;
+            stroke: #c0c0c0;
+            fill: none;
+            stroke-width: 1.5;
+        }
+        .os-start-app span {
+            font-size: 11px;
+            font-weight: 400;
+            color: #c0c0c0;
+        }
+        .os-start-app img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
 
-      '"':'&quot;',
+        /* Calculator */
+        .os-calc-display {
+            background: #1a1a1a;
+            border-bottom: 1px solid #2e2e2e;
+            padding: 16px 20px;
+            text-align: right;
+            font-size: 30px;
+            font-weight: 400;
+            color: #e0e0e0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+        .os-calc-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 3px;
+            padding: 10px;
+            flex: 1;
+            background: #1a1a1a;
+        }
+        .os-calc-btn {
+            background: #2a2a2a;
+            border: 1px solid #2e2e2e;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-size: 16px;
+            font-weight: 400;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.1s;
+        }
+        .os-calc-btn:hover {
+            background: #333;
+        }
+        .os-calc-btn:active {
+            background: #3a3a3a;
+        }
+        .os-calc-btn.op {
+            background: #2d2d2d;
+            color: #a5b0ff;
+        }
+        .os-calc-btn.op:hover {
+            background: #363636;
+        }
+        .os-calc-btn.eq {
+            background: #7c8cff;
+            color: #fff;
+        }
+        .os-calc-btn.eq:hover {
+            background: #6a7aee;
+        }
+        .os-calc-btn.clr {
+            background: #2d2d2d;
+            color: #ff9b9b;
+        }
+        .os-calc-btn.clr:hover {
+            background: #363636;
+        }
 
-      "'":'&#39;'
+        /* Clock */
+        .os-clock-display {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 28px;
+            background: #1a1a1a;
+        }
+        .os-clock-time {
+            font-size: 52px;
+            font-weight: 300;
+            letter-spacing: -1.5px;
+            color: #e0e0e0;
+            font-variant-numeric: tabular-nums;
+        }
+        .os-clock-date {
+            font-size: 15px;
+            color: #a0a0a0;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
 
-    })[character]
+        /* Wallpaper gallery */
+        .os-wallpaper-gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 16px;
+            height: 100%;
+            overflow-y: auto;
+            background: #1a1a1a;
+        }
+        .os-wallpaper-gallery::-webkit-scrollbar {
+            width: 8px;
+        }
+        .os-wallpaper-gallery::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        .os-wallpaper-gallery::-webkit-scrollbar-thumb {
+            background: #3a3a3a;
+            border-radius: 4px;
+        }
+        .os-wallpaper-thumb {
+            aspect-ratio: 16/9;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+            transition: border-color 0.18s, transform 0.18s;
+        }
+        .os-wallpaper-thumb:hover {
+            border-color: #7c8cff;
+            transform: scale(1.03);
+        }
+        .os-wallpaper-actions {
+            padding: 14px 16px;
+            border-top: 1px solid #2e2e2e;
+            display: flex;
+            gap: 10px;
+            background: #1c1c1e;
+        }
+        .os-wallpaper-actions button {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 6px;
+            border: 1px solid #3a3a3a;
+            background: #2a2a2a;
+            color: #e0e0e0;
+            font-weight: 400;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: inherit;
+            transition: background 0.12s;
+        }
+        .os-wallpaper-actions button:hover {
+            background: #333;
+        }
+        .os-wallpaper-actions button.primary {
+            background: #7c8cff;
+            border-color: #7c8cff;
+            color: #fff;
+        }
+        .os-wallpaper-actions button.primary:hover {
+            background: #6a7aee;
+        }
 
-  );
+        /* Desktop icons */
+        .os-desktop-icons {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 5;
+        }
+        .os-desktop-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            width: 80px;
+            padding: 10px 6px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.12s;
+            user-select: none;
+        }
+        .os-desktop-icon:hover {
+            background: rgba(124, 140, 255, 0.22);
+            outline: 1px solid rgba(124, 140, 255, 0.45);
+        }
+        .os-desktop-icon svg {
+            width: 34px;
+            height: 34px;
+            stroke: #fff;
+            fill: none;
+            stroke-width: 1.4;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.9));
+        }
+        .os-desktop-icon span {
+            font-size: 11px;
+            font-weight: 400;
+            color: #fff;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+            text-align: center;
+            line-height: 1.25;
+        }
 
-}
+        /* Snap preview */
+        .os-snap-preview {
+            position: absolute;
+            background: rgba(124, 140, 255, 0.18);
+            border: 2px solid rgba(124, 140, 255, 0.55);
+            pointer-events: none;
+            z-index: 400;
+            display: none;
+            transition: all 0.15s ease;
+            border-radius: 8px;
+        }
+        .os-snap-preview.show {
+            display: block;
+        }
 
+        /* Toast */
+        .os-toast {
+            position: absolute;
+            bottom: 56px;
+            right: 16px;
+            background: #2a2a2c;
+            border: 1px solid #3a3a3c;
+            border-radius: 10px;
+            padding: 14px 20px;
+            color: #e0e0e0;
+            font-size: 12.5px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7);
+            z-index: 700;
+            animation: slideUp 0.25s ease;
+            max-width: 340px;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
 
-/* =========================================================
-   BROWSER HOME
-========================================================= */
+        /* OS browser inner */
+        .os-browser-inner {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: #181818;
+        }
+        .os-browser-bar {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 10px;
+            background: #1e1e1e;
+            border-bottom: 1px solid #2e2e2e;
+            flex-shrink: 0;
+        }
+        .os-browser-bar button {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            color: #c0c0c0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.12s;
+        }
+        .os-browser-bar button:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .os-browser-bar button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .os-browser-bar svg {
+            width: 15px;
+            height: 15px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .os-browser-url {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #2a2a2c;
+            border: 1px solid #3a3a3c;
+            border-radius: 6px;
+            padding: 0 12px;
+            height: 30px;
+        }
+        .os-browser-url input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #e0e0e0;
+            font-size: 12.5px;
+            outline: none;
+            font-family: inherit;
+        }
+        .os-browser-url input::placeholder {
+            color: #888;
+        }
+        .os-browser-iframe {
+            flex: 1;
+            border: none;
+            background: #fff;
+            width: 100%;
+        }
 
-function showHomeView(){
+        .os-wallpaper-input {
+            display: none;
+        }
 
-  const view =
-    $('#view');
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 720px) {
+            .side-dock {
+                width: 68px;
+                padding: 16px 8px;
+                gap: 6px;
+            }
+            .dock-btn {
+                height: 46px;
+                padding: 0;
+                justify-content: center;
+                gap: 0;
+            }
+            .dock-btn .label {
+                display: none;
+            }
+            .dock-btn svg {
+                width: 21px;
+                height: 21px;
+            }
+            .main-content {
+                margin-right: 68px;
+                padding: 0 16px;
+            }
+            .farius-logo {
+                max-width: min(320px, 80vw);
+                max-height: 160px;
+            }
+            .logo-image-wrap {
+                min-height: 100px;
+                margin-bottom: 16px;
+            }
+            .search-container {
+                max-width: 100%;
+            }
+            .app-button {
+                width: 46px;
+                height: 46px;
+                border-radius: 14px;
+            }
+            .countdown {
+                padding: 10px 14px;
+                top: 12px;
+                left: 12px;
+            }
+            .countdown .value .num {
+                font-size: 18px;
+            }
+            .tab {
+                max-width: 150px;
+                min-width: 80px;
+            }
+            .browser-toolbar {
+                padding: 10px;
+                gap: 4px;
+            }
+            .browser-toolbar button {
+                width: 32px;
+                height: 32px;
+            }
+            .browser-address {
+                height: 34px;
+                padding: 0 12px;
+            }
+            .chooser-card {
+                padding: 32px 24px 28px;
+            }
+            .chooser-title {
+                font-size: 22px;
+            }
+            .chooser-options {
+                flex-direction: column;
+            }
+            .chooser-btn {
+                min-width: auto;
+            }
+            .os-window {
+                min-width: 240px;
+            }
+            .os-start-apps {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .os-start-menu {
+                width: 92vw;
+                padding: 24px;
+            }
+            .os-clock-time {
+                font-size: 36px;
+            }
+            .os-taskbar-center {
+                gap: 0;
+            }
+            .os-taskbar-btn {
+                width: 38px;
+                height: 38px;
+            }
+            .os-tray-clock {
+                display: none;
+            }
+        }
 
-  view.innerHTML = `
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
 
-    <div class="browserHome">
+    <div class="snow-layer" id="snowLayer" aria-hidden="true"></div>
 
-      <h2>
-        FARIUM
-      </h2>
-
+    <div class="countdown" id="xmasCountdown" aria-live="polite">
+        <span class="label">🎄 Until Christmas</span>
+        <div class="value"><span class="num" id="xmasNum">--</span><span class="unit" id="xmasUnit">days</span></div>
+        <span class="sub" id="xmasSub">loading…</span>
     </div>
 
-    <div
-      class="status"
-      id="status">
-
-      Loading
-
-      <b id="statusText"></b>
-
+    <div class="main-content" id="main-content">
+        <div class="logo-image-wrap"><img class="farius-logo" src="/logo.gif" alt="Farium"></div>
+        <div class="tagline">Browse Freely</div>
+        <div class="search-container">
+            <input type="text" class="search-input" id="search-input" placeholder="Search or enter a URL..." autocomplete="off">
+            <button class="search-button" id="search-go">Go</button>
+        </div>
+        <div class="app-buttons" id="app-buttons">
+            <div class="app-button" data-url="https://discord.com">
+                <img src="/assets/svg/discord.svg" alt="Discord">
+            </div>
+            <div class="app-button" data-url="https://youtube.com">
+                <img src="/assets/svg/youtube.svg" alt="YouTube">
+            </div>
+            <div class="app-button" data-url="https://spotify.com">
+                <img src="/assets/svg/spotify.svg" alt="Spotify">
+            </div>
+            <div class="app-button" data-url="https://github.com">
+                <img src="https://www.google.com/s2/favicons?domain=github.com&sz=64" alt="GitHub">
+            </div>
+            <div class="app-button" id="add-app-button">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </div>
+        </div>
     </div>
 
-  `;
+    <nav class="side-dock" aria-label="Site navigation">
+        <a href="/" class="dock-btn active" title="Home">
+            <span class="label">Home</span>
+            <svg viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM9 20v-6h6v6"/></svg>
+        </a>
+        <a href="/settings" class="dock-btn" title="Settings">
+            <span class="label">Settings</span>
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        </a>
+        <div class="dock-sep" aria-hidden="true"></div>
+        <a href="/gnmath.html" class="dock-btn games-btn" id="gamesBtn" title="Play Games">
+            <span class="label">Games</span>
+            <svg viewBox="0 0 24 24">
+                <rect x="2" y="6" width="20" height="12" rx="3"/>
+                <path d="M6 12h4M8 10v4M15 11h.01M17.5 13h.01"/>
+            </svg>
+        </a>
+    </nav>
 
-}
+    <!-- ============ SIMPLE BROWSER OVERLAY ============ -->
+    <div class="browser-overlay" id="browser-overlay">
+        <div class="tabs-bar" id="tabs-bar">
+            <button class="new-tab-btn" id="new-tab-btn" title="New Tab">+</button>
+        </div>
 
+        <div class="browser-toolbar">
+            <button id="browser-back" title="Back">
+                <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <button id="browser-forward" title="Forward">
+                <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <button id="browser-refresh" title="Refresh">
+                <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>
+            </button>
+            <button id="browser-home" title="Home">
+                <svg viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM9 20v-6h6v6"/></svg>
+            </button>
+            <div class="browser-address">
+                <svg class="lock-icon" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+                <input type="text" id="browser-url-input" placeholder="Search or enter URL..." autocomplete="off">
+                <div class="browser-loader" id="browser-loader"></div>
+            </div>
+            <button id="browser-fullscreen" title="Toggle Fullscreen">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"/>
+                </svg>
+            </button>
+            <button id="browser-close" title="Close">
+                <svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+            </button>
+        </div>
 
-/* =========================================================
-   LOAD TAB
-========================================================= */
-
-async function loadTab(tab){
-
-  if(!tab || !tab.url){
-
-    showHomeView();
-
-    return;
-
-  }
-
-
-  const view =
-    $('#view');
-
-  view.innerHTML = `
-
-    <div
-      class="status show"
-      id="status">
-
-      Loading
-
-      <b id="statusText"></b>
-
+        <div class="browser-frame-wrap">
+            <iframe id="browser-frame" src="" referrerpolicy="no-referrer" allowfullscreen></iframe>
+            <div class="new-tab-page" id="new-tab-page">
+                <div class="new-tab-logo"><img src="/logo.gif" alt="Farium"></div>
+                <div class="new-tab-sub">Browse Freely</div>
+                <div class="new-tab-search">
+                    <input type="text" id="new-tab-search-input" placeholder="Search or enter URL..." autocomplete="off">
+                    <button id="new-tab-search-btn">Go</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-  `;
-
-
-  const status =
-    $('#status');
-
-  const statusText =
-    $('#statusText');
-
-
-  statusText.textContent =
-    tab.url;
-
-  $('#addressInput').value =
-    tab.url;
-
-
-  const iframe =
-    document.createElement('iframe');
-
-
-  iframe.setAttribute(
-    'allow',
-    'fullscreen; autoplay; clipboard-read; clipboard-write'
-  );
-
-
-  iframe.style.width = '100%';
-
-  iframe.style.height = '100%';
-
-  iframe.style.border = '0';
-
-
-  iframe.addEventListener(
-    'load',
-    ()=>{
-      status.classList.remove('show');
-    },
-    {once:true}
-  );
-
-
-  view.appendChild(iframe);
-
-
-  try{
-
-    /*
-      SCRAMJET
-    */
-
-    if(state.engine === 'scramjet'){
-
-      const controller =
-        await initScramjet();
-
-
-      state.frame =
-        controller.createFrame(
-          iframe
-        );
-
-
-      /*
-        This is the important part.
-
-        Frame.go() handles the
-        Scramjet URL rewriting.
-      */
-
-      state.frame.go(
-        tab.url
-      );
-
-    }
-
-
-    /*
-      ULTRAVIOLET
-    */
-
-    else{
-
-      await ensureUV();
-
-
-      iframe.src =
-        '/uv/service/' +
-        self.__uv$config.encodeUrl(
-          tab.url
-        );
-
-    }
-
-
-  }catch(error){
-
-    console.error(
-      'Farium proxy error:',
-      error
-    );
-
-    status.classList.remove(
-      'show'
-    );
-
-    statusText.textContent =
-      'Proxy failed: ' +
-      error.message;
-
-  }
-
-}
-
-
-/* =========================================================
-   ULTRAVIOLET SERVICE WORKER
-========================================================= */
-
-async function ensureUV(){
-
-  if(
-    navigator.serviceWorker.controller
-  ){
-
-    return;
-
-  }
-
-
-  await navigator.serviceWorker.register(
-    '/uv-sw.js',
-    {
-      scope:'/'
-    }
-  );
-
-
-  await navigator.serviceWorker.ready;
-
-}
-
-
-/* =========================================================
-   INIT PROXY (BareMux)
-========================================================= */
-
-async function initProxy(){
-
-  if ('serviceWorker' in navigator) {
-    try {
-      await navigator.serviceWorker.register('/sw.js');
-      await navigator.serviceWorker.ready;
-    } catch (err) {}
-  }
-
-  try {
-    const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
-    const wispUrl = localStorage.getItem("wisp") || ((location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/");
-    const transport = localStorage.getItem("transport") || "libcurl";
-    const transportPath = transport === "epoxy" ? "/epoxy/index.mjs" : "/libcurl/index.mjs";
-    if (await connection.getTransport() !== transportPath) {
-      await connection.setTransport(transportPath, [{ wisp: wispUrl }]);
-    }
-  } catch (err) {}
-}
-
-
-/* =========================================================
-   NAVIGATION
-========================================================= */
-
-async function navigate(
-  raw,
-  title
-){
-
-  let value =
-    (raw || '').trim();
-
-  if(!value){
-
-    return;
-
-  }
-
-
-  /*
-    If the user enters:
-
-      youtube.com
-
-    it becomes:
-
-      https://youtube.com
-
-    If they enter:
-
-      minecraft pvp
-
-    it becomes:
-
-      https://www.google.com/search?q=minecraft+pvp
-
-    Then THAT URL is passed through
-    Scramjet / UV.
-  */
-
-  const url =
-    looksUrl(value)
-      ? normalize(value)
-      : searches[state.search](value);
-
-
-  if(!state.tabs.length){
-
-    tabNew();
-
-  }
-
-
-  const tab =
-    state.tabs.find(
-      item =>
-        item.id === state.active
-    );
-
-
-  tab.url = url;
-
-
-  try{
-
-    tab.title =
-      title ||
-      new URL(url)
-        .hostname
-        .replace(
-          /^www\./,
-          ''
-        );
-
-  }catch{
-
-    tab.title = 'Farium';
-
-  }
-
-
-  $('#browser')
-    .classList
-    .add('show');
-
-
-  renderTabs();
-
-  await loadTab(tab);
-
-}
-
-
-/* =========================================================
-   HOME SEARCH
-========================================================= */
-
-$('#homeInput')
-  .addEventListener(
-    'keydown',
-    event => {
-
-      if(event.key === 'Enter'){
-
-        navigate(
-          event.target.value
-        );
-
-      }
-
-    }
-  );
-
-
-/* =========================================================
-   SETTINGS
-========================================================= */
-
-$('#settingsNav').onclick =
-  () => {
-
-    $('#settings')
-      .classList
-      .add('open');
-
-  };
-
-
-$('#closeSettings').onclick =
-  () => {
-
-    $('#settings')
-      .classList
-      .remove('open');
-
-  };
-
-
-/*
-  Close settings when clicking
-  outside the settings card.
-*/
-
-$('#settings').addEventListener(
-  'click',
-  event => {
-
-    if(event.target === $('#settings')){
-
-      $('#settings')
-        .classList
-        .remove('open');
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   PROXY ENGINE SELECTOR
-========================================================= */
-
-$$('#engines button')
-.forEach(button=>{
-
-  button.onclick = () => {
-
-    if(button.disabled){
-
-      return;
-
-    }
-
-
-    state.engine =
-      button.dataset.e;
-
-
-    localStorage.fariumEngine =
-      state.engine;
-
-
-    $$('#engines button')
-    .forEach(item=>{
-
-      item.classList.toggle(
-        'active',
-        item === button
-      );
-
-    });
-
-  };
-
-});
-
-
-/*
-  Restore saved proxy button.
-*/
-
-$$('#engines button')
-.forEach(button=>{
-
-  button.classList.toggle(
-    'active',
-    button.dataset.e === state.engine
-  );
-
-});
-
-
-/* =========================================================
-   SEARCH ENGINE SELECTOR
-========================================================= */
-
-$$('#searchEngines button')
-.forEach(button=>{
-
-  button.onclick = () => {
-
-    state.search =
-      button.dataset.s;
-
-
-    localStorage.fariumSearch =
-      state.search;
-
-
-    $('#homeEngine').textContent =
-      searchNames[state.search];
-
-
-    $$('#searchEngines button')
-    .forEach(item=>{
-
-      item.classList.toggle(
-        'active',
-        item === button
-      );
-
-    });
-
-  };
-
-});
-
-
-$$('#searchEngines button')
-.forEach(button=>{
-
-  button.classList.toggle(
-    'active',
-    button.dataset.s === state.search
-  );
-
-});
-
-
-/* =========================================================
-   EFFECT SWITCHES
-========================================================= */
-
-$$('.switch')
-.forEach(sw=>{
-
-  sw.onclick = () => {
-
-    const enabled =
-      !sw.classList.contains('on');
-
-
-    sw.classList.toggle(
-      'on',
-      enabled
-    );
-
-
-    if(
-      sw.dataset.toggle ===
-      'motion'
-    ){
-
-      state.motion =
-        enabled;
-
-
-      document.body.classList.toggle(
-        'reduced-motion',
-        !enabled
-      );
-
-    }
-
-
-    if(
-      sw.dataset.toggle ===
-      'shader'
-    ){
-
-      state.shader =
-        enabled;
-
-
-      $('#shader').style.opacity =
-        enabled ? '.45' : '0';
-
-
-      $('#lines').style.opacity =
-        enabled ? '.5' : '0';
-
-
-      $('#g1').style.opacity =
-        enabled ? '1' : '0';
-
-
-      $('#g2').style.opacity =
-        enabled ? '1' : '0';
-
-    }
-
-  };
-
-});
-
-
-/* =========================================================
-   BROWSER CONTROLS
-========================================================= */
-
-$('#closeBrowser').onclick =
-  () => {
-
-    $('#browser')
-      .classList
-      .remove('show');
-
-  };
-
-
-$('#go').onclick =
-  () => {
-
-    navigate(
-      $('#addressInput').value
-    );
-
-  };
-
-
-$('#addressInput')
-.addEventListener(
-  'keydown',
-  event => {
-
-    if(event.key === 'Enter'){
-
-      navigate(
-        event.target.value
-      );
-
-    }
-
-  }
-);
-
-
-$('#reload').onclick =
-  () => {
-
-    const tab =
-      state.tabs.find(
-        item =>
-          item.id === state.active
-      );
-
-    if(tab){
-
-      loadTab(tab);
-
-    }
-
-  };
-
-
-$('#back').onclick =
-  () => {
-
-    if(state.frame?.back){
-
-      state.frame.back();
-
-    }
-
-  };
-
-
-$('#forward').onclick =
-  () => {
-
-    if(state.frame?.forward){
-
-      state.frame.forward();
-
-    }
-
-  };
-
-
-/* =========================================================
-   SEARCH NAV
-========================================================= */
-
-$('#searchNav').onclick =
-  () => {
-
-    $('#settings')
-      .classList
-      .remove('open');
-
-    $('#homeInput').focus();
-
-  };
-
-
-/* =========================================================
-   NAV INDICATOR (GLOW SLIDE)
-========================================================= */
-
-(function(){
-
-  function moveIndicator(btn){
-
-    const nav = $('#nav');
-    const indicator = $('#navIndicator');
-
-    if(!nav || !indicator || !btn) return;
-
-    const navRect = nav.getBoundingClientRect();
-    const btnRect = btn.getBoundingClientRect();
-
-    indicator.style.left =
-      (btnRect.left - navRect.left) + 'px';
-
-    indicator.style.width =
-      btnRect.width + 'px';
-
-  }
-
-
-  $$('.nav button')
-  .forEach(btn => {
-
-    btn.addEventListener(
-      'click',
-      () => moveIndicator(btn)
-    );
-
-  });
-
-
-  /*
-    Position the indicator on the
-    currently active button at load.
-  */
-
-  const active =
-    $('#nav .active');
-
-  if(active){
-
-    moveIndicator(active);
-
-  }
-
-})();
-
-
-/* =========================================================
-   INITIAL TAB
-========================================================= */
-
-tabNew();
-
-
-/* =========================================================
-   WEBGL BACKGROUND
-========================================================= */
-
-(function(){
-
-  const canvas =
-    document.getElementById(
-      'shader'
-    );
-
-  const gl =
-    canvas.getContext(
-      'webgl',
-      {
-        alpha:true,
-        antialias:false
-      }
-    );
-
-
-  if(!gl){
-
-    return;
-
-  }
-
-
-  const vertexShader = `
-
-    attribute vec2 position;
-
-    void main(){
-
-      gl_Position =
-        vec4(
-          position,
-          0.0,
-          1.0
-        );
-
-    }
-
-  `;
-
-
-  const fragmentShader = `
-
-    precision mediump float;
-
-    uniform vec2 resolution;
-
-    uniform vec2 mouse;
-
-    uniform float time;
-
-
-    float hash(vec2 p){
-
-      return fract(
-        sin(
-          dot(
-            p,
-            vec2(
-              127.1,
-              311.7
-            )
-          )
-        ) * 43758.5453
-      );
-
-    }
-
-
-    float noise(vec2 p){
-
-      vec2 i =
-        floor(p);
-
-      vec2 f =
-        fract(p);
-
-      f =
-        f*f*(3.0-2.0*f);
-
-
-      return mix(
-
-        mix(
-          hash(i),
-          hash(
-            i + vec2(1.0,0.0)
-          ),
-          f.x
-        ),
-
-        mix(
-          hash(
-            i + vec2(0.0,1.0)
-          ),
-          hash(
-            i + vec2(1.0,1.0)
-          ),
-          f.x
-        ),
-
-        f.y
-
-      );
-
-    }
-
-
-    void main(){
-
-      vec2 uv =
-        gl_FragCoord.xy /
-        resolution;
-
-
-      vec2 p =
-        (uv-.5) *
-        vec2(
-          resolution.x /
-          resolution.y,
-          1.0
-        );
-
-
-      float n =
-        noise(
-          p * 6.0 +
-          time * .08
-        );
-
-
-      float n2 =
-        noise(
-          p * 13.0 -
-          time * .05
-        );
-
-
-      float waves =
-        sin(
-          p.x * 13.0 +
-          sin(
-            p.y * 7.0 +
-            time
-          ) * 2.0 +
-          time
-        );
-
-
-      waves +=
-        sin(
-          p.y * 20.0 -
-          time * .7
-        );
-
-
-      float lineGlow =
-        .028 /
-        (
-          .028 +
-          abs(
-            waves*.04 +
-            n*.02
-          )
-        );
-
-
-      float cursorDistance =
-        distance(
-          uv,
-          mouse /
-          resolution
-        );
-
-
-      float cursorGlow =
-        .07 /
-        (
-          .07 +
-          cursorDistance * 6.0
-        );
-
-
-      vec3 base =
-        vec3(
-          .007,
-          .008,
-          .010
-        );
-
-
-      vec3 light =
-        vec3(
-          .18,
-          .19,
-          .22
-        );
-
-
-      vec3 color =
-        base +
-        light *
-        (
-          lineGlow*.25 +
-          cursorGlow*.12 +
-          n2*.018
-        );
-
-
-      gl_FragColor =
-        vec4(
-          color,
-          1.0
-        );
-
-    }
-
-  `;
-
-
-  function compile(
-    type,
-    source
-  ){
-
-    const shader =
-      gl.createShader(type);
-
-    gl.shaderSource(
-      shader,
-      source
-    );
-
-    gl.compileShader(shader);
-
-    return shader;
-
-  }
-
-
-  const program =
-    gl.createProgram();
-
-
-  gl.attachShader(
-    program,
-    compile(
-      gl.VERTEX_SHADER,
-      vertexShader
-    )
-  );
-
-
-  gl.attachShader(
-    program,
-    compile(
-      gl.FRAGMENT_SHADER,
-      fragmentShader
-    )
-  );
-
-
-  gl.linkProgram(program);
-
-  gl.useProgram(program);
-
-
-  const buffer =
-    gl.createBuffer();
-
-
-  gl.bindBuffer(
-    gl.ARRAY_BUFFER,
-    buffer
-  );
-
-
-  gl.bufferData(
-    gl.ARRAY_BUFFER,
-
-    new Float32Array([
-      -1,-1,
-       1,-1,
-      -1, 1,
-
-      -1, 1,
-       1,-1,
-       1, 1
-    ]),
-
-    gl.STATIC_DRAW
-  );
-
-
-  const position =
-    gl.getAttribLocation(
-      program,
-      'position'
-    );
-
-
-  gl.enableVertexAttribArray(
-    position
-  );
-
-
-  gl.vertexAttribPointer(
-    position,
-    2,
-    gl.FLOAT,
-    false,
-    0,
-    0
-  );
-
-
-  const resolution =
-    gl.getUniformLocation(
-      program,
-      'resolution'
-    );
-
-
-  const mouse =
-    gl.getUniformLocation(
-      program,
-      'mouse'
-    );
-
-
-  const time =
-    gl.getUniformLocation(
-      program,
-      'time'
-    );
-
-
-  let t = 0;
-
-  let mouseX =
-    innerWidth / 2;
-
-  let mouseY =
-    innerHeight / 2;
-
-
-  function resize(){
-
-    const dpr =
-      Math.min(
-        devicePixelRatio || 1,
-        2
-      );
-
-
-    canvas.width =
-      innerWidth * dpr;
-
-    canvas.height =
-      innerHeight * dpr;
-
-
-    canvas.style.width =
-      innerWidth + 'px';
-
-    canvas.style.height =
-      innerHeight + 'px';
-
-
-    gl.viewport(
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
-
-  }
-
-
-  addEventListener(
-    'resize',
-    resize
-  );
-
-
-  addEventListener(
-    'pointermove',
-    event => {
-
-      mouseX =
-        event.clientX *
-        (canvas.width / innerWidth);
-
-      mouseY =
-        canvas.height -
-        event.clientY *
-        (canvas.height / innerHeight);
-
-    }
-  );
-
-
-  resize();
-
-
-  function render(){
-
-    t += .009;
-
-
-    gl.uniform2f(
-      resolution,
-      canvas.width,
-      canvas.height
-    );
-
-
-    gl.uniform2f(
-      mouse,
-      mouseX,
-      mouseY
-    );
-
-
-    gl.uniform1f(
-      time,
-      t
-    );
-
-
-    gl.drawArrays(
-      gl.TRIANGLES,
-      0,
-      6
-    );
-
-
-    requestAnimationFrame(
-      render
-    );
-
-  }
-
-
-  render();
-
-})();
-
-
-/* =========================================================
-   REACTIVE LINE FIELD NIGGER
-========================================================= */
-
-const canvas =
-  $('#lines');
-
-const ctx =
-  canvas.getContext('2d');
-
-
-let mouseX =
-  innerWidth / 2;
-
-let mouseY =
-  innerHeight / 2;
-
-let targetX =
-  mouseX;
-
-let targetY =
-  mouseY;
-
-let lineTime = 0;
-
-
-addEventListener(
-  'pointermove',
-  event => {
-
-    targetX =
-      event.clientX;
-
-    targetY =
-      event.clientY;
-
-
-    $('#g1').style.transform =
-      `
-        translate(
-          ${(event.clientX-innerWidth/2)*.045}px,
-          ${(event.clientY-innerHeight/2)*.045}px
-        )
-      `;
-
-
-    $('#g2').style.transform =
-      `
-        translate(
-          ${(innerWidth/2-event.clientX)*.025}px,
-          ${(innerHeight/2-event.clientY)*.025}px
-        )
-      `;
-
-  }
-);
-
-
-function resizeLines(){
-
-  const dpr =
-    Math.min(
-      devicePixelRatio || 1,
-      2
-    );
-
-
-  canvas.width =
-    innerWidth * dpr;
-
-  canvas.height =
-    innerHeight * dpr;
-
-
-  canvas.style.width =
-    innerWidth + 'px';
-
-  canvas.style.height =
-    innerHeight + 'px';
-
-
-  ctx.setTransform(
-    dpr,
-    0,
-    0,
-    dpr,
-    0,
-    0
-  );
-
-}
-
-
-addEventListener(
-  'resize',
-  resizeLines
-);
-
-resizeLines();
-
-
-function drawLines(){
-
-  mouseX +=
-    (targetX - mouseX) * .055;
-
-  mouseY +=
-    (targetY - mouseY) * .055;
-
-
-  ctx.clearRect(
-    0,
-    0,
-    innerWidth,
-    innerHeight
-  );
-
-
-  ctx.lineWidth = 1;
-
-
-  for(
-    let x = -40;
-    x < innerWidth + 50;
-    x += 15
-  ){
-
-    ctx.beginPath();
-
-
-    for(
-      let y = -30;
-      y < innerHeight + 50;
-      y += 15
-    ){
-
-      const dx =
-        x - mouseX;
-
-      const dy =
-        y - mouseY;
-
-      const distance =
-        Math.sqrt(
-          dx*dx +
-          dy*dy
-        );
-
-
-      const influence =
-        Math.max(
-          0,
-          1 - distance / 470
-        );
-
-
-      const wave =
-        Math.sin(
-          y*.017 +
-          lineTime +
-          x*.005
-        ) * 10;
-
-
-      const finalX =
-        x +
-        wave * influence +
-        Math.sin(
-          y*.006 +
-          lineTime*.5
-        ) * 5;
-
-
-      ctx.lineTo(
-        finalX,
-        y
-      );
-
-    }
-
-
-    ctx.strokeStyle =
-      'rgba(255,255,255,.10)';
-
-    ctx.stroke();
-
-  }
-
-
-  lineTime += .01;
-
-  requestAnimationFrame(
-    drawLines
-  );
-
-}
-
-
-drawLines();
-
-</script>
-
-<script src="/socket.io/socket.io.js"></script>
-<script src="/chat.js"></script>
-
-<!-- PAGE SLIDE -->
-<div class="page-slide" id="pageSlide" style="position:fixed;inset:0;z-index:30000;background:var(--bg);transform:translateX(100%);transition:transform .45s cubic-bezier(.65,0,.35,1);pointer-events:none;display:flex;align-items:center;justify-content:center;will-change:transform;">
-  <div style="color:var(--muted);font:600 14px 'Space Grotesk';letter-spacing:3px;">Loading Games...</div>
-</div>
-
-<script>
-/* =========================================================
-   GAMES NAV SLIDE
-========================================================= */
-
-(function(){
-  const gamesBtn = document.getElementById('gamesNav');
-  const slide = document.getElementById('pageSlide');
-
-  if(!gamesBtn || !slide) return;
-
-  // If returning from a slide navigation, animate in
-  if(sessionStorage.getItem('slideFrom')){
-    sessionStorage.removeItem('slideFrom');
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        slide.style.transform = 'translateX(100%)';
-        slide.style.pointerEvents = 'none';
-      });
-    });
-  }
-
-  gamesBtn.addEventListener('click', function(e){
-    e.preventDefault();
-    // Slide out
-    slide.style.transform = 'translateX(0)';
-    slide.style.pointerEvents = 'auto';
-    sessionStorage.setItem('slideFrom', 'true');
-    setTimeout(function(){
-      window.location.href = '/gnmath.html';
-    }, 450);
-  });
-})();
-</script>
-
+    <!-- ============ CHOOSER OVERLAY ============ -->
+    <div class="chooser-overlay" id="chooser-overlay">
+        <div class="chooser-card">
+            <div class="chooser-logo">
+                <img src="/assets/BrowserLogo.png" alt="Farium" onerror="this.src='/logo.gif'">
+            </div>
+            <div class="chooser-title">What will you choose?</div>
+            <div class="chooser-sub">Pick the classic proxy browser or the full Browser OS desktop</div>
+            <div class="chooser-options">
+                <button class="chooser-btn" id="choose-simple">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="2" y1="12" x2="22" y2="12"/>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                    Simple Browser
+                    <span>Classic proxy browser with tabs</span>
+                </button>
+                <button class="chooser-btn" id="choose-os">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="2" y="3" width="20" height="14" rx="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                    Browser OS
+                    <span>Full Windows-style desktop</span>
+                </button>
+            </div>
+            <button class="chooser-close" id="chooser-close">Cancel</button>
+        </div>
+    </div>
+
+    <!-- ============ BROWSER OS ============ -->
+    <div class="os-desktop" id="os-desktop">
+        <div class="os-snap-preview" id="os-snap-preview"></div>
+
+        <div class="os-desktop-icons">
+            <div class="os-desktop-icon" data-os-app="browser">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                <span>Browser</span>
+            </div>
+            <div class="os-desktop-icon" data-os-app="calculator">
+                <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="12" x2="10" y2="12"/><line x1="14" y1="12" x2="16" y2="12"/><line x1="8" y1="17" x2="10" y2="17"/><line x1="14" y1="17" x2="16" y2="17"/></svg>
+                <span>Calculator</span>
+            </div>
+            <div class="os-desktop-icon" data-os-app="clock">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>Clock</span>
+            </div>
+            <div class="os-desktop-icon" data-os-app="wallpaper">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span>Wallpaper</span>
+            </div>
+            <div class="os-desktop-icon" data-os-app="settings">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                <span>Settings</span>
+            </div>
+        </div>
+
+        <div id="os-windows-container"></div>
+
+        <div class="os-start-menu" id="os-start-menu">
+            <div class="os-start-search">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="os-start-search-input" placeholder="Type here to search">
+            </div>
+            <div class="os-start-section-title">Pinned</div>
+            <div class="os-start-apps" id="os-start-apps">
+                <button class="os-start-app" data-os-app="browser">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    <span>Browser</span>
+                </button>
+                <button class="os-start-app" data-os-app="calculator">
+                    <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="12" x2="10" y2="12"/><line x1="14" y1="12" x2="16" y2="12"/><line x1="8" y1="17" x2="10" y2="17"/><line x1="14" y1="17" x2="16" y2="17"/></svg>
+                    <span>Calculator</span>
+                </button>
+                <button class="os-start-app" data-os-app="clock">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span>Clock</span>
+                </button>
+                <button class="os-start-app" data-os-app="wallpaper">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <span>Wallpaper</span>
+                </button>
+                <button class="os-start-app" data-os-app="settings">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                    <span>Settings</span>
+                </button>
+                <button class="os-start-app" data-os-app="exit">
+                    <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    <span>Exit OS</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="os-taskbar">
+            <div class="os-taskbar-left">
+                <button class="os-taskbar-btn" data-os-app="start" title="Start">
+                    <svg viewBox="0 0 24 24" style="stroke:none;fill:#e0e0e0;">
+                        <rect x="3" y="3" width="8" height="8" rx="1" fill="#e0e0e0" stroke="none"/>
+                        <rect x="13" y="3" width="8" height="8" rx="1" fill="#e0e0e0" stroke="none"/>
+                        <rect x="3" y="13" width="8" height="8" rx="1" fill="#e0e0e0" stroke="none"/>
+                        <rect x="13" y="13" width="8" height="8" rx="1" fill="#e0e0e0" stroke="none"/>
+                    </svg>
+                    <span class="os-taskbar-tooltip">Start</span>
+                </button>
+            </div>
+
+            <div class="os-taskbar-center">
+                <button class="os-taskbar-btn" data-os-app="browser" title="Browser">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    <span class="os-taskbar-tooltip">Browser</span>
+                </button>
+                <button class="os-taskbar-btn" data-os-app="calculator" title="Calculator">
+                    <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="12" x2="10" y2="12"/><line x1="14" y1="12" x2="16" y2="12"/><line x1="8" y1="17" x2="10" y2="17"/><line x1="14" y1="17" x2="16" y2="17"/></svg>
+                    <span class="os-taskbar-tooltip">Calculator</span>
+                </button>
+                <button class="os-taskbar-btn" data-os-app="clock" title="Clock">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span class="os-taskbar-tooltip">Clock</span>
+                </button>
+                <button class="os-taskbar-btn" data-os-app="wallpaper" title="Wallpaper">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <span class="os-taskbar-tooltip">Wallpaper</span>
+                </button>
+            </div>
+
+            <div class="os-taskbar-right">
+                <button class="os-tray-btn" title="Network">
+                    <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                </button>
+                <button class="os-tray-btn" title="Volume">
+                    <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                </button>
+                <div class="os-tray-clock" id="os-tray-clock">
+                    <span class="time" id="os-tray-time">--:--</span>
+                    <span class="date" id="os-tray-date">--/--/----</span>
+                </div>
+            </div>
+        </div>
+
+        <input type="file" class="os-wallpaper-input" id="os-wallpaper-input" accept="image/*">
+    </div>
+
+    <a href="#" class="venusFooter" style="position: fixed; bottom: 16px; left: 24px; color: var(--text-dim); font-size: 10px; text-decoration: none; z-index: 10; transition: color 0.2s;">Venus integration</a>
+
+    <div class="page-slide" id="pageSlide" style="position: fixed; inset: 0; z-index: 30000; background: #000; transform: translateX(100%); transition: transform 0.45s cubic-bezier(0.65, 0, 0.35, 1); pointer-events: none; display: flex; align-items: center; justify-content: center; will-change: transform;"></div>
+
+    <script>
+        /* ============ ORIGINAL SCRIPT (with minor polish) ============ */
+        let tabs = [];
+        let activeTabId = null;
+
+        class Tab {
+            constructor(id, url, title) {
+                this.id = id;
+                this.url = url || null;
+                this.title = title || 'New Tab';
+                this.history = [];
+                this.historyIndex = -1;
+                this.favicon = null;
+            }
+            pushHistory(url) {
+                if (this.historyIndex < this.history.length - 1) {
+                    this.history = this.history.slice(0, this.historyIndex + 1);
+                }
+                this.history.push(url);
+                this.historyIndex = this.history.length - 1;
+            }
+            canGoBack() { return this.historyIndex > 0; }
+            canGoForward() { return this.historyIndex < this.history.length - 1; }
+        }
+
+        function createTabId() {
+            return 't' + Date.now() + Math.random().toString(36).substr(2, 4);
+        }
+
+        function normalizeUrl(query) {
+            query = String(query).trim();
+            if (!query) return null;
+            if (/^https?:\/\//i.test(query)) return query;
+            if (query.includes('.') && !query.includes(' ')) return 'https://' + query;
+            const engine = localStorage.getItem('search') || 'https://www.google.com/search?q=';
+            return engine + encodeURIComponent(query);
+        }
+
+        function getProxyUrl(url) {
+            return __uv$config.prefix + __uv$config.encodeUrl(url);
+        }
+
+        function getHostname(url) {
+            try { return new URL(url).hostname.replace('www.', ''); } catch(e) { return url.substring(0, 20); }
+        }
+
+        function getFaviconUrl(url) {
+            try {
+                const u = new URL(url);
+                return `https://www.google.com/s2/favicons?domain=${u.hostname}&sz=32`;
+            } catch(e) { return null; }
+        }
+
+        function addTab(url, title) {
+            const id = createTabId();
+            const tab = new Tab(id, url, title || (url ? getHostname(url) : 'New Tab'));
+            if (url) tab.favicon = getFaviconUrl(url);
+            tabs.push(tab);
+            renderTabs();
+            switchTab(id);
+            if (url) navigateInTab(id, url);
+            return tab;
+        }
+
+        function closeTab(id) {
+            if (tabs.length <= 1) {
+                tabs = [];
+                addTab(null);
+                return;
+            }
+            const idx = tabs.findIndex(t => t.id === id);
+            if (idx === -1) return;
+            tabs.splice(idx, 1);
+            if (activeTabId === id) {
+                const ni = Math.min(idx, tabs.length - 1);
+                activeTabId = tabs[ni].id;
+                updateActiveTab();
+            }
+            renderTabs();
+        }
+
+        function switchTab(id) {
+            activeTabId = id;
+            updateActiveTab();
+            renderTabs();
+        }
+
+        function updateActiveTab() {
+            const tab = tabs.find(t => t.id === activeTabId);
+            if (!tab) return;
+            const frame = document.getElementById('browser-frame');
+            const newTabPage = document.getElementById('new-tab-page');
+            const urlInput = document.getElementById('browser-url-input');
+
+            if (tab.url) {
+                frame.classList.add('visible');
+                newTabPage.classList.add('hidden');
+                urlInput.value = tab.url;
+            } else {
+                frame.classList.remove('visible');
+                newTabPage.classList.remove('hidden');
+                urlInput.value = '';
+            }
+
+            document.getElementById('browser-back').disabled = !tab.canGoBack();
+            document.getElementById('browser-forward').disabled = !tab.canGoForward();
+        }
+
+        function navigateInTab(id, url) {
+            const tab = tabs.find(t => t.id === id);
+            if (!tab) return;
+            tab.pushHistory(url);
+            tab.url = url;
+            tab.title = getHostname(url);
+            tab.favicon = getFaviconUrl(url);
+            renderTabs();
+            if (activeTabId === id) loadUrl(url);
+        }
+
+        function loadUrl(url) {
+            const frame = document.getElementById('browser-frame');
+            const newTabPage = document.getElementById('new-tab-page');
+            const urlInput = document.getElementById('browser-url-input');
+            const loader = document.getElementById('browser-loader');
+
+            frame.classList.add('visible');
+            newTabPage.classList.add('hidden');
+            urlInput.value = url;
+            loader.classList.add('visible');
+            frame.src = getProxyUrl(url);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const frame = document.getElementById('browser-frame');
+            if (frame) {
+                frame.addEventListener('load', () => {
+                    const loader = document.getElementById('browser-loader');
+                    if (loader) loader.classList.remove('visible');
+                });
+            }
+        });
+
+        function renderTabs() {
+            const tabsBar = document.getElementById('tabs-bar');
+            tabsBar.querySelectorAll('.tab').forEach(el => el.remove());
+
+            const frag = document.createDocumentFragment();
+
+            tabs.forEach(tab => {
+                const el = document.createElement('div');
+                el.className = 'tab' + (tab.id === activeTabId ? ' active' : '');
+
+                if (tab.favicon) {
+                    const img = document.createElement('img');
+                    img.className = 'tab-favicon';
+                    img.src = tab.favicon;
+                    img.alt = '';
+                    img.onerror = () => { img.replaceWith(makeFaviconPlaceholder(tab.title)); };
+                    el.appendChild(img);
+                } else {
+                    el.appendChild(makeFaviconPlaceholder(tab.title));
+                }
+
+                const titleEl = document.createElement('span');
+                titleEl.className = 'tab-title';
+                titleEl.textContent = tab.title || 'New Tab';
+                el.appendChild(titleEl);
+
+                if (tabs.length > 1) {
+                    const cb = document.createElement('button');
+                    cb.className = 'tab-close';
+                    cb.textContent = '×';
+                    cb.addEventListener('click', (e) => { e.stopPropagation(); closeTab(tab.id); });
+                    el.appendChild(cb);
+                }
+
+                el.addEventListener('click', () => switchTab(tab.id));
+                frag.appendChild(el);
+            });
+
+            tabsBar.insertBefore(frag, document.getElementById('new-tab-btn'));
+        }
+
+        function makeFaviconPlaceholder(title) {
+            const d = document.createElement('div');
+            d.className = 'tab-favicon-placeholder';
+            d.textContent = (title || 'N')[0].toUpperCase();
+            return d;
+        }
+
+        function openBrowser(url) {
+            const overlay = document.getElementById('browser-overlay');
+            overlay.classList.add('open');
+            addTab(url);
+        }
+
+        function closeBrowser() {
+            const overlay = document.getElementById('browser-overlay');
+            overlay.classList.remove('open');
+            tabs = [];
+            activeTabId = null;
+        }
+
+        async function initProxy() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    await navigator.serviceWorker.register('/sw.js');
+                    await navigator.serviceWorker.ready;
+                } catch (err) {}
+            }
+            try {
+                const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
+                const wispUrl = localStorage.getItem("wisp") || ((location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/");
+                const transport = localStorage.getItem("transport") || "libcurl";
+                const transportPath = transport === "epoxy" ? "/epoxy/index.mjs" : "/libcurl/index.mjs";
+                if (await connection.getTransport() !== transportPath) {
+                    await connection.setTransport(transportPath, [{ wisp: wispUrl }]);
+                }
+            } catch (err) {}
+        }
+
+        (function initBackground() {
+            const DEFAULT_BG = '/assets/backgrounds/foggy-forest.png';
+            const DEFAULT_DARKNESS = 72;
+            const DEFAULT_SCALE = 1;
+            const DEFAULT_X = 50;
+            const DEFAULT_Y = 50;
+
+            const bg = localStorage.getItem('bg') || DEFAULT_BG;
+            const scale = parseFloat(localStorage.getItem('bgScale')) || DEFAULT_SCALE;
+            const posX = parseFloat(localStorage.getItem('bgX'));
+            const posY = parseFloat(localStorage.getItem('bgY'));
+            const finalX = isNaN(posX) ? DEFAULT_X : posX;
+            const finalY = isNaN(posY) ? DEFAULT_Y : posY;
+
+            document.documentElement.style.setProperty('--bg-scale', scale);
+            document.documentElement.style.setProperty('--bg-pos-x', finalX + '%');
+            document.documentElement.style.setProperty('--bg-pos-y', finalY + '%');
+
+            const applyTo = (el) => {
+                el.style.backgroundColor = '#000';
+                el.style.backgroundImage = `url('${bg}')`;
+                el.style.backgroundSize = `calc(100% * ${scale}) auto`;
+                el.style.backgroundPosition = `${finalX}% ${finalY}%`;
+                el.style.backgroundRepeat = 'no-repeat';
+                el.style.backgroundAttachment = 'fixed';
+            };
+            applyTo(document.body);
+            const overlay = document.getElementById('browser-overlay');
+            if (overlay) applyTo(overlay);
+
+            const raw = localStorage.getItem('bgDarkness');
+            const percent = raw !== null ? Number(raw) : DEFAULT_DARKNESS;
+            const p = Math.max(0, Math.min(100, percent));
+            const alpha = p / 100;
+            const alphaBottom = Math.min(1, alpha * 1.15);
+
+            document.documentElement.style.setProperty('--overlay-top', `rgba(0, 0, 0, ${alpha.toFixed(3)})`);
+            document.documentElement.style.setProperty('--overlay-bottom', `rgba(0, 0, 0, ${alphaBottom.toFixed(3)})`);
+        })();
+
+        (function initSnow() {
+            const layer = document.getElementById('snowLayer');
+            if (!layer) return;
+            const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (reduced) return;
+
+            const isSmallScreen = window.innerWidth < 900;
+            const isLowPower = (navigator.hardwareConcurrency || 4) <= 4;
+            const count = isLowPower || isSmallScreen ? 35 : 60;
+
+            const frag = document.createDocumentFragment();
+            for (let i = 0; i < count; i++) {
+                const el = document.createElement('div');
+                el.className = 'snowflake';
+                const size = 6 + Math.random() * 14;
+                const duration = 7 + Math.random() * 10;
+                const drift = (Math.random() - 0.5) * 200;
+                const opacity = 0.45 + Math.random() * 0.5;
+                const startX = Math.random() * 100;
+                el.style.left = startX + 'vw';
+                el.style.setProperty('--size', size + 'px');
+                el.style.setProperty('--drift', drift + 'px');
+                el.style.setProperty('--opacity', opacity);
+                el.style.setProperty('--dur', duration + 's');
+                el.style.setProperty('--delay', (-Math.random() * duration) + 's');
+                frag.appendChild(el);
+            }
+            layer.appendChild(frag);
+        })();
+
+        (function initCountdown() {
+            const numEl  = document.getElementById('xmasNum');
+            const unitEl = document.getElementById('xmasUnit');
+            const subEl  = document.getElementById('xmasSub');
+            if (!numEl || !unitEl || !subEl) return;
+
+            function nextChristmas(now) {
+                const year = now.getFullYear();
+                const thisYear = new Date(year, 11, 25, 0, 0, 0, 0);
+                if (now.getTime() <= thisYear.getTime()) return thisYear;
+                return new Date(year + 1, 11, 25, 0, 0, 0, 0);
+            }
+            function pad(n) { return String(n).padStart(2, '0'); }
+
+            function tick() {
+                const now = new Date();
+                const xmas = nextChristmas(now);
+                let diff = xmas.getTime() - now.getTime();
+                const isXmasDay = now.getMonth() === 11 && now.getDate() === 25;
+                if (isXmasDay) {
+                    numEl.textContent = '🎁';
+                    unitEl.textContent = 'today';
+                    subEl.textContent = 'Merry Christmas!';
+                    return;
+                }
+                const days    = Math.floor(diff / 86400000);
+                const hours   = Math.floor((diff % 86400000) / 3600000);
+                const minutes = Math.floor((diff % 3600000) / 60000);
+                const seconds = Math.floor((diff % 60000) / 1000);
+                if (days === 0) {
+                    numEl.textContent = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+                    unitEl.textContent = '';
+                    subEl.textContent = 'Almost here!';
+                } else {
+                    numEl.textContent = days;
+                    unitEl.textContent = days === 1 ? 'day' : 'days';
+                    subEl.textContent = `${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
+                }
+            }
+            tick();
+            setInterval(tick, 1000);
+        })();
+
+        (function initFullscreenToggle() {
+            const btn = document.getElementById('browser-fullscreen');
+            if (!btn) return;
+            const target = document.getElementById('browser-overlay');
+
+            btn.addEventListener('click', async () => {
+                try {
+                    if (!document.fullscreenElement) {
+                        if (target.requestFullscreen) await target.requestFullscreen();
+                        else if (target.webkitRequestFullscreen) target.webkitRequestFullscreen();
+                    } else {
+                        if (document.exitFullscreen) await document.exitFullscreen();
+                        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                    }
+                } catch (e) {}
+            });
+
+            function updateIcon() {
+                const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+                btn.innerHTML = isFs
+                    ? `<svg viewBox="0 0 24 24">
+                           <path d="M9 4v4a1 1 0 0 1-1 1H4M15 4v4a1 1 0 0 0 1 1h4M9 20v-4a1 1 0 0 0-1-1H4M15 20v-4a1 1 0 0 1 1-1h4"/>
+                       </svg>`
+                    : `<svg viewBox="0 0 24 24">
+                           <path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"/>
+                       </svg>`;
+                btn.title = isFs ? "Exit Fullscreen" : "Toggle Fullscreen";
+            }
+
+            document.addEventListener('fullscreenchange', updateIcon);
+            document.addEventListener('webkitfullscreenchange', updateIcon);
+        })();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            (function () {
+                const slide = document.getElementById("pageSlide");
+                if (sessionStorage.getItem("slideFrom")) {
+                    sessionStorage.removeItem("slideFrom");
+                    slide.classList.add("enter");
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            slide.classList.add("leaving");
+                        });
+                    });
+                    setTimeout(() => {
+                        slide.classList.remove("enter", "leaving");
+                    }, 600);
+                }
+            })();
+
+            const gamesBtn = document.getElementById("gamesBtn");
+            if (gamesBtn) {
+                gamesBtn.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    const slide = document.getElementById("pageSlide");
+                    slide.classList.add("active");
+                    sessionStorage.setItem("slideFrom", "true");
+                    setTimeout(() => {
+                        window.location.href = "/gnmath.html";
+                    }, 500);
+                });
+            }
+
+            initProxy();
+
+            // Search triggers chooser
+            document.getElementById('search-go').addEventListener('click', () => {
+                const raw = document.getElementById('search-input').value.trim();
+                if (!raw) return;
+                document.getElementById('chooser-overlay').classList.add('open');
+                document.getElementById('chooser-overlay').dataset.pendingUrl = raw;
+            });
+            document.getElementById('search-input').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const raw = e.target.value.trim();
+                    if (!raw) return;
+                    document.getElementById('chooser-overlay').classList.add('open');
+                    document.getElementById('chooser-overlay').dataset.pendingUrl = raw;
+                }
+            });
+
+            // Chooser actions
+            document.getElementById('chooser-close').addEventListener('click', () => {
+                document.getElementById('chooser-overlay').classList.remove('open');
+            });
+            document.getElementById('chooser-overlay').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) {
+                    document.getElementById('chooser-overlay').classList.remove('open');
+                }
+            });
+
+            document.getElementById('choose-simple').addEventListener('click', () => {
+                const pending = document.getElementById('chooser-overlay').dataset.pendingUrl;
+                document.getElementById('chooser-overlay').classList.remove('open');
+                if (pending) {
+                    const url = normalizeUrl(pending);
+                    if (url) openBrowser(url);
+                }
+            });
+
+            document.getElementById('choose-os').addEventListener('click', () => {
+                document.getElementById('chooser-overlay').classList.remove('open');
+                openBrowserOS();
+            });
+
+            // App buttons trigger chooser
+            document.querySelectorAll('#app-buttons .app-button[data-url]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.getElementById('chooser-overlay').classList.add('open');
+                    document.getElementById('chooser-overlay').dataset.pendingUrl = btn.dataset.url;
+                });
+            });
+
+            // Simple browser controls
+            document.getElementById('browser-close').addEventListener('click', closeBrowser);
+            document.getElementById('browser-home').addEventListener('click', closeBrowser);
+            document.getElementById('browser-back').addEventListener('click', () => {
+                const tab = tabs.find(t => t.id === activeTabId);
+                if (tab && tab.canGoBack()) {
+                    tab.historyIndex--;
+                    tab.url = tab.history[tab.historyIndex];
+                    tab.title = getHostname(tab.url);
+                    tab.favicon = getFaviconUrl(tab.url);
+                    renderTabs();
+                    loadUrl(tab.url);
+                }
+            });
+            document.getElementById('browser-forward').addEventListener('click', () => {
+                const tab = tabs.find(t => t.id === activeTabId);
+                if (tab && tab.canGoForward()) {
+                    tab.historyIndex++;
+                    tab.url = tab.history[tab.historyIndex];
+                    tab.title = getHostname(tab.url);
+                    tab.favicon = getFaviconUrl(tab.url);
+                    renderTabs();
+                    loadUrl(tab.url);
+                }
+            });
+            document.getElementById('browser-refresh').addEventListener('click', () => {
+                const tab = tabs.find(t => t.id === activeTabId);
+                if (tab && tab.url) loadUrl(tab.url);
+            });
+
+            document.getElementById('browser-url-input').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const url = normalizeUrl(e.target.value);
+                    if (url) {
+                        const tab = tabs.find(t => t.id === activeTabId);
+                        if (tab) navigateInTab(activeTabId, url);
+                    }
+                }
+            });
+
+            document.getElementById('new-tab-btn').addEventListener('click', () => addTab(null));
+            document.getElementById('new-tab-search-btn').addEventListener('click', () => {
+                const input = document.getElementById('new-tab-search-input');
+                const url = normalizeUrl(input.value);
+                if (url) {
+                    const tab = tabs.find(t => t.id === activeTabId);
+                    if (tab) navigateInTab(activeTabId, url);
+                    input.value = '';
+                }
+            });
+            document.getElementById('new-tab-search-input').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') document.getElementById('new-tab-search-btn').click();
+            });
+
+            document.getElementById('add-app-button').addEventListener('click', () => {
+                const name = prompt('App name:');
+                if (!name) return;
+                const url = prompt('URL (e.g. netflix.com):');
+                if (!url) return;
+                let fullUrl = url.startsWith('http') ? url : 'https://' + url;
+                const domain = new URL(fullUrl).hostname;
+                const btn = document.createElement('div');
+                btn.className = 'app-button';
+                btn.dataset.url = fullUrl;
+                btn.innerHTML = `<img src="https://www.google.com/s2/favicons?domain=${domain}&sz=64" alt="${name}">`;
+                btn.addEventListener('click', () => {
+                    document.getElementById('chooser-overlay').classList.add('open');
+                    document.getElementById('chooser-overlay').dataset.pendingUrl = fullUrl;
+                });
+                btn.addEventListener('contextmenu', (e) => { e.preventDefault(); btn.remove(); });
+                document.getElementById('app-buttons').insertBefore(btn, document.getElementById('add-app-button'));
+            });
+
+            // Browser OS
+            initBrowserOS();
+        });
+
+        /* ============ BROWSER OS — WINDOWS 11 DARK (unchanged) ============ */
+        let osWindows = [];
+        let osWindowZ = 100;
+        let osMinimized = [];
+        let osSnapPreviewTimer = null;
+
+        function openBrowserOS() {
+            const desktop = document.getElementById('os-desktop');
+            desktop.classList.add('open');
+
+            const savedWall = localStorage.getItem('os-wallpaper');
+            if (savedWall) {
+                desktop.style.backgroundImage = `url('${savedWall}')`;
+            } else {
+                desktop.style.backgroundImage = `url('/assets/backgrounds/foggy-forest.png')`;
+            }
+
+            updateOSTrayClock();
+            setInterval(updateOSTrayClock, 1000);
+            updateTaskbarRunning();
+
+            const pending = document.getElementById('chooser-overlay').dataset.pendingUrl;
+            if (pending) {
+                const url = normalizeUrl(pending);
+                if (url) {
+                    setTimeout(() => createOSWindow('browser', { url }), 150);
+                }
+            }
+        }
+
+        function closeBrowserOS() {
+            document.getElementById('os-desktop').classList.remove('open');
+            document.querySelectorAll('.os-window').forEach(w => w.remove());
+            osWindows = [];
+            osMinimized = [];
+            updateTaskbarRunning();
+        }
+
+        function updateOSTrayClock() {
+            const timeEl = document.getElementById('os-tray-time');
+            const dateEl = document.getElementById('os-tray-date');
+            if (!timeEl || !dateEl) return;
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            timeEl.textContent = `${h}:${m}`;
+            const dd = String(now.getDate()).padStart(2, '0');
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const yyyy = now.getFullYear();
+            dateEl.textContent = `${dd}/${mm}/${yyyy}`;
+        }
+
+        function updateTaskbarRunning() {
+            document.querySelectorAll('.os-taskbar-btn[data-os-app]').forEach(btn => {
+                const app = btn.dataset.osApp;
+                if (app === 'start') return;
+                const isRunning = osWindows.some(w => w.type === app);
+                btn.classList.toggle('running', isRunning);
+                btn.classList.toggle('active-app', isRunning && osWindows.some(w => w.type === app && !w.minimized));
+            });
+        }
+
+        function createOSWindow(type, opts = {}) {
+            const container = document.getElementById('os-windows-container');
+            const id = 'osw-' + Date.now() + Math.random().toString(36).substr(2, 4);
+
+            const win = document.createElement('div');
+            win.className = 'os-window';
+            win.id = id;
+            win.style.zIndex = ++osWindowZ;
+
+            const offset = (osWindows.length % 6) * 26;
+            const w = opts.width || 780;
+            const h = opts.height || 520;
+            win.style.width = w + 'px';
+            win.style.height = h + 'px';
+            win.style.left = Math.max(16, (window.innerWidth - w) / 2 + offset - 80) + 'px';
+            win.style.top = Math.max(16, (window.innerHeight - h) / 2 + offset - 60) + 'px';
+
+            const titlebar = document.createElement('div');
+            titlebar.className = 'os-window-titlebar';
+
+            const icon = document.createElement('div');
+            icon.className = 'os-window-icon';
+            icon.innerHTML = getOSIconSVG(type);
+
+            const title = document.createElement('div');
+            title.className = 'os-window-title';
+            title.textContent = opts.title || getOSTitle(type);
+
+            const controls = document.createElement('div');
+            controls.className = 'os-window-controls';
+
+            const minBtn = document.createElement('button');
+            minBtn.className = 'os-window-control min';
+            minBtn.title = 'Minimize';
+            minBtn.innerHTML = '<svg viewBox="0 0 12 12"><line x1="2" y1="6" x2="10" y2="6"/></svg>';
+            minBtn.addEventListener('click', (e) => { e.stopPropagation(); minimizeOSWindow(id); });
+
+            const maxBtn = document.createElement('button');
+            maxBtn.className = 'os-window-control max';
+            maxBtn.title = 'Maximize';
+            maxBtn.innerHTML = '<svg viewBox="0 0 12 12"><rect x="2.5" y="2.5" width="7" height="7" rx="0.5"/></svg>';
+            maxBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMaximizeOSWindow(id); });
+
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'os-window-control close';
+            closeBtn.title = 'Close';
+            closeBtn.innerHTML = '<svg viewBox="0 0 12 12"><line x1="3" y1="3" x2="9" y2="9"/><line x1="9" y1="3" x2="3" y2="9"/></svg>';
+            closeBtn.addEventListener('click', (e) => { e.stopPropagation(); closeOSWindow(id); });
+
+            controls.appendChild(minBtn);
+            controls.appendChild(maxBtn);
+            controls.appendChild(closeBtn);
+
+            titlebar.appendChild(icon);
+            titlebar.appendChild(title);
+            titlebar.appendChild(controls);
+
+            const content = document.createElement('div');
+            content.className = 'os-window-content';
+            content.appendChild(buildOSContent(type, opts, id));
+
+            ['n','s','e','w','ne','nw','se','sw'].forEach(dir => {
+                const handle = document.createElement('div');
+                handle.className = 'os-resize-handle ' + dir;
+                handle.dataset.dir = dir;
+                win.appendChild(handle);
+            });
+
+            win.appendChild(titlebar);
+            win.appendChild(content);
+            container.appendChild(win);
+
+            makeDraggable(win, titlebar, id);
+            makeResizable(win);
+
+            win.addEventListener('mousedown', () => {
+                win.style.zIndex = ++osWindowZ;
+            });
+
+            osWindows.push({ id, type, el: win, opts, minimized: false });
+            updateTaskbarRunning();
+            return win;
+        }
+
+        function getOSTitle(type) {
+            const titles = {
+                browser: 'Browser',
+                calculator: 'Calculator',
+                clock: 'Clock',
+                wallpaper: 'Wallpaper',
+                settings: 'Settings'
+            };
+            return titles[type] || 'Window';
+        }
+
+        function getOSIconSVG(type) {
+            if (type === 'browser') {
+                return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
+            } else if (type === 'calculator') {
+                return '<svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="12" x2="10" y2="12"/><line x1="14" y1="12" x2="16" y2="12"/><line x1="8" y1="17" x2="10" y2="17"/><line x1="14" y1="17" x2="16" y2="17"/></svg>';
+            } else if (type === 'clock') {
+                return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+            } else if (type === 'wallpaper') {
+                return '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+            } else if (type === 'settings') {
+                return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+            }
+            return '';
+        }
+
+        function buildOSContent(type, opts, winId) {
+            if (type === 'browser') return buildOSBrowser(opts);
+            if (type === 'calculator') return buildOSCalculator();
+            if (type === 'clock') return buildOSClock();
+            if (type === 'wallpaper') return buildOSWallpaper();
+            if (type === 'settings') return buildOSSettings();
+            return document.createElement('div');
+        }
+
+        function buildOSBrowser(opts) {
+            const wrap = document.createElement('div');
+            wrap.className = 'os-browser-inner';
+
+            const bar = document.createElement('div');
+            bar.className = 'os-browser-bar';
+
+            const back = document.createElement('button');
+            back.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>';
+            back.title = 'Back';
+
+            const forward = document.createElement('button');
+            forward.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>';
+            forward.title = 'Forward';
+
+            const refresh = document.createElement('button');
+            refresh.innerHTML = '<svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>';
+            refresh.title = 'Refresh';
+
+            const urlWrap = document.createElement('div');
+            urlWrap.className = 'os-browser-url';
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = 'Search or enter URL...';
+            input.value = opts.url || '';
+
+            urlWrap.appendChild(input);
+
+            const goBtn = document.createElement('button');
+            goBtn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+            goBtn.title = 'Go';
+            goBtn.style.width = '28px';
+            goBtn.style.height = '28px';
+
+            bar.appendChild(back);
+            bar.appendChild(forward);
+            bar.appendChild(refresh);
+            bar.appendChild(urlWrap);
+            bar.appendChild(goBtn);
+
+            const iframe = document.createElement('iframe');
+            iframe.className = 'os-browser-iframe';
+            iframe.referrerPolicy = 'no-referrer';
+            iframe.allowFullscreen = true;
+
+            let history = [];
+            let historyIdx = -1;
+
+            function navigate(raw) {
+                const url = normalizeUrl(raw);
+                if (!url) return;
+                if (historyIdx < history.length - 1) {
+                    history = history.slice(0, historyIdx + 1);
+                }
+                history.push(url);
+                historyIdx = history.length - 1;
+                input.value = url;
+                iframe.src = getProxyUrl(url);
+                updateNav();
+            }
+
+            function updateNav() {
+                back.disabled = historyIdx <= 0;
+                forward.disabled = historyIdx >= history.length - 1;
+            }
+
+            back.addEventListener('click', () => {
+                if (historyIdx > 0) {
+                    historyIdx--;
+                    input.value = history[historyIdx];
+                    iframe.src = getProxyUrl(history[historyIdx]);
+                    updateNav();
+                }
+            });
+            forward.addEventListener('click', () => {
+                if (historyIdx < history.length - 1) {
+                    historyIdx++;
+                    input.value = history[historyIdx];
+                    iframe.src = getProxyUrl(history[historyIdx]);
+                    updateNav();
+                }
+            });
+            refresh.addEventListener('click', () => {
+                if (history[historyIdx]) {
+                    iframe.src = getProxyUrl(history[historyIdx]);
+                }
+            });
+            goBtn.addEventListener('click', () => navigate(input.value));
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') navigate(input.value);
+            });
+
+            if (opts.url) {
+                setTimeout(() => navigate(opts.url), 100);
+            }
+
+            wrap.appendChild(bar);
+            wrap.appendChild(iframe);
+            return wrap;
+        }
+
+        function buildOSCalculator() {
+            const wrap = document.createElement('div');
+            wrap.style.display = 'flex';
+            wrap.style.flexDirection = 'column';
+            wrap.style.height = '100%';
+
+            const display = document.createElement('div');
+            display.className = 'os-calc-display';
+            display.textContent = '0';
+
+            const grid = document.createElement('div');
+            grid.className = 'os-calc-grid';
+
+            let current = '0';
+            let previous = null;
+            let op = null;
+            let reset = false;
+
+            const buttons = [
+                { t: 'C', c: 'clr' }, { t: '⌫', c: '' }, { t: '%', c: 'op' }, { t: '÷', c: 'op', v: '/' },
+                { t: '7', c: '' }, { t: '8', c: '' }, { t: '9', c: '' }, { t: '×', c: 'op', v: '*' },
+                { t: '4', c: '' }, { t: '5', c: '' }, { t: '6', c: '' }, { t: '−', c: 'op', v: '-' },
+                { t: '1', c: '' }, { t: '2', c: '' }, { t: '3', c: '' }, { t: '+', c: 'op', v: '+' },
+                { t: '±', c: '' }, { t: '0', c: '' }, { t: '.', c: '' }, { t: '=', c: 'eq' }
+            ];
+
+            function update() { display.textContent = current; }
+
+            function handle(action) {
+                if (/[0-9]/.test(action) && action.length === 1) {
+                    if (reset) { current = action; reset = false; }
+                    else { current = current === '0' ? action : current + action; }
+                } else if (action === '.') {
+                    if (reset) { current = '0.'; reset = false; }
+                    else if (!current.includes('.')) current += '.';
+                } else if (action === 'C') {
+                    current = '0'; previous = null; op = null; reset = false;
+                } else if (action === '⌫') {
+                    current = current.length > 1 ? current.slice(0, -1) : '0';
+                } else if (action === '±') {
+                    current = current.startsWith('-') ? current.slice(1) : '-' + current;
+                } else if (action === '%') {
+                    current = String(parseFloat(current) / 100);
+                } else if (['+','-','*','/'].includes(action)) {
+                    if (op !== null && !reset) compute();
+                    previous = current; op = action; reset = true;
+                } else if (action === '=') {
+                    compute();
+                }
+                update();
+            }
+
+            function compute() {
+                if (op === null || previous === null) return;
+                const a = parseFloat(previous), b = parseFloat(current);
+                let r = 0;
+                if (op === '+') r = a + b;
+                else if (op === '-') r = a - b;
+                else if (op === '*') r = a * b;
+                else if (op === '/') r = b === 0 ? NaN : a / b;
+                current = String(r);
+                previous = null; op = null; reset = true;
+                update();
+            }
+
+            buttons.forEach(b => {
+                const btn = document.createElement('button');
+                btn.className = 'os-calc-btn ' + b.c;
+                btn.textContent = b.t;
+                btn.addEventListener('click', () => handle(b.v || b.t));
+                grid.appendChild(btn);
+            });
+
+            wrap.appendChild(display);
+            wrap.appendChild(grid);
+            return wrap;
+        }
+
+        function buildOSClock() {
+            const wrap = document.createElement('div');
+            wrap.className = 'os-clock-display';
+
+            const time = document.createElement('div');
+            time.className = 'os-clock-time';
+            time.textContent = '--:--:--';
+
+            const date = document.createElement('div');
+            date.className = 'os-clock-date';
+            date.textContent = '';
+
+            function update() {
+                const now = new Date();
+                const h = String(now.getHours()).padStart(2, '0');
+                const m = String(now.getMinutes()).padStart(2, '0');
+                const s = String(now.getSeconds()).padStart(2, '0');
+                time.textContent = `${h}:${m}:${s}`;
+                date.textContent = now.toLocaleDateString(undefined, {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                });
+            }
+            update();
+            setInterval(update, 1000);
+
+            wrap.appendChild(time);
+            wrap.appendChild(date);
+            return wrap;
+        }
+
+        function buildOSWallpaper() {
+            const wrap = document.createElement('div');
+            wrap.style.display = 'flex';
+            wrap.style.flexDirection = 'column';
+            wrap.style.height = '100%';
+
+            const gallery = document.createElement('div');
+            gallery.className = 'os-wallpaper-gallery';
+
+            const presets = [
+                '/assets/backgrounds/foggy-forest.png',
+                'https://picsum.photos/seed/mountain/800/450',
+                'https://picsum.photos/seed/ocean/800/450',
+                'https://picsum.photos/seed/city/800/450',
+                'https://picsum.photos/seed/space/800/450',
+                'https://picsum.photos/seed/forest/800/450',
+                'https://picsum.photos/seed/desert/800/450',
+                'https://picsum.photos/seed/abstract/800/450',
+                'https://picsum.photos/seed/night/800/450'
+            ];
+
+            presets.forEach(url => {
+                const thumb = document.createElement('div');
+                thumb.className = 'os-wallpaper-thumb';
+                thumb.style.backgroundImage = `url('${url}')`;
+                thumb.addEventListener('click', () => setOSWallpaper(url));
+                gallery.appendChild(thumb);
+            });
+
+            const actions = document.createElement('div');
+            actions.className = 'os-wallpaper-actions';
+
+            const uploadBtn = document.createElement('button');
+            uploadBtn.className = 'primary';
+            uploadBtn.textContent = 'Import from device';
+            uploadBtn.addEventListener('click', () => {
+                document.getElementById('os-wallpaper-input').click();
+            });
+
+            const resetBtn = document.createElement('button');
+            resetBtn.textContent = 'Reset to default';
+            resetBtn.addEventListener('click', () => {
+                setOSWallpaper('/assets/backgrounds/foggy-forest.png');
+            });
+
+            actions.appendChild(uploadBtn);
+            actions.appendChild(resetBtn);
+
+            wrap.appendChild(gallery);
+            wrap.appendChild(actions);
+            return wrap;
+        }
+
+        function buildOSSettings() {
+            const wrap = document.createElement('div');
+            wrap.style.padding = '28px';
+            wrap.style.overflowY = 'auto';
+            wrap.style.height = '100%';
+            wrap.style.background = '#181818';
+            wrap.style.color = '#e0e0e0';
+
+            const title = document.createElement('h2');
+            title.textContent = 'System Settings';
+            title.style.fontSize = '22px';
+            title.style.fontWeight = '600';
+            title.style.marginBottom = '24px';
+            title.style.color = '#fff';
+
+            const section = document.createElement('div');
+            section.style.marginBottom = '24px';
+
+            const label = document.createElement('div');
+            label.textContent = 'Desktop Wallpaper';
+            label.style.fontSize = '13px';
+            label.style.fontWeight = '600';
+            label.style.marginBottom = '12px';
+            label.style.color = '#a0a0a0';
+
+            const changeBtn = document.createElement('button');
+            changeBtn.textContent = 'Change wallpaper';
+            changeBtn.style.padding = '10px 20px';
+            changeBtn.style.background = '#7c8cff';
+            changeBtn.style.border = 'none';
+            changeBtn.style.borderRadius = '6px';
+            changeBtn.style.color = '#fff';
+            changeBtn.style.cursor = 'pointer';
+            changeBtn.style.fontFamily = 'inherit';
+            changeBtn.style.fontSize = '13px';
+            changeBtn.style.fontWeight = '500';
+            changeBtn.style.transition = 'background 0.15s';
+            changeBtn.addEventListener('mouseenter', () => changeBtn.style.background = '#6a7aee');
+            changeBtn.addEventListener('mouseleave', () => changeBtn.style.background = '#7c8cff');
+            changeBtn.addEventListener('click', () => {
+                document.getElementById('os-wallpaper-input').click();
+            });
+
+            section.appendChild(label);
+            section.appendChild(changeBtn);
+            wrap.appendChild(title);
+            wrap.appendChild(section);
+
+            return wrap;
+        }
+
+        function setOSWallpaper(url) {
+            const desktop = document.getElementById('os-desktop');
+            desktop.style.backgroundImage = `url('${url}')`;
+            localStorage.setItem('os-wallpaper', url);
+        }
+
+        /* ===== DRAGGING ===== */
+        function makeDraggable(win, handle, winId) {
+            let startX, startY, startLeft, startTop;
+            let isDragging = false;
+            let snapSide = null;
+
+            function onDown(e) {
+                if (e.target.closest('.os-window-control')) return;
+                if (e.target.closest('.os-resize-handle')) return;
+                if (win.classList.contains('maximized')) return;
+                e.preventDefault();
+                const rect = win.getBoundingClientRect();
+                startX = e.clientX;
+                startY = e.clientY;
+                startLeft = rect.left;
+                startTop = rect.top;
+                isDragging = true;
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            }
+
+            function onMove(e) {
+                if (!isDragging) return;
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                const newLeft = startLeft + dx;
+                const newTop = Math.max(0, startTop + dy);
+
+                const preview = document.getElementById('os-snap-preview');
+                const threshold = 20;
+                const screenW = window.innerWidth;
+                const screenH = window.innerHeight - 42;
+
+                clearTimeout(osSnapPreviewTimer);
+
+                if (e.clientX < threshold) {
+                    snapSide = 'left';
+                    preview.style.display = 'block';
+                    preview.style.left = '0';
+                    preview.style.top = '0';
+                    preview.style.width = '50%';
+                    preview.style.height = screenH + 'px';
+                } else if (e.clientX > screenW - threshold) {
+                    snapSide = 'right';
+                    preview.style.display = 'block';
+                    preview.style.left = '50%';
+                    preview.style.top = '0';
+                    preview.style.width = '50%';
+                    preview.style.height = screenH + 'px';
+                } else {
+                    snapSide = null;
+                    preview.style.display = 'none';
+                }
+
+                win.style.left = newLeft + 'px';
+                win.style.top = newTop + 'px';
+            }
+
+            function onUp() {
+                isDragging = false;
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onUp);
+
+                const preview = document.getElementById('os-snap-preview');
+                if (snapSide) {
+                    win.classList.remove('snapped-left', 'snapped-right');
+                    win.classList.add('snapped-' + snapSide);
+                    preview.style.display = 'none';
+                    snapSide = null;
+                } else {
+                    if (win.classList.contains('snapped-left') || win.classList.contains('snapped-right')) {
+                        win.classList.remove('snapped-left', 'snapped-right');
+                    }
+                }
+            }
+
+            handle.addEventListener('mousedown', onDown);
+
+            handle.addEventListener('dblclick', (e) => {
+                if (e.target.closest('.os-window-control')) return;
+                toggleMaximizeOSWindow(winId);
+            });
+        }
+
+        /* ===== RESIZING ===== */
+        function makeResizable(win) {
+            const handles = win.querySelectorAll('.os-resize-handle');
+            handles.forEach(handle => {
+                handle.addEventListener('mousedown', (e) => {
+                    if (win.classList.contains('maximized')) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const dir = handle.dataset.dir;
+                    const rect = win.getBoundingClientRect();
+                    const startX = e.clientX;
+                    const startY = e.clientY;
+                    const startW = rect.width;
+                    const startH = rect.height;
+                    const startL = rect.left;
+                    const startT = rect.top;
+
+                    function onMove(e) {
+                        let newW = startW, newH = startH, newL = startL, newT = startT;
+
+                        if (dir.includes('e')) newW = Math.max(280, startW + (e.clientX - startX));
+                        if (dir.includes('w')) {
+                            newW = Math.max(280, startW - (e.clientX - startX));
+                            newL = startL + (startW - newW);
+                        }
+                        if (dir.includes('s')) newH = Math.max(160, startH + (e.clientY - startY));
+                        if (dir.includes('n')) {
+                            newH = Math.max(160, startH - (e.clientY - startY));
+                            newT = startT + (startH - newH);
+                        }
+
+                        win.style.width = newW + 'px';
+                        win.style.height = newH + 'px';
+                        win.style.left = newL + 'px';
+                        win.style.top = newT + 'px';
+                    }
+
+                    function onUp() {
+                        document.removeEventListener('mousemove', onMove);
+                        document.removeEventListener('mouseup', onUp);
+                    }
+
+                    document.addEventListener('mousemove', onMove);
+                    document.addEventListener('mouseup', onUp);
+                });
+            });
+        }
+
+        /* ===== WINDOW CONTROLS ===== */
+        function closeOSWindow(id) {
+            const win = osWindows.find(w => w.id === id);
+            if (win) {
+                win.el.remove();
+                osWindows = osWindows.filter(w => w.id !== id);
+                osMinimized = osMinimized.filter(m => m !== id);
+                updateTaskbarRunning();
+            }
+        }
+
+        function minimizeOSWindow(id) {
+            const win = osWindows.find(w => w.id === id);
+            if (!win) return;
+            win.el.classList.add('minimized');
+            win.minimized = true;
+            if (!osMinimized.includes(id)) osMinimized.push(id);
+            updateTaskbarRunning();
+        }
+
+        function restoreOSWindow(id) {
+            const win = osWindows.find(w => w.id === id);
+            if (!win) return;
+            win.el.classList.remove('minimized');
+            win.minimized = false;
+            win.el.style.zIndex = ++osWindowZ;
+            osMinimized = osMinimized.filter(m => m !== id);
+            updateTaskbarRunning();
+        }
+
+        function toggleMaximizeOSWindow(id) {
+            const win = osWindows.find(w => w.id === id);
+            if (!win) return;
+            win.el.classList.toggle('maximized');
+        }
+
+        /* ===== INIT OS ===== */
+        function initBrowserOS() {
+            setInterval(() => {
+                if (document.getElementById('os-desktop').classList.contains('open')) {
+                    updateOSTrayClock();
+                }
+            }, 1000);
+
+            document.querySelectorAll('.os-taskbar-btn[data-os-app], .os-desktop-icon[data-os-app]').forEach(el => {
+                el.addEventListener('click', () => {
+                    const app = el.dataset.osApp;
+                    handleOSApp(app);
+                });
+            });
+
+            document.querySelectorAll('.os-start-app').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const app = btn.dataset.osApp;
+                    handleOSApp(app);
+                    document.getElementById('os-start-menu').classList.remove('open');
+                });
+            });
+
+            document.getElementById('os-wallpaper-input').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => setOSWallpaper(ev.target.result);
+                reader.readAsDataURL(file);
+            });
+
+            document.addEventListener('click', (e) => {
+                const menu = document.getElementById('os-start-menu');
+                const startBtn = document.querySelector('.os-taskbar-btn[data-os-app="start"]');
+                if (menu.classList.contains('open') &&
+                    !menu.contains(e.target) &&
+                    !startBtn.contains(e.target)) {
+                    menu.classList.remove('open');
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.getElementById('os-start-menu').classList.remove('open');
+                }
+            });
+        }
+
+        function handleOSApp(app) {
+            if (app === 'start') {
+                document.getElementById('os-start-menu').classList.toggle('open');
+                return;
+            }
+            if (app === 'exit') {
+                closeBrowserOS();
+                return;
+            }
+
+            const existing = osWindows.find(w => w.type === app);
+            if (existing) {
+                if (existing.minimized) restoreOSWindow(existing.id);
+                existing.el.style.zIndex = ++osWindowZ;
+                return;
+            }
+
+            if (app === 'browser') {
+                createOSWindow('browser', { width: 820, height: 540 });
+            } else if (app === 'calculator') {
+                createOSWindow('calculator', { width: 320, height: 460, title: 'Calculator' });
+            } else if (app === 'clock') {
+                createOSWindow('clock', { width: 380, height: 260, title: 'Clock' });
+            } else if (app === 'wallpaper') {
+                createOSWindow('wallpaper', { width: 540, height: 440, title: 'Wallpaper' });
+            } else if (app === 'settings') {
+                createOSWindow('settings', { width: 520, height: 400, title: 'Settings' });
+            }
+        }
+    </script>
 </body>
 </html>

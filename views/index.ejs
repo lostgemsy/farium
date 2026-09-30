@@ -1861,7 +1861,9 @@
             box-shadow: 0 12px 30px rgba(0,0,0,.5), inset 0 1px rgba(255,255,255,.8);
         }
         .farius-logo, .new-tab-logo img, .chooser-logo img { filter: grayscale(1) contrast(1.12) drop-shadow(0 10px 25px rgba(0,0,0,.55)); }
-        .browser-frame-wrap, .new-tab-page, .os-desktop { background: transparent !important; }
+        .browser-frame-wrap, .new-tab-page { background: transparent !important; }
+        /* Keep the OS opaque so the home page cannot show through it. */
+        .os-desktop { background-color: #080808 !important; }
         .os-window, .os-window-titlebar, .os-window-content, .os-calc-grid,
         .os-calc-display, .os-clock-display, .os-wallpaper-gallery, .os-start-menu {
             color: #f2f2f2 !important;
@@ -2650,6 +2652,11 @@
 
         function openBrowserOS() {
             const desktop = document.getElementById('os-desktop');
+            // OS is a separate full-screen mode; hide the home UI behind it.
+            document.getElementById('main-content').style.visibility = 'hidden';
+            document.querySelector('.side-dock').style.visibility = 'hidden';
+            document.getElementById('xmasCountdown').style.visibility = 'hidden';
+            document.querySelector('.snow-layer').style.visibility = 'hidden';
             desktop.classList.add('open');
 
             const savedWall = localStorage.getItem('os-wallpaper');
@@ -2664,6 +2671,8 @@
             updateTaskbarRunning();
 
             const pending = document.getElementById('chooser-overlay').dataset.pendingUrl;
+            // Consume the original search once, so the OS does not reopen the home page.
+            delete document.getElementById('chooser-overlay').dataset.pendingUrl;
             if (pending) {
                 const url = normalizeUrl(pending);
                 if (url) {
@@ -2675,6 +2684,12 @@
         function closeBrowserOS() {
             document.getElementById('os-desktop').classList.remove('open');
             document.querySelectorAll('.os-window').forEach(w => w.remove());
+            // Restore the main page only after leaving the OS.
+            document.getElementById('main-content').style.visibility = '';
+            document.querySelector('.side-dock').style.visibility = '';
+            document.getElementById('xmasCountdown').style.visibility = '';
+            document.querySelector('.snow-layer').style.visibility = '';
+            document.getElementById('chooser-overlay').classList.remove('open');
             osWindows = [];
             osMinimized = [];
             updateTaskbarRunning();
@@ -2868,6 +2883,8 @@
             iframe.className = 'os-browser-iframe';
             iframe.referrerPolicy = 'no-referrer';
             iframe.allowFullscreen = true;
+            // An empty iframe src can resolve to this page; use a true blank page.
+            iframe.src = 'about:blank';
 
             let history = [];
             let historyIdx = -1;

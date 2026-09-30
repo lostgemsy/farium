@@ -27,10 +27,10 @@
             --input-border: rgba(255,255,255,.1);
             --input-border-focus: rgba(255,255,255,.4);
             --shadow: rgba(0,0,0,.8);
-            --accent: #7c8cff;
-            --accent-2: #b47cff;
-            --accent-glow: rgba(124,140,255,.28);
-            --ring: rgba(124,140,255,.28);
+            --accent: #e6e6e6;
+            --accent-2: #858585;
+            --accent-glow: rgba(255,255,255,.2);
+            --ring: rgba(255,255,255,.18);
 
             /* Background editor state — set from JS */
             --bg-scale: 1;
@@ -68,27 +68,32 @@
             overflow-x: hidden;
 
             background-color: #000;
-            background-image: url('/assets/backgrounds/foggy-forest.png');
-            background-size: calc(100% * var(--bg-scale, 1));
-            background-position: var(--bg-pos-x, 50%) var(--bg-pos-y, 50%);
-            background-repeat: no-repeat;
-            background-attachment: fixed;
+            background: #050505;
+            isolation: isolate;
         }
 
         body::before {
             content: '';
             position: fixed;
             inset: 0;
-            background:
-                linear-gradient(
-                    180deg,
-                    var(--overlay-top, rgba(0,0,0,.72)) 0%,
-                    var(--overlay-bottom, rgba(0,0,0,.82)) 100%
-                ),
-                radial-gradient(700px 500px at 50% 30%, rgba(124,140,255,.06), transparent 65%);
-            z-index: 0;
+            z-index: -1;
             pointer-events: none;
-            transition: background .15s ease;
+            background:
+                radial-gradient(circle at 15% 10%, rgba(255,255,255,.09), transparent 28%),
+                radial-gradient(circle at 85% 80%, rgba(170,170,170,.08), transparent 30%),
+                linear-gradient(135deg, #151515 0%, #050505 48%, #101010 100%);
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            opacity: .16;
+            background-image: linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px);
+            background-size: 64px 64px;
+            mask-image: linear-gradient(to bottom, black, transparent 75%);
         }
 
         /* ============ SETTINGS WRAPPER ============ */
@@ -101,6 +106,7 @@
             flex-direction: column;
             gap: 16px;
             margin-right: 130px;
+            max-width: 860px;
         }
 
         .logo-area {
@@ -143,7 +149,7 @@
             font-weight: 800;
             letter-spacing: -1px;
             animation: slideUp 0.4s 0.05s ease both;
-            background: linear-gradient(180deg, var(--text), var(--text-dim-2));
+            background: linear-gradient(180deg, #ffffff, #8d8d8d);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -162,8 +168,10 @@
         /* ============ SETTING CARD ============ */
         .settings-container {
             position: relative;
-            background: rgba(10,10,10,.78);
-            padding: 22px 24px;
+            background: linear-gradient(135deg, rgba(255,255,255,.095), rgba(255,255,255,.025));
+            backdrop-filter: blur(18px) saturate(120%);
+            -webkit-backdrop-filter: blur(18px) saturate(120%);
+            padding: 24px 26px;
             border-radius: 16px;
             border: 1px solid var(--card-border);
             box-shadow: 0 12px 32px -16px var(--shadow);
@@ -368,8 +376,8 @@
             border-color: var(--card-border-hover);
         }
         .bg-adjust {
-            background: linear-gradient(135deg, rgba(124,140,255,.18), rgba(180,124,255,.14));
-            border-color: rgba(124,140,255,.4);
+            background: linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.04));
+            border-color: rgba(255,255,255,.3);
         }
         .bg-adjust:hover {
             background: linear-gradient(135deg, rgba(124,140,255,.28), rgba(180,124,255,.22));
@@ -400,7 +408,9 @@
 
         .bg-editor {
             width: min(100%, 900px);
-            background: #0a0a0a;
+            background: linear-gradient(145deg, rgba(30,30,30,.97), rgba(7,7,7,.98));
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
             border: 1.5px solid var(--card-border);
             border-radius: 18px;
             padding: 22px;
@@ -454,7 +464,7 @@
             border-radius: 12px;
             overflow: hidden;
             background-color: #000;
-            background-image: url('/assets/backgrounds/foggy-forest.png');
+            background-image: none;
             background-size: calc(100% * var(--preview-scale, 1));
             background-position: var(--preview-x, 50%) var(--preview-y, 50%);
             background-repeat: no-repeat;
@@ -685,7 +695,9 @@
             gap: 8px;
             padding: 13px 28px;
             border-radius: 12px;
-            background: rgba(10,10,10,.78);
+            background: linear-gradient(135deg, rgba(255,255,255,.1), rgba(255,255,255,.025));
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border: 1.5px solid var(--input-border);
             color: var(--text);
             font-family: inherit;
@@ -734,7 +746,9 @@
             justify-content: center;
             gap: 6px;
             padding: 18px 12px;
-            background: #0a0a0a;
+            background: linear-gradient(180deg, rgba(18,18,18,.88), rgba(4,4,4,.94));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-left: 1px solid var(--card-border);
             animation: slideRight .4s cubic-bezier(.2,.9,.25,1.15) both;
         }
@@ -801,8 +815,8 @@
         }
 
         .dock-btn.games-btn {
-            background: linear-gradient(135deg, rgba(124,140,255,.16), rgba(180,124,255,.12));
-            border: 1px solid rgba(124,140,255,.3);
+            background: linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.035));
+            border: 1px solid rgba(255,255,255,.24);
             color: var(--text);
         }
         .dock-btn.games-btn svg { stroke: var(--accent); }
@@ -908,36 +922,7 @@
         </div>
 
         <h1 class="page-title">Settings</h1>
-        <p class="page-subtitle">Make sure to use DuckDuckGo — Google ain't workin :sob</p>
-
-        <!-- ============ BACKGROUND PICKER ============ -->
-        <div class="settings-container" style="animation-delay: 0.05s;">
-            <div class="bg-section-title">Background</div>
-            <div class="bg-grid" id="bgGrid"></div>
-            <div class="bg-actions-row">
-                <button class="bg-adjust" id="bgAdjust" type="button">
-                    <svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="4"/></svg>
-                    Adjust Fit
-                </button>
-                <button class="bg-reset" id="bgReset" type="button">Reset to default</button>
-            </div>
-        </div>
-
-        <!-- ============ BACKGROUND DARKNESS ============ -->
-        <div class="settings-container" style="animation-delay: 0.08s;">
-            <div class="bg-section-title">Background Darkness</div>
-            <div class="darkness-row">
-                <div class="darkness-header">
-                    <label for="darknessSlider">Overlay opacity</label>
-                    <span class="darkness-value" id="darknessValue">72%</span>
-                </div>
-                <input type="range" class="darkness-slider" id="darknessSlider" min="0" max="100" step="1" value="72">
-                <div class="darkness-ticks">
-                    <span>Clear</span>
-                    <span>Dark</span>
-                </div>
-            </div>
-        </div>
+        <p class="page-subtitle">Configure your browsing experience</p>
 
         <!-- ============ PROXY TYPE ============ -->
         <div class="settings-container" style="animation-delay: 0.1s;">
@@ -1000,8 +985,9 @@
 
     </div>
 
+    <!-- Background editor removed: the shader supplies the page background. -->
     <!-- ============ BACKGROUND EDITOR HUD ============ -->
-    <div class="bg-editor-overlay" id="bgEditorOverlay">
+    <div class="bg-editor-overlay" id="bgEditorOverlay" style="display:none;">
         <div class="bg-editor">
             <div class="bg-editor-header">
                 <div>
@@ -1129,10 +1115,9 @@
                 });
             }
 
-            /* ---------- APPLY BACKGROUND + TRANSFORMS ----------
-               scale:  1.0 = 100% width (cover), 0.5 = half, 3.0 = 3x
-               posX / posY: 0..100% (background-position values)
-            */
+                        /* Background controls were removed; the shader owns the page background. */
+            if (false) {
+                function applyBackground() {}
             function applyBackground(url, scale, posX, posY) {
                 document.body.style.backgroundColor = '#000';
                 document.body.style.backgroundImage = `url('${url}')`;
@@ -1379,6 +1364,8 @@
                 if (e.key === 'Escape') closeEditor();
                 if (e.key === 'Enter') editorSave.click();
             });
+
+            }
 
             /* ---------- PROXY TYPE ---------- */
             const proxyTypeSelect = document.getElementById('type');

@@ -1860,7 +1860,10 @@
             color: #090909 !important;
             box-shadow: 0 12px 30px rgba(0,0,0,.5), inset 0 1px rgba(255,255,255,.8);
         }
-        .farius-logo, .new-tab-logo img, .chooser-logo img { filter: grayscale(1) contrast(1.12) drop-shadow(0 10px 25px rgba(0,0,0,.55)); }
+        /* Preserve the original logo colors while keeping a subtle shadow. */
+        .farius-logo, .new-tab-logo img, .chooser-logo img {
+            filter: drop-shadow(0 10px 25px rgba(0, 0, 0, .55));
+        }
         .browser-frame-wrap, .new-tab-page { background: transparent !important; }
         /* Keep the OS opaque so the home page cannot show through it. */
         .os-desktop { background-color: #080808 !important; }
@@ -3378,68 +3381,128 @@
         }
 
         /* ============ MONOCHROME WEBGL BACKGROUND ============ */
+        /* ============ POLISHED SILVER LIQUID SHADER ============ */
         (function initShaderBackground() {
             const canvas = document.getElementById('shader-background');
-            const gl = canvas && canvas.getContext('webgl', { antialias: false, alpha: false });
+            const gl = canvas && canvas.getContext('webgl', { antialias: true, alpha: false });
             if (!gl) return;
 
-            const vertexSource = `attribute vec2 position; void main() { gl_Position = vec4(position, 0.0, 1.0); }`;
-            const fragmentSource = `precision mediump float;
+            const vertexSource = `
+                attribute vec2 position;
+                void main() { gl_Position = vec4(position, 0.0, 1.0); }
+            `;
+            const fragmentSource = `
+                precision highp float;
                 uniform vec2 resolution;
                 uniform float time;
                 uniform vec2 pointer;
-                float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-                float noise(vec2 p) {
-                    vec2 i = floor(p), f = fract(p);
-                    f = f * f * (3.0 - 2.0 * f);
-                    return mix(mix(hash(i), hash(i + vec2(1.0,0.0)), f.x), mix(hash(i + vec2(0.0,1.0)), hash(i + vec2(1.0,1.0)), f.x), f.y);
+                uniform float pulse;
+
+                #define PI 3.14159265359
+
+                float hash(vec2 p) {
+                    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
                 }
+
+                float noise(vec2 p) {
+                    vec2 i = floor(p);
+                    vec2 f = fract(p);
+                    f = f * f * (3.0 - 2.0 * f);
+                    return mix(
+                        mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
+                        mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x),
+                        f.y
+                    );
+                }
+
+                float fbm(vec2 p) {
+                    float value = 0.0;
+                    float amplitude = 0.5;
+                    for (int i = 0; i < 5; i++) {
+                        value += noise(p) * amplitude;
+                        p = p * 2.02 + vec2(17.3, 9.1);
+                        amplitude *= 0.5;
+                    }
+                    return value;
+                }
+
                 void main() {
                     vec2 uv = gl_FragCoord.xy / resolution.xy;
-                    vec2 p = (gl_FragCoord.xy - 0.5 * resolution.xy) / min(resolution.x, resolution.y);
-                    float ripple = sin(length(uv - pointer) * 34.0 - time * 4.0) * 0.035;
-                    float waves = noise(p * 2.2 + vec2(time * 0.035, -time * 0.025));
-                    waves += 0.5 * noise(p * 5.0 - vec2(time * 0.02, time * 0.03));
-                    waves += ripple;
-                    float glow = 0.12 / (0.25 + length(p + vec2(sin(time*.08)*.25, cos(time*.06)*.18)));
-                    float silver = clamp(0.16 + waves * 0.18 + glow * 0.08, 0.0, 1.0);
-                    vec3 color = mix(vec3(0.015), vec3(0.72), silver);
+                    vec2 aspect = vec2(resolution.x / resolution.y, 1.0);
+                    vec2 p = (uv - 0.5) * aspect;
+                    float t = time * 0.16;
+
+                    // Layered flowing bands create a soft liquid-metal surface.
+                    vec2 flow = vec2(t * 0.22, -t * 0.14);
+                    float field = fbm(p * 2.1 + flow);
+                    field += 0.42 * fbm(p * 4.4 - flow * 1.35);
+                    float bands = sin((p.x * 3.2 + p.y * 2.4) + field * 5.5 - t * 2.0);
+                    float surface = smoothstep(-0.35, 0.8, bands * 0.5 + field * 0.75);
+
+                    // Mouse interaction produces a soft expanding ripple.
+                    vec2 mouse = (pointer - 0.5) * aspect;
+                    float distanceToMouse = length(p - mouse);
+                    float ripple = sin(distanceToMouse * 38.0 - time * 3.4) * exp(-distanceToMouse * 4.2) * pulse;
+
+                    float vignette = smoothstep(1.35, 0.15, length(p));
+                    vec3 black = vec3(0.006, 0.008, 0.012);
+                    vec3 charcoal = vec3(0.055, 0.065, 0.08);
+                    vec3 silver = vec3(0.48, 0.52, 0.58);
+                    vec3 highlight = vec3(0.9, 0.93, 0.98);
+
+                    vec3 color = mix(black, charcoal, surface * 0.8);
+                    color = mix(color, silver, smoothstep(0.58, 0.92, surface) * 0.42);
+                    color += highlight * max(0.0, ripple) * 0.14;
+                    color += silver * vignette * 0.06;
+
                     gl_FragColor = vec4(color, 1.0);
-                }`;
+                }
+            `;
+
             function compile(type, source) {
                 const shader = gl.createShader(type);
                 gl.shaderSource(shader, source);
                 gl.compileShader(shader);
                 return shader;
             }
+
             const program = gl.createProgram();
             gl.attachShader(program, compile(gl.VERTEX_SHADER, vertexSource));
             gl.attachShader(program, compile(gl.FRAGMENT_SHADER, fragmentSource));
             gl.linkProgram(program);
             gl.useProgram(program);
+
             const buffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+                -1, -1, 1, -1, -1, 1,
+                -1, 1, 1, -1, 1, 1
+            ]), gl.STATIC_DRAW);
+
             const position = gl.getAttribLocation(program, 'position');
             gl.enableVertexAttribArray(position);
             gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+
             const resolution = gl.getUniformLocation(program, 'resolution');
             const time = gl.getUniformLocation(program, 'time');
             const pointer = gl.getUniformLocation(program, 'pointer');
+            const pulse = gl.getUniformLocation(program, 'pulse');
+
             let waveX = 0.5;
             let waveY = 0.5;
-            let wavePower = 0.0;
             let targetX = 0.5;
             let targetY = 0.5;
+            let wavePulse = 0.0;
 
-            function moveWave(clientX, clientY, pressed = false) {
-                targetX = clientX / Math.max(innerWidth, 1);
-                targetY = 1.0 - clientY / Math.max(innerHeight, 1);
-                if (pressed) wavePower = 1.0;
+            function moveWave(x, y, pressed = false) {
+                targetX = x / Math.max(innerWidth, 1);
+                targetY = 1.0 - y / Math.max(innerHeight, 1);
+                if (pressed) wavePulse = 1.0;
             }
+
             addEventListener('pointermove', e => moveWave(e.clientX, e.clientY, e.buttons > 0));
             addEventListener('pointerdown', e => moveWave(e.clientX, e.clientY, true));
-            addEventListener('pointerup', () => { wavePower = Math.max(wavePower, 0.35); });
+            addEventListener('pointerup', () => { wavePulse = Math.max(wavePulse, 0.55); });
 
             function resize() {
                 const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -3447,16 +3510,19 @@
                 canvas.height = Math.floor(innerHeight * ratio);
                 gl.viewport(0, 0, canvas.width, canvas.height);
             }
+
             function draw(now) {
-                waveX += (targetX - waveX) * 0.08;
-                waveY += (targetY - waveY) * 0.08;
-                wavePower *= 0.965;
+                waveX += (targetX - waveX) * 0.045;
+                waveY += (targetY - waveY) * 0.045;
+                wavePulse *= 0.972;
                 gl.uniform2f(resolution, canvas.width, canvas.height);
-                gl.uniform1f(time, now * 0.001 + wavePower * 2.0);
+                gl.uniform1f(time, now * 0.001);
                 gl.uniform2f(pointer, waveX, waveY);
+                gl.uniform1f(pulse, wavePulse);
                 gl.drawArrays(gl.TRIANGLES, 0, 6);
                 requestAnimationFrame(draw);
             }
+
             addEventListener('resize', resize);
             resize();
             requestAnimationFrame(draw);

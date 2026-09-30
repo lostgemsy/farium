@@ -74,11 +74,6 @@
             align-items: center;
             position: relative;
             background-color: #000;
-            background-image: url('/assets/backgrounds/foggy-forest.png');
-            background-size: calc(100% * var(--bg-scale, 1)) auto;
-            background-position: var(--bg-pos-x, 50%) var(--bg-pos-y, 50%);
-            background-repeat: no-repeat;
-            background-attachment: fixed;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
@@ -131,121 +126,31 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        @keyframes snowFall {
-            0% { transform: translate3d(0, -30px, 0); }
-            100% { transform: translate3d(var(--drift, 0px), 110vh, 0); }
-        }
         @keyframes osWindowOpen {
             from { opacity: 0; transform: scale(0.96); }
             to { opacity: 1; transform: scale(1); }
         }
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 20px -4px var(--accent-glow); }
-            50% { box-shadow: 0 0 40px -2px var(--accent-glow); }
-        }
 
-        /* ============ SNOW LAYER ============ */
-        .snow-layer {
-            position: fixed;
-            inset: 0;
-            z-index: 1;
-            pointer-events: none;
-            overflow: hidden;
-            contain: strict;
-        }
-        .snowflake {
-            position: absolute;
-            top: -30px;
-            width: var(--size, 10px);
-            height: var(--size, 10px);
-            background-image: url('/snowParticle.png');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            opacity: var(--opacity, 0.75);
-            will-change: transform;
-            animation: snowFall linear infinite;
-            animation-duration: var(--dur, 8s);
-            animation-delay: var(--delay, 0s);
-        }
-
-        /* ============ COUNTDOWN ============ */
-        .countdown {
-            position: fixed;
-            top: 18px;
-            left: 18px;
-            z-index: 110;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 4px;
-            padding: 12px 18px;
-            border-radius: var(--radius-btn);
-            background: rgba(12, 12, 16, 0.88);
-            border: 1px solid var(--card-border);
-            color: var(--text);
-            font-size: 12px;
-            font-weight: 600;
-            pointer-events: none;
-            user-select: none;
-            animation: fadeIn 0.5s ease;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 8px 28px -10px rgba(0, 0, 0, 0.9);
-        }
-        .countdown .label {
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 1.6px;
-            color: var(--text-dim);
-            font-weight: 700;
-        }
-        .countdown .value {
-            display: flex;
-            align-items: baseline;
-            gap: 4px;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--accent), var(--accent-2));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .countdown .value .num {
-            font-size: 22px;
-            line-height: 1;
-            letter-spacing: -0.5px;
-        }
-        .countdown .value .unit {
-            font-size: 10px;
-            letter-spacing: 1.2px;
-            text-transform: uppercase;
-            opacity: 0.9;
-        }
-        .countdown .sub {
-            font-size: 10px;
-            color: var(--text-dim);
-            font-weight: 500;
-        }
-
-        /* ============ SIDE DOCK ============ */
+        /* ============ SIDE DOCK — REMOVABLE BUTTONS ============ */
         .side-dock {
             position: fixed;
             top: 0;
             bottom: 0;
             right: 0;
             z-index: 100;
-            width: 148px;
+            width: 180px;
             display: flex;
             flex-direction: column;
             align-items: stretch;
             justify-content: center;
-            gap: 8px;
-            padding: 20px 14px;
+            gap: 6px;
+            padding: 20px 12px;
             background: rgba(10, 10, 14, 0.88);
             border-left: 1px solid var(--card-border);
             animation: slideRight 0.45s var(--transition-smooth) both;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
+            transition: width 0.3s var(--transition-smooth);
         }
         .side-dock::before {
             content: "";
@@ -258,17 +163,67 @@
             opacity: 0.6;
             pointer-events: none;
         }
-        .dock-btn {
+
+        .dock-header {
             display: flex;
             align-items: center;
-            gap: 12px;
-            height: 48px;
-            padding: 0 16px;
+            justify-content: space-between;
+            padding: 0 6px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 6px;
+        }
+        .dock-header span {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.6px;
+            color: var(--text-dim);
+            font-weight: 700;
+        }
+        .dock-collapse-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .dock-collapse-btn:hover {
+            background: var(--card-hover);
+            color: var(--text);
+        }
+
+        .dock-items {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex: 1;
+            padding-right: 2px;
+        }
+        .dock-items::-webkit-scrollbar {
+            width: 4px;
+        }
+        .dock-items::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+        }
+
+        .dock-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: 44px;
+            padding: 0 12px;
             border-radius: var(--radius-btn);
             text-decoration: none;
             color: var(--text-dim-2);
             font-size: 13px;
-            font-weight: 700;
+            font-weight: 600;
             letter-spacing: 0.3px;
             background: transparent;
             border: 1px solid transparent;
@@ -276,12 +231,13 @@
             cursor: pointer;
             will-change: transform;
             font-family: inherit;
+            flex-shrink: 0;
         }
-        .dock-btn .label {
+        .dock-item .label {
             flex: 1;
             text-align: left;
         }
-        .dock-btn svg {
+        .dock-item svg {
             width: 18px;
             height: 18px;
             stroke: currentColor;
@@ -292,47 +248,124 @@
             flex-shrink: 0;
             transition: stroke 0.2s ease, transform 0.25s ease;
         }
-        .dock-btn:hover {
+        .dock-item:hover {
             color: var(--text);
             background: var(--card-hover);
             border-color: var(--card-border-hover);
-            transform: translateY(-3px) scale(1.03);
+            transform: translateY(-2px) scale(1.02);
             box-shadow: 0 12px 28px -12px var(--shadow);
         }
-        .dock-btn:hover svg {
+        .dock-item:hover svg {
             stroke: var(--accent);
             transform: scale(1.1);
         }
-        .dock-btn:active {
+        .dock-item:active {
             transform: translateY(-1px) scale(1.01);
         }
-        .dock-btn.active {
+        .dock-item.active {
             color: var(--text);
             background: var(--card);
             border-color: var(--card-border);
         }
-        .dock-btn.games-btn {
+        .dock-item.games-btn {
             background: linear-gradient(135deg, rgba(124, 140, 255, 0.18), rgba(180, 124, 255, 0.14));
             border: 1px solid rgba(124, 140, 255, 0.35);
             color: var(--text);
         }
-        .dock-btn.games-btn svg {
+        .dock-item.games-btn svg {
             stroke: var(--accent);
         }
-        .dock-btn.games-btn:hover {
+        .dock-item.games-btn:hover {
             background: linear-gradient(135deg, var(--accent), var(--accent-2));
             border-color: transparent;
             color: #fff;
-            transform: translateY(-3px) scale(1.05);
+            transform: translateY(-2px) scale(1.03);
             box-shadow: 0 14px 32px -10px var(--accent-glow);
         }
-        .dock-btn.games-btn:hover svg {
+        .dock-item.games-btn:hover svg {
             stroke: #fff;
         }
+
+        /* Remove button */
+        .dock-remove {
+            position: absolute;
+            top: 50%;
+            right: 6px;
+            transform: translateY(-50%) scale(0.8);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(220, 50, 50, 0.25);
+            color: #ff7b7b;
+            font-size: 12px;
+            line-height: 1;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.18s, transform 0.18s, background 0.18s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .dock-item:hover .dock-remove {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(-50%) scale(1);
+        }
+        .dock-remove:hover {
+            background: rgba(220, 50, 50, 0.6);
+            color: #fff;
+            transform: translateY(-50%) scale(1.1) !important;
+        }
+
         .dock-sep {
             height: 1px;
             margin: 6px 8px;
             background: linear-gradient(90deg, transparent, var(--card-border), transparent);
+            flex-shrink: 0;
+        }
+
+        /* Collapsed dock state */
+        .side-dock.collapsed {
+            width: 60px;
+            padding: 20px 6px;
+            align-items: center;
+        }
+        .side-dock.collapsed .dock-header span,
+        .side-dock.collapsed .dock-item .label,
+        .side-dock.collapsed .dock-sep {
+            display: none;
+        }
+        .side-dock.collapsed .dock-header {
+            border-bottom: none;
+            padding: 0 0 8px;
+            justify-content: center;
+        }
+        .side-dock.collapsed .dock-collapse-btn {
+            font-size: 18px;
+        }
+        .side-dock.collapsed .dock-item {
+            justify-content: center;
+            padding: 0;
+            width: 44px;
+            height: 44px;
+        }
+        .side-dock.collapsed .dock-item svg {
+            width: 20px;
+            height: 20px;
+        }
+        .side-dock.collapsed .dock-remove {
+            right: -6px;
+            top: 6px;
+            transform: scale(0.8);
+        }
+        .side-dock.collapsed .dock-item:hover .dock-remove {
+            transform: scale(1);
+        }
+        .side-dock.collapsed .dock-item .label {
+            display: none;
         }
 
         /* ============ MAIN CONTENT ============ */
@@ -343,7 +376,11 @@
             width: 100%;
             max-width: 660px;
             padding: 0 24px;
-            margin-right: 148px;
+            margin-right: 180px;
+            transition: margin-right 0.3s var(--transition-smooth);
+        }
+        .side-dock.collapsed ~ .main-content {
+            margin-right: 60px;
         }
         .logo-image-wrap {
             display: flex;
@@ -501,11 +538,6 @@
             color: var(--text);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: #000;
-            background-image: url('/assets/backgrounds/foggy-forest.png');
-            background-size: calc(100% * var(--bg-scale, 1)) auto;
-            background-position: var(--bg-pos-x, 50%) var(--bg-pos-y, 50%);
-            background-repeat: no-repeat;
-            background-attachment: fixed;
         }
         .browser-overlay::before {
             content: '';
@@ -1692,22 +1724,25 @@
                 padding: 16px 8px;
                 gap: 6px;
             }
-            .dock-btn {
+            .side-dock .dock-item {
                 height: 46px;
                 padding: 0;
                 justify-content: center;
                 gap: 0;
             }
-            .dock-btn .label {
+            .side-dock .dock-item .label {
                 display: none;
             }
-            .dock-btn svg {
+            .side-dock .dock-item svg {
                 width: 21px;
                 height: 21px;
             }
             .main-content {
                 margin-right: 68px;
                 padding: 0 16px;
+            }
+            .side-dock.collapsed ~ .main-content {
+                margin-right: 60px;
             }
             .farius-logo {
                 max-width: min(320px, 80vw);
@@ -1724,14 +1759,6 @@
                 width: 46px;
                 height: 46px;
                 border-radius: 14px;
-            }
-            .countdown {
-                padding: 10px 14px;
-                top: 12px;
-                left: 12px;
-            }
-            .countdown .value .num {
-                font-size: 18px;
             }
             .tab {
                 max-width: 150px;
@@ -1846,26 +1873,24 @@
             -webkit-backdrop-filter: blur(24px) saturate(115%);
         }
         .side-dock { background: rgba(5,5,5,.62) !important; }
-        .dock-btn, .browser-toolbar button { color: var(--text-dim-2); }
-        .dock-btn:hover, .app-button:hover, .chooser-btn:hover,
+        .dock-item, .browser-toolbar button { color: var(--text-dim-2); }
+        .dock-item:hover, .app-button:hover, .chooser-btn:hover,
         .browser-toolbar button:hover:not(:disabled), .os-taskbar-btn:hover {
             background: linear-gradient(135deg, rgba(255,255,255,.24), rgba(0,0,0,.32)) !important;
             color: #fff;
             border-color: rgba(255,255,255,.58) !important;
         }
-        .dock-btn.games-btn, .search-button, .new-tab-search button,
+        .dock-item.games-btn, .search-button, .new-tab-search button,
         .os-calc-btn.eq, .os-wallpaper-actions button.primary {
             background: linear-gradient(135deg, #eeeeee, #686868) !important;
             border: 1px solid rgba(255,255,255,.75) !important;
             color: #090909 !important;
             box-shadow: 0 12px 30px rgba(0,0,0,.5), inset 0 1px rgba(255,255,255,.8);
         }
-        /* Preserve the original logo colors while keeping a subtle shadow. */
         .farius-logo, .new-tab-logo img, .chooser-logo img {
             filter: drop-shadow(0 10px 25px rgba(0, 0, 0, .55));
         }
         .browser-frame-wrap, .new-tab-page { background: transparent !important; }
-        /* Keep the OS opaque so the home page cannot show through it. */
         .os-desktop { background-color: #080808 !important; }
         .os-window, .os-window-titlebar, .os-window-content, .os-calc-grid,
         .os-calc-display, .os-clock-display, .os-wallpaper-gallery, .os-start-menu {
@@ -1874,18 +1899,129 @@
         }
         .os-window-title, .os-clock-time, .os-calc-display, .os-start-app span { color: #f2f2f2 !important; }
         .os-window-control, .os-start-app { color: #e5e5e5; }
+
+        /* ============ WATER DROP BACKGROUND ============ */
+        #water-drop-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: none;
+            isolation: isolate;
+        }
+
+        .water-drop {
+            position: absolute;
+            top: -12vh;
+            left: 0;
+            width: var(--drop-size);
+            height: calc(var(--drop-size) * 2.9);
+            border-radius: 55% 55% 48% 48% / 48% 48% 58% 58%;
+            background:
+                radial-gradient(circle at 34% 22%,
+                    rgba(255,255,255,.78) 0 5%,
+                    rgba(255,255,255,.22) 6% 14%,
+                    transparent 15%),
+                linear-gradient(105deg,
+                    rgba(255,255,255,.08),
+                    rgba(255,255,255,.42) 38%,
+                    rgba(190,220,255,.13) 58%,
+                    rgba(255,255,255,.04));
+            border: 1px solid rgba(255,255,255,.24);
+            box-shadow:
+                inset -2px -3px 5px rgba(0,0,0,.22),
+                inset 2px 2px 5px rgba(255,255,255,.18),
+                0 0 12px rgba(180,215,255,.07);
+            opacity: var(--drop-opacity);
+            filter: blur(var(--drop-blur));
+            transform: translate3d(0,0,0) rotate(var(--drop-tilt));
+            animation:
+                waterDropFall var(--drop-duration) linear var(--drop-delay) infinite,
+                waterDropSway calc(var(--drop-duration) * .65) ease-in-out var(--drop-delay) infinite alternate;
+            will-change: transform, opacity;
+        }
+
+        .water-drop::after {
+            content: "";
+            position: absolute;
+            top: -42%;
+            left: 50%;
+            width: 1px;
+            height: 48%;
+            transform: translateX(-50%);
+            background: linear-gradient(
+                to top,
+                rgba(255,255,255,.10),
+                transparent
+            );
+            opacity: .45;
+        }
+
+        .water-drop::before {
+            content: "";
+            position: absolute;
+            left: 28%;
+            top: 12%;
+            width: 22%;
+            height: 32%;
+            border-radius: 50%;
+            background: rgba(255,255,255,.28);
+            filter: blur(.7px);
+        }
+
+        @keyframes waterDropFall {
+            0% {
+                transform: translate3d(0, -16vh, 0) rotate(var(--drop-tilt)) scale(.88);
+                opacity: 0;
+            }
+            7% {
+                opacity: var(--drop-opacity);
+            }
+            88% {
+                opacity: var(--drop-opacity);
+            }
+            100% {
+                transform: translate3d(0, 118vh, 0) rotate(var(--drop-tilt)) scale(1.04);
+                opacity: 0;
+            }
+        }
+
+        @keyframes waterDropSway {
+            0%   { margin-left: -7px; }
+            100% { margin-left: 7px; }
+        }
+
+        /* Tiny droplets make the effect feel like real rain instead of falling pills. */
+        .water-splash {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.45);
+            box-shadow: 0 0 8px rgba(190,220,255,.18);
+            animation: splashFall var(--splash-duration) linear var(--splash-delay) infinite;
+            opacity: 0;
+        }
+
+        @keyframes splashFall {
+            0%   { transform: translate3d(0,-10vh,0) scale(.6); opacity: 0; }
+            10%  { opacity: .55; }
+            88%  { opacity: .28; }
+            100% { transform: translate3d(var(--splash-drift),115vh,0) scale(1); opacity: 0; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .water-drop,
+            .water-splash {
+                animation-play-state: paused;
+            }
+        }
+
     </style>
 </head>
 <body>
     <canvas id="shader-background" aria-hidden="true"></canvas>
-
-    <div class="snow-layer" id="snowLayer" aria-hidden="true"></div>
-
-    <div class="countdown" id="xmasCountdown" aria-live="polite">
-        <span class="label">🎄 Until Christmas</span>
-        <div class="value"><span class="num" id="xmasNum">--</span><span class="unit" id="xmasUnit">days</span></div>
-        <span class="sub" id="xmasSub">loading…</span>
-    </div>
+    <div id="water-drop-layer" aria-hidden="true"></div>
 
     <div class="main-content" id="main-content">
         <div class="logo-image-wrap"><img class="farius-logo" src="/logo.gif" alt="Farium"></div>
@@ -1913,23 +2049,32 @@
         </div>
     </div>
 
-    <nav class="side-dock" aria-label="Site navigation">
-        <a href="/" class="dock-btn active" title="Home">
-            <span class="label">Home</span>
-            <svg viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM9 20v-6h6v6"/></svg>
-        </a>
-        <a href="/settings" class="dock-btn" title="Settings">
-            <span class="label">Settings</span>
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-        </a>
-        <div class="dock-sep" aria-hidden="true"></div>
-        <a href="/gnmath.html" class="dock-btn games-btn" id="gamesBtn" title="Play Games">
-            <span class="label">Games</span>
-            <svg viewBox="0 0 24 24">
-                <rect x="2" y="6" width="20" height="12" rx="3"/>
-                <path d="M6 12h4M8 10v4M15 11h.01M17.5 13h.01"/>
-            </svg>
-        </a>
+    <nav class="side-dock" id="sideDock" aria-label="Site navigation">
+        <div class="dock-header">
+            <span>Menu</span>
+            <button class="dock-collapse-btn" id="dockCollapseBtn" title="Collapse/Expand">◀</button>
+        </div>
+        <div class="dock-items" id="dockItems">
+            <a href="/" class="dock-item active" data-dock-id="home" title="Home">
+                <span class="label">Home</span>
+                <svg viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM9 20v-6h6v6"/></svg>
+                <button class="dock-remove" data-remove="home" title="Remove">×</button>
+            </a>
+            <a href="/settings" class="dock-item" data-dock-id="settings" title="Settings">
+                <span class="label">Settings</span>
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                <button class="dock-remove" data-remove="settings" title="Remove">×</button>
+            </a>
+            <div class="dock-sep" data-sep-id="sep1"></div>
+            <a href="/gnmath.html" class="dock-item games-btn" id="gamesBtn" data-dock-id="games" title="Play Games">
+                <span class="label">Games</span>
+                <svg viewBox="0 0 24 24">
+                    <rect x="2" y="6" width="20" height="12" rx="3"/>
+                    <path d="M6 12h4M8 10v4M15 11h.01M17.5 13h.01"/>
+                </svg>
+                <button class="dock-remove" data-remove="games" title="Remove">×</button>
+            </a>
+        </div>
     </nav>
 
     <!-- ============ SIMPLE BROWSER OVERLAY ============ -->
@@ -2384,79 +2529,6 @@
             document.documentElement.style.setProperty('--overlay-bottom', `rgba(0, 0, 0, ${alphaBottom.toFixed(3)})`);
         })();
 
-        (function initSnow() {
-            const layer = document.getElementById('snowLayer');
-            if (!layer) return;
-            const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            if (reduced) return;
-
-            const isSmallScreen = window.innerWidth < 900;
-            const isLowPower = (navigator.hardwareConcurrency || 4) <= 4;
-            const count = isLowPower || isSmallScreen ? 35 : 60;
-
-            const frag = document.createDocumentFragment();
-            for (let i = 0; i < count; i++) {
-                const el = document.createElement('div');
-                el.className = 'snowflake';
-                const size = 6 + Math.random() * 14;
-                const duration = 7 + Math.random() * 10;
-                const drift = (Math.random() - 0.5) * 200;
-                const opacity = 0.45 + Math.random() * 0.5;
-                const startX = Math.random() * 100;
-                el.style.left = startX + 'vw';
-                el.style.setProperty('--size', size + 'px');
-                el.style.setProperty('--drift', drift + 'px');
-                el.style.setProperty('--opacity', opacity);
-                el.style.setProperty('--dur', duration + 's');
-                el.style.setProperty('--delay', (-Math.random() * duration) + 's');
-                frag.appendChild(el);
-            }
-            layer.appendChild(frag);
-        })();
-
-        (function initCountdown() {
-            const numEl  = document.getElementById('xmasNum');
-            const unitEl = document.getElementById('xmasUnit');
-            const subEl  = document.getElementById('xmasSub');
-            if (!numEl || !unitEl || !subEl) return;
-
-            function nextChristmas(now) {
-                const year = now.getFullYear();
-                const thisYear = new Date(year, 11, 25, 0, 0, 0, 0);
-                if (now.getTime() <= thisYear.getTime()) return thisYear;
-                return new Date(year + 1, 11, 25, 0, 0, 0, 0);
-            }
-            function pad(n) { return String(n).padStart(2, '0'); }
-
-            function tick() {
-                const now = new Date();
-                const xmas = nextChristmas(now);
-                let diff = xmas.getTime() - now.getTime();
-                const isXmasDay = now.getMonth() === 11 && now.getDate() === 25;
-                if (isXmasDay) {
-                    numEl.textContent = '🎁';
-                    unitEl.textContent = 'today';
-                    subEl.textContent = 'Merry Christmas!';
-                    return;
-                }
-                const days    = Math.floor(diff / 86400000);
-                const hours   = Math.floor((diff % 86400000) / 3600000);
-                const minutes = Math.floor((diff % 3600000) / 60000);
-                const seconds = Math.floor((diff % 60000) / 1000);
-                if (days === 0) {
-                    numEl.textContent = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-                    unitEl.textContent = '';
-                    subEl.textContent = 'Almost here!';
-                } else {
-                    numEl.textContent = days;
-                    unitEl.textContent = days === 1 ? 'day' : 'days';
-                    subEl.textContent = `${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
-                }
-            }
-            tick();
-            setInterval(tick, 1000);
-        })();
-
         (function initFullscreenToggle() {
             const btn = document.getElementById('browser-fullscreen');
             if (!btn) return;
@@ -2505,6 +2577,81 @@
                         slide.classList.remove("enter", "leaving");
                     }, 600);
                 }
+            })();
+
+            /* ========== DOCK: REMOVE BUTTONS & COLLAPSE ========== */
+            (function initDock() {
+                const dock = document.getElementById('sideDock');
+                const dockItems = document.getElementById('dockItems');
+                const collapseBtn = document.getElementById('dockCollapseBtn');
+
+                // Collapse toggle
+                let collapsed = localStorage.getItem('dockCollapsed') === 'true';
+                if (collapsed) dock.classList.add('collapsed');
+
+                collapseBtn.addEventListener('click', () => {
+                    collapsed = !collapsed;
+                    dock.classList.toggle('collapsed', collapsed);
+                    localStorage.setItem('dockCollapsed', collapsed);
+                    collapseBtn.textContent = collapsed ? '▶' : '◀';
+                    // Update main content margin
+                    const main = document.getElementById('main-content');
+                    if (main) {
+                        main.style.marginRight = collapsed ? '60px' : '180px';
+                    }
+                });
+                if (collapsed) {
+                    collapseBtn.textContent = '▶';
+                    document.getElementById('main-content').style.marginRight = '60px';
+                }
+
+                // Remove buttons — persisted
+                const hiddenDockItems = JSON.parse(localStorage.getItem('hiddenDockItems') || '[]');
+                hiddenDockItems.forEach(id => {
+                    const item = dockItems.querySelector(`[data-dock-id="${id}"]`);
+                    if (item) item.style.display = 'none';
+                    // Also hide the separator before games if it's the only one left? We'll handle separators separately.
+                });
+
+                // Also handle separators: hide a separator if the next visible item is hidden
+                function updateSeparators() {
+                    const seps = dockItems.querySelectorAll('.dock-sep');
+                    seps.forEach(sep => {
+                        // Find next visible dock item after this separator
+                        let next = sep.nextElementSibling;
+                        let nextVisible = false;
+                        while (next) {
+                            if (next.classList && next.classList.contains('dock-item') && next.style.display !== 'none') {
+                                nextVisible = true;
+                                break;
+                            }
+                            next = next.nextElementSibling;
+                        }
+                        sep.style.display = nextVisible ? '' : 'none';
+                    });
+                }
+                updateSeparators();
+
+                dockItems.querySelectorAll('.dock-remove').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const id = btn.dataset.remove;
+                        const item = dockItems.querySelector(`[data-dock-id="${id}"]`);
+                        if (item) {
+                            item.style.display = 'none';
+                            // Persist
+                            const hidden = JSON.parse(localStorage.getItem('hiddenDockItems') || '[]');
+                            if (!hidden.includes(id)) {
+                                hidden.push(id);
+                                localStorage.setItem('hiddenDockItems', JSON.stringify(hidden));
+                            }
+                            updateSeparators();
+                        }
+                    });
+                });
+
+                // If all dock items are hidden, maybe hide the dock? Not required.
             })();
 
             const gamesBtn = document.getElementById("gamesBtn");
@@ -2647,7 +2794,7 @@
             initBrowserOS();
         });
 
-        /* ============ BROWSER OS — WINDOWS 11 DARK (unchanged) ============ */
+        /* ============ BROWSER OS — WINDOWS 11 DARK ============ */
         let osWindows = [];
         let osWindowZ = 100;
         let osMinimized = [];
@@ -2655,11 +2802,8 @@
 
         function openBrowserOS() {
             const desktop = document.getElementById('os-desktop');
-            // OS is a separate full-screen mode; hide the home UI behind it.
             document.getElementById('main-content').style.visibility = 'hidden';
-            document.querySelector('.side-dock').style.visibility = 'hidden';
-            document.getElementById('xmasCountdown').style.visibility = 'hidden';
-            document.querySelector('.snow-layer').style.visibility = 'hidden';
+            document.getElementById('sideDock').style.visibility = 'hidden';
             desktop.classList.add('open');
 
             const savedWall = localStorage.getItem('os-wallpaper');
@@ -2674,7 +2818,6 @@
             updateTaskbarRunning();
 
             const pending = document.getElementById('chooser-overlay').dataset.pendingUrl;
-            // Consume the original search once, so the OS does not reopen the home page.
             delete document.getElementById('chooser-overlay').dataset.pendingUrl;
             if (pending) {
                 const url = normalizeUrl(pending);
@@ -2687,11 +2830,8 @@
         function closeBrowserOS() {
             document.getElementById('os-desktop').classList.remove('open');
             document.querySelectorAll('.os-window').forEach(w => w.remove());
-            // Restore the main page only after leaving the OS.
             document.getElementById('main-content').style.visibility = '';
-            document.querySelector('.side-dock').style.visibility = '';
-            document.getElementById('xmasCountdown').style.visibility = '';
-            document.querySelector('.snow-layer').style.visibility = '';
+            document.getElementById('sideDock').style.visibility = '';
             document.getElementById('chooser-overlay').classList.remove('open');
             osWindows = [];
             osMinimized = [];
@@ -2886,7 +3026,6 @@
             iframe.className = 'os-browser-iframe';
             iframe.referrerPolicy = 'no-referrer';
             iframe.allowFullscreen = true;
-            // An empty iframe src can resolve to this page; use a true blank page.
             iframe.src = 'about:blank';
 
             let history = [];
@@ -3380,17 +3519,17 @@
             });
         }
 
-        /* ============ MONOCHROME WEBGL BACKGROUND ============ */
-        /* ============ POLISHED SILVER LIQUID SHADER ============ */
+        /* ============ IMPROVED WEBGL SHADER — WATER DROPS ============ */
         (function initShaderBackground() {
             const canvas = document.getElementById('shader-background');
-            const gl = canvas && canvas.getContext('webgl', { antialias: true, alpha: false });
+            const gl = canvas && canvas.getContext('webgl', { antialias: true, alpha: false, premultipliedAlpha: false });
             if (!gl) return;
 
             const vertexSource = `
                 attribute vec2 position;
                 void main() { gl_Position = vec4(position, 0.0, 1.0); }
             `;
+
             const fragmentSource = `
                 precision highp float;
                 uniform vec2 resolution;
@@ -3426,34 +3565,91 @@
                     return value;
                 }
 
+                // Water drop distortion
+                vec2 dropDistort(vec2 uv, vec2 dropCenter, float dropRadius, float dropStrength) {
+                    vec2 delta = uv - dropCenter;
+                    float dist = length(delta);
+                    float influence = smoothstep(dropRadius, dropRadius * 0.2, dist);
+                    // Refraction-like displacement
+                    vec2 direction = normalize(delta + 0.0001);
+                    float wave = sin(dist * 30.0 - time * 6.0) * 0.5 + 0.5;
+                    return direction * influence * dropStrength * wave;
+                }
+
                 void main() {
                     vec2 uv = gl_FragCoord.xy / resolution.xy;
                     vec2 aspect = vec2(resolution.x / resolution.y, 1.0);
                     vec2 p = (uv - 0.5) * aspect;
-                    float t = time * 0.16;
 
-                    // Layered flowing bands create a soft liquid-metal surface.
-                    vec2 flow = vec2(t * 0.22, -t * 0.14);
-                    float field = fbm(p * 2.1 + flow);
-                    field += 0.42 * fbm(p * 4.4 - flow * 1.35);
-                    float bands = sin((p.x * 3.2 + p.y * 2.4) + field * 5.5 - t * 2.0);
-                    float surface = smoothstep(-0.35, 0.8, bands * 0.5 + field * 0.75);
+                    float t = time * 0.18;
 
-                    // Mouse interaction produces a soft expanding ripple.
-                    vec2 mouse = (pointer - 0.5) * aspect;
-                    float distanceToMouse = length(p - mouse);
-                    float ripple = sin(distanceToMouse * 38.0 - time * 3.4) * exp(-distanceToMouse * 4.2) * pulse;
+                    // Mouse influence
+                    vec2 mouseUV = pointer;
+                    vec2 mousePos = (mouseUV - 0.5) * aspect;
+                    float mouseDist = length(p - mousePos);
+                    float mouseInfluence = smoothstep(0.6, 0.0, mouseDist) * (0.4 + pulse * 0.6);
 
-                    float vignette = smoothstep(1.35, 0.15, length(p));
-                    vec3 black = vec3(0.006, 0.008, 0.012);
-                    vec3 charcoal = vec3(0.055, 0.065, 0.08);
-                    vec3 silver = vec3(0.48, 0.52, 0.58);
-                    vec3 highlight = vec3(0.9, 0.93, 0.98);
+                    // Simulate multiple water drops
+                    // Drop 1: moving with pointer
+                    vec2 drop1Center = mousePos + vec2(sin(t * 1.3) * 0.15, cos(t * 1.7) * 0.12);
+                    float drop1Radius = 0.32 + sin(t * 2.1) * 0.08;
+                    float drop1Strength = 0.06 + pulse * 0.08;
 
-                    vec3 color = mix(black, charcoal, surface * 0.8);
-                    color = mix(color, silver, smoothstep(0.58, 0.92, surface) * 0.42);
-                    color += highlight * max(0.0, ripple) * 0.14;
-                    color += silver * vignette * 0.06;
+                    // Drop 2: auto-moving
+                    vec2 drop2Center = vec2(sin(t * 0.9) * 0.4, cos(t * 0.7) * 0.35);
+                    float drop2Radius = 0.28 + sin(t * 1.5) * 0.1;
+                    float drop2Strength = 0.05;
+
+                    // Drop 3: auto-moving
+                    vec2 drop3Center = vec2(cos(t * 0.6 + 2.0) * 0.45, sin(t * 0.8 + 1.0) * 0.3);
+                    float drop3Radius = 0.25 + cos(t * 1.8) * 0.09;
+                    float drop3Strength = 0.045;
+
+                    // Combine distortions
+                    vec2 distortion = vec2(0.0);
+                    distortion += dropDistort(p, drop1Center, drop1Radius, drop1Strength);
+                    distortion += dropDistort(p, drop2Center, drop2Radius, drop2Strength);
+                    distortion += dropDistort(p, drop3Center, drop3Radius, drop3Strength);
+
+                    // Add subtle flowing distortion
+                    vec2 flow = vec2(t * 0.1, -t * 0.08);
+                    float field = fbm(p * 2.5 + flow);
+                    distortion += vec2(
+                        sin(field * 5.0 + t * 1.5) * 0.01,
+                        cos(field * 5.0 + t * 1.2) * 0.01
+                    );
+
+                    // Sample the base pattern with distortion
+                    vec2 distortedP = p + distortion;
+
+                    float bands = sin((distortedP.x * 4.0 + distortedP.y * 3.2) + field * 4.0 - t * 2.5);
+                    float surface = smoothstep(-0.35, 0.85, bands * 0.5 + field * 0.8);
+
+                    // Water-like caustics
+                    float caustic = fbm(distortedP * 6.0 + t * 0.5);
+                    caustic = pow(caustic, 2.0);
+
+                    // Vignette
+                    float vignette = smoothstep(1.5, 0.2, length(p));
+
+                    // Color palette — black, silver, deep water
+                    vec3 black = vec3(0.004, 0.005, 0.008);
+                    vec3 deepWater = vec3(0.02, 0.04, 0.06);
+                    vec3 charcoal = vec3(0.06, 0.075, 0.09);
+                    vec3 silver = vec3(0.45, 0.5, 0.58);
+                    vec3 highlight = vec3(0.85, 0.9, 1.0);
+
+                    vec3 color = mix(black, deepWater, surface * 0.7);
+                    color = mix(color, charcoal, smoothstep(0.4, 0.8, surface) * 0.6);
+                    color = mix(color, silver, smoothstep(0.65, 0.95, surface) * 0.35);
+                    color += highlight * caustic * 0.08;
+                    color += silver * vignette * 0.04;
+
+                    // Mouse proximity glow
+                    color += highlight * mouseInfluence * 0.12;
+
+                    // Subtle pulse
+                    color += highlight * pulse * 0.03;
 
                     gl_FragColor = vec4(color, 1.0);
                 }
@@ -3463,6 +3659,9 @@
                 const shader = gl.createShader(type);
                 gl.shaderSource(shader, source);
                 gl.compileShader(shader);
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    console.warn(gl.getShaderInfoLog(shader));
+                }
                 return shader;
             }
 
@@ -3470,6 +3669,10 @@
             gl.attachShader(program, compile(gl.VERTEX_SHADER, vertexSource));
             gl.attachShader(program, compile(gl.FRAGMENT_SHADER, fragmentSource));
             gl.linkProgram(program);
+            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+                console.warn(gl.getProgramInfoLog(program));
+                return;
+            }
             gl.useProgram(program);
 
             const buffer = gl.createBuffer();
@@ -3502,7 +3705,7 @@
 
             addEventListener('pointermove', e => moveWave(e.clientX, e.clientY, e.buttons > 0));
             addEventListener('pointerdown', e => moveWave(e.clientX, e.clientY, true));
-            addEventListener('pointerup', () => { wavePulse = Math.max(wavePulse, 0.55); });
+            addEventListener('pointerup', () => { wavePulse = Math.max(wavePulse, 0.5); });
 
             function resize() {
                 const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -3512,9 +3715,9 @@
             }
 
             function draw(now) {
-                waveX += (targetX - waveX) * 0.045;
-                waveY += (targetY - waveY) * 0.045;
-                wavePulse *= 0.972;
+                waveX += (targetX - waveX) * 0.06;
+                waveY += (targetY - waveY) * 0.06;
+                wavePulse *= 0.975;
                 gl.uniform2f(resolution, canvas.width, canvas.height);
                 gl.uniform1f(time, now * 0.001);
                 gl.uniform2f(pointer, waveX, waveY);
@@ -3558,5 +3761,74 @@
             }
         }
     </script>
+
+    <script>
+        /* ============ LIGHTWEIGHT FALLING WATER DROPS ============ */
+        (() => {
+            const layer = document.getElementById('water-drop-layer');
+            if (!layer) return;
+
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+            const isSmallScreen = () => window.innerWidth < 700;
+
+            function random(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            function createDrops() {
+                layer.innerHTML = '';
+
+                // Fewer elements on phones keeps the effect smooth.
+                const mainCount = isSmallScreen() ? 18 : 30;
+                const tinyCount = isSmallScreen() ? 12 : 24;
+
+                for (let i = 0; i < mainCount; i++) {
+                    const drop = document.createElement('span');
+                    drop.className = 'water-drop';
+
+                    const size = random(3.5, 10);
+                    const duration = random(5.5, 11.5);
+                    const delay = random(-11, 0);
+
+                    drop.style.left = `${random(-2, 102)}vw`;
+                    drop.style.setProperty('--drop-size', `${size}px`);
+                    drop.style.setProperty('--drop-duration', `${duration}s`);
+                    drop.style.setProperty('--drop-delay', `${delay}s`);
+                    drop.style.setProperty('--drop-opacity', random(.12, .42).toFixed(2));
+                    drop.style.setProperty('--drop-blur', `${random(0, .7).toFixed(2)}px`);
+                    drop.style.setProperty('--drop-tilt', `${random(-9, 9).toFixed(1)}deg`);
+
+                    layer.appendChild(drop);
+                }
+
+                for (let i = 0; i < tinyCount; i++) {
+                    const splash = document.createElement('span');
+                    splash.className = 'water-splash';
+
+                    splash.style.left = `${random(0, 100)}vw`;
+                    splash.style.setProperty('--splash-duration', `${random(3.5, 8)}s`);
+                    splash.style.setProperty('--splash-delay', `${random(-8, 0)}s`);
+                    splash.style.setProperty('--splash-drift', `${random(-35, 35)}px`);
+
+                    layer.appendChild(splash);
+                }
+            }
+
+            createDrops();
+
+            // Rebuild only when crossing the mobile/desktop breakpoint.
+            let wasSmall = isSmallScreen();
+            window.addEventListener('resize', () => {
+                const nowSmall = isSmallScreen();
+                if (nowSmall !== wasSmall) {
+                    wasSmall = nowSmall;
+                    createDrops();
+                }
+            }, { passive: true });
+
+            reduceMotion.addEventListener?.('change', createDrops);
+        })();
+    </script>
+
 </body>
 </html>

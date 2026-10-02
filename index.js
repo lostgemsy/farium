@@ -16,6 +16,13 @@ const app = express();
 const publicPath = join(__dirname, "public");
 app.use(express.static(publicPath));
 
+// Serve background.png from repo root so CSS url('/background.png') works even
+// if the image was accidentally placed at the repo root instead of /public
+app.get("/background.png", (req, res) => {
+    res.type("image/png");
+    res.sendFile(join(__dirname, "background.png"));
+});
+
 app.set('view engine', 'ejs');
 app.set('views', join(__dirname, 'views'));
 

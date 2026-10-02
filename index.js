@@ -7,6 +7,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { hostname } from "node:os";
 import { Server } from "socket.io";
+import { createClient } from "redis";
 import { epoxyPath } from "@mercuryworkshop/epoxy-transport";
 import { libcurlPath } from "@mercuryworkshop/libcurl-transport";
 import { baremuxPath } from "@mercuryworkshop/bare-mux/node";
@@ -21,8 +22,12 @@ const DATA_DIR = join(__dirname, "data");
 const DATA_FILE = join(DATA_DIR, "store.json");
 const CHAT_PORT = Number(process.env.CHAT_PORT || 3001);
 const CHAT_SOCKET_URL = process.env.CHAT_SOCKET_URL || `http://localhost:${CHAT_PORT}`;
+const REDIS_URL = process.env.REDIS_URL || process.env.diddya_REDIS_URL || null;
 
 const userSockets = new Map();
+let redisClient = null;
+let redisSub = null;
+let redisReady = false;
 
 async function ensureDataDir() {
   await mkdir(DATA_DIR, { recursive: true });
@@ -70,6 +75,7 @@ function findUserByName(store, username) {
 
 function getSafeUser(user) {
   if (!user) return null;
+
   return {
     username: user.username,
     role: user.role,
@@ -87,6 +93,119 @@ function listUsers(store) {
       banned: Boolean(user.banned),
       muted: Boolean(user.muted),
     }));
+}
+
+async function initRedis() {
+  if (!REDIS_URL) {
+    console.log("Redis not configured; using local JSON store for chat data.");
+    return;
+  }
+
+  try {
+    redisClient = createClient({ url: REDIS_URL });
+    redisSub = createClient({ url: REDIS_URL });
+
+    await Promise.all([redisClient.connect(), redisSub.connect()]);
+    redisReady = true;
+
+    await redisSub.subscribe("farium:messages:channel");
+    redisSub.on("message", (channel, message) => {
+      if (channel !== "farium:messages:channel") return;
+
+      try {
+        const parsed = JSON.parse(message);
+        globalThis.__io?.emit("chat:message", parsed);
+      } catch (error) {
+        console.error("Failed to parse Redis chat message:", error);
+      }
+    });
+
+    console.log("Redis connected for chat storage and presence.");
+  } catch (error) {
+    redisReady = false;
+    console.warn("Redis unavailable; falling back to file store.", error.message || error);
+  }
+}
+
+async function saveMessageRedis(message) {
+  if (!redisReady || !redisClient) return false;
+
+  await redisClient.lPush("farium:messages", JSON.stringify(message));
+  await redisClient.lTrim("farium:messages", 0, 249);
+  await redisClient.publish("farium:messages:channel", JSON.stringify(message));
+  return true;
+}
+
+async function getRecentMessagesRedis(limit = 100) {
+  if (!redisReady || !redisClient) return [];
+
+  const list = await redisClient.lRange("farium:messages", 0, Math.max(limit - 1, 0));
+  return list
+    .map((entry) => {
+      try {
+        return JSON.parse(entry);
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean)
+    .reverse();
+}
+
+async function setPresenceRedis(username, socketId) {
+  if (!redisReady || !redisClient) return;
+
+  await redisClient.hSet("farium:presence", username, JSON.stringify({
+    socketId,
+    lastSeen: new Date().toISOString(),
+  }));
+}
+
+async function clearPresenceRedis(username) {
+  if (!redisReady || !redisClient) return;
+
+  await redisClient.hDel("farium:presence", username);
+}
+
+async function listPresenceRedis() {
+  if (!redisReady || !redisClient) return [];
+
+  const all = await redisClient.hGetAll("farium:presence");
+  return Object.entries(all).map(([username, value]) => {
+    try {
+      const parsed = JSON.parse(value);
+      return {
+        username,
+        socketId: parsed.socketId,
+        lastSeen: parsed.lastSeen,
+      };
+    } catch {
+      return { username, socketId: null, lastSeen: null };
+    }
+  });
+}
+
+async function appendChatMessage(message) {
+  if (redisReady && redisClient) {
+    await saveMessageRedis(message);
+    return;
+  }
+
+  const store = await loadStore();
+  store.messages.push(message);
+  if (store.messages.length > 250) {
+    store.messages = store.messages.slice(-250);
+  }
+  await saveStore(store);
+}
+
+async function getRecentMessages(limit = 100) {
+  if (redisReady && redisClient) {
+    return getRecentMessagesRedis(limit);
+  }
+
+  const store = await loadStore();
+  return store.messages.slice(-limit);
 }
 
 async function ensureSeedAdmin() {
@@ -145,9 +264,35 @@ async function requireAdminMiddleware(req, res, next) {
 
 async function broadcastPresence() {
   const store = await loadStore();
+
+  if (redisReady && redisClient) {
+    const presenceEntries = await listPresenceRedis();
+    const userMap = new Map(store.users.map((user) => [user.username, user]));
+    const users = presenceEntries
+      .map((entry) => {
+        const user = userMap.get(entry.username) || null;
+        if (!user) return null;
+        return {
+          username: user.username,
+          role: user.role,
+          banned: Boolean(user.banned),
+          muted: Boolean(user.muted),
+        };
+      })
+      .filter(Boolean)
+      .filter((user) => !user.banned);
+
+    globalThis.__io?.emit("presence:update", users);
+    return;
+  }
+
   const users = listUsers(store)
     .filter((user) => !user.banned)
-    .map((user) => ({ username: user.username, role: user.role, muted: user.muted }));
+    .map((user) => ({
+      username: user.username,
+      role: user.role,
+      muted: user.muted,
+    }));
 
   globalThis.__io?.emit("presence:update", users);
 }
@@ -181,6 +326,8 @@ chatServer.listen(CHAT_PORT, () => {
   console.log(`Chat socket server listening on http://localhost:${CHAT_PORT}`);
 });
 
+await initRedis();
+
 io.on("connection", async (socket) => {
   const username = normalizeUsername(socket.handshake.auth?.username || "");
 
@@ -203,10 +350,14 @@ io.on("connection", async (socket) => {
   socket.join(`user:${username}`);
   userSockets.set(username, socket.id);
 
-  socket.emit("chat:history", store.messages.slice(-100));
-  socket.emit("presence:update", listUsers(store).filter((item) => !item.banned));
+  if (redisReady && redisClient) {
+    await setPresenceRedis(username, socket.id);
+  }
 
-  broadcastPresence();
+  const history = await getRecentMessages(100);
+  socket.emit("chat:history", history);
+
+  await broadcastPresence();
 
   socket.on("chat:send", async ({ text }) => {
     const messageText = String(text || "").trim();
@@ -232,13 +383,11 @@ io.on("connection", async (socket) => {
       createdAt: new Date().toISOString(),
     };
 
-    currentStore.messages.push(message);
-    if (currentStore.messages.length > 250) {
-      currentStore.messages = currentStore.messages.slice(-250);
-    }
+    await appendChatMessage(message);
 
-    await saveStore(currentStore);
-    io.emit("chat:message", message);
+    if (!(redisReady && redisClient)) {
+      io.emit("chat:message", message);
+    }
   });
 
   socket.on("call:offer", ({ to, offer }) => {
@@ -275,19 +424,34 @@ io.on("connection", async (socket) => {
     }
   });
 
-  socket.on("disconnect", () => {
+  socket.on("disconnect", async () => {
     if (userSockets.get(username) === socket.id) {
       userSockets.delete(username);
     }
-    broadcastPresence();
+
+    if (redisReady && redisClient) {
+      await clearPresenceRedis(username);
+    }
+
+    await broadcastPresence();
   });
 });
 
 app.use(express.static(publicPath));
 
 app.get("/background.png", (req, res) => {
-  res.type("image/png");
-  res.sendFile(join(__dirname, "background.png"));
+  const candidates = [
+    join(__dirname, "background.png"),
+    join(publicPath, "background.png"),
+  ];
+
+  for (const filePath of candidates) {
+    if (existsSync(filePath)) {
+      return res.sendFile(filePath);
+    }
+  }
+
+  return res.status(404).send("background.png not found");
 });
 
 app.set("view engine", "ejs");
@@ -344,8 +508,8 @@ app.get("/api/session", (req, res) => {
 });
 
 app.get("/api/messages", requireAuthMiddleware, async (req, res) => {
-  const store = await loadStore();
-  res.json({ messages: store.messages.slice(-100) });
+  const messages = await getRecentMessages(100);
+  res.json({ messages });
 });
 
 app.get("/api/users", requireAuthMiddleware, async (req, res) => {
@@ -467,7 +631,6 @@ app.post("/api/admin/unmute", requireAdminMiddleware, async (req, res) => {
 });
 
 app.get("/", async (req, res) => {
-  const store = await loadStore();
   await ensureSeedAdmin();
 
   const renderWithInjectedChatButton = (err, html) => {
@@ -563,3 +726,4 @@ function shutdown() {
 
 server.listen({ port });
 await ensureSeedAdmin();
+

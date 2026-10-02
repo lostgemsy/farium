@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Farium Chat</title>
+    <style>
+      :root {
+        --bg: #07140a;
+        --bg-2: #0d2012;
+        --panel: rgba(18, 32, 22, 0.8);
+        --panel-2: rgba(12, 25, 17, 0.9);
+        --accent: #5cb85c;
+        --accent-2: #3a9e3a;
+        --text: #eefaf0;
+        --muted: rgba(220, 240, 220, 0.72);
+        --danger: #ff6b6b;
+        --warning: #f7c948;
+        --border: rgba(160, 245, 160, 0.2);
+      }
+
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        background: linear-gradient(180deg, var(--bg), var(--bg-2));
+        color: var(--text);
+        font-family: Inter, Arial, sans-serif;
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 24px;
+      }
+
+      .shell {
+        width: min(1200px, 100%);
+        height: min(820px, 90vh);
+        display: grid;
+        grid-template-columns: 320px minmax(0, 1fr);
+        background: rgba(13, 27, 18, 0.8);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+      }
+
+      .sidebar {
+        background: rgba(7, 19, 11, 0.9);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .brand {
+        padding: 18px 20px 12px;
+        border-bottom: 1px solid var(--border);
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+      }
+
+      .sidebar-section {
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .section-title {
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      #user-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .user-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px 12px;
+        background: rgba(30, 52, 39, 0.4);
+      }
+
+      .user-item .meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 12px rgba(92, 184, 92, 0.6);
+      }
+
+      .dot.muted {
+        background: var(--warning);
+        box-shadow: 0 0 12px rgba(247, 201, 72, 0.6);
+      }
+
+      .call-btn {
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 8px 10px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .panel {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        background: rgba(8, 18, 12, 0.8);
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 22px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(12, 26, 18, 0.9);
+      }
+
+      .user-badge {
+        font-weight: 700;
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .ghost-link,
+      .ghost-button {
+        color: var(--text);
+        text-decoration: none;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 9px 12px;
+        font-weight: 600;
+      }
+
+      .messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 18px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .message {
+        max-width: 75%;
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: rgba(25, 45, 35, 0.8);
+        border: 1px solid rgba(160, 245, 160, 0.14);
+      }
+
+      .message.self {
+        align-self: flex-end;
+        background: rgba(70, 111, 70, 0.45);
+      }
+
+      .message-header {
+        display: flex;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+
+      .message-text {
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .composer {
+        display: flex;
+        gap: 12px;
+        padding: 18px 20px 20px;
+        border-top: 1px solid var(--border);
+      }
+
+      .composer input {
+        flex: 1;
+        border: 1px solid var(--border);
+        background: rgba(24, 42, 30, 0.7);
+        color: var(--text);
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-size: 15px;
+      }
+
+      .composer button {
+        border: none;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        color: white;
+        font-weight: 700;
+        padding: 0 18px;
+        border-radius: 12px;
+        cursor: pointer;
+      }
+
+      .status {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      @media (max-width: 760px) {
+        .shell {
+          grid-template-columns: 1fr;
+          height: auto;
+        }
+        .sidebar {
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">FARIUM CHAT</div>
+        <div class="sidebar-section">
+          <p class="section-title">Online</p>
+          <ul id="user-list"></ul>
+        </div>
+      </aside>
+
+      <main class="panel">
+        <div class="topbar">
+          <div class="user-badge">Signed in as <%= user.username %></div>
+          <div class="actions">
+            <a class="ghost-link" href="/">Home</a>
+            <a class="ghost-link" href="/logout">Log out</a>
+          </div>
+        </div>
+
+        <div id="messages" class="messages"></div>
+
+        <div class="composer">
+          <input id="chat-message" type="text" maxlength="500" placeholder="Type a message..." />
+          <button id="send-message">Send</button>
+        </div>
+      </main>
+    </div>
+
+    <script src="<%= socketUrl %>/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io('<%= socketUrl %>', {
+        auth: { username: '<%= user.username %>' },
+        transports: ['websocket', 'polling']
+      });
+
+      const messageInput = document.getElementById('chat-message');
+      const sendButton = document.getElementById('send-message');
+      const messagesEl = document.getElementById('messages');
+      const userListEl = document.getElementById('user-list');
+      const currentUser = '<%= user.username %>';
+
+      function appendMessage(message) {
+        const item = document.createElement('div');
+        item.className = 'message ' + (message.username === currentUser ? 'self' : '');
+
+        const header = document.createElement('div');
+        header.className = 'message-header';
+        header.innerHTML = `<strong>${message.username}</strong><span>${new Date(message.createdAt).toLocaleTimeString()}</span>`;
+
+        const text = document.createElement('div');
+        text.className = 'message-text';
+        text.textContent = message.text;
+
+        item.appendChild(header);
+        item.appendChild(text);
+        messagesEl.appendChild(item);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+
+      function renderUsers(users) {
+        userListEl.innerHTML = '';
+
+        users.forEach((user) => {
+          const li = document.createElement('li');
+          li.className = 'user-item';
+
+          const meta = document.createElement('div');
+          meta.className = 'meta';
+
+          const dot = document.createElement('span');
+          dot.className = 'dot' + (user.muted ? ' muted' : '');
+
+          const name = document.createElement('span');
+          name.textContent = user.username + (user.role === 'admin' ? ' · admin' : '');
+
+          meta.appendChild(dot);
+          meta.appendChild(name);
+
+          const callButton = document.createElement('button');
+          callButton.className = 'call-btn';
+          callButton.textContent = 'Call';
+          callButton.disabled = user.username === currentUser;
+          callButton.addEventListener('click', () => startCall(user.username));
+
+          li.appendChild(meta);
+          li.appendChild(callButton);
+          userListEl.appendChild(li);
+        });
+      }
+
+      function notifyUser(text) {
+        const msg = document.createElement('div');
+        msg.className = 'message';
+        msg.innerHTML = `<div class="message-header"><strong>System</strong></div><div class="message-text">${text}</div>`;
+        messagesEl.appendChild(msg);
+      }
+
+      async function loadHistory() {
+        const res = await fetch('/api/messages');
+        const data = await res.json();
+        data.messages.forEach(appendMessage);
+      }
+
+      async function loadUsers() {
+        const res = await fetch('/api/users');
+        const data = await res.json();
+        renderUsers(data.users || []);
+      }
+
+      let localStream = null;
+      const peerConnections = new Map();
+
+      async function startCall(target) {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          notifyUser('Your browser does not support WebRTC audio calls.');
+          return;
+        }
+
+        if (peerConnections.has(target)) {
+          notifyUser('You already have a call with this user.');
+          return;
+        }
+
+        localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+
+        localStream.getTracks().forEach((track) => pc.addTrack(track, localStream));
+
+        pc.onicecandidate = (event) => {
+          if (event.candidate) {
+            socket.emit('call:ice', { to: target, candidate: event.candidate });
+          }
+        };
+
+        pc.ontrack = (event) => {
+          const audio = new Audio();
+          audio.srcObject = event.streams[0];
+          audio.play();
+        };
+
+        peerConnections.set(target, pc);
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        socket.emit('call:offer', { to: target, offer });
+        notifyUser(`Calling ${target}...`);
+      }
+
+      async function acceptIncomingCall(from, offer) {
+        const accepted = confirm(`${from} is calling you. Accept?`);
+        if (!accepted) {
+          socket.emit('call:hangup', { to: from });
+          return;
+        }
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          notifyUser('Your browser does not support WebRTC audio calls.');
+          return;
+        }
+
+        localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+        peerConnections.set(from, pc);
+
+        localStream.getTracks().forEach((track) => pc.addTrack(track, localStream));
+
+        pc.onicecandidate = (event) => {
+          if (event.candidate) {
+            socket.emit('call:ice', { to: from, candidate: event.candidate });
+          }
+        };
+
+        pc.ontrack = (event) => {
+          const audio = new Audio();
+          audio.srcObject = event.streams[0];
+          audio.play();
+        };
+
+        await pc.setRemoteDescription(new RTCSessionDescription(offer));
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        socket.emit('call:answer', { to: from, answer });
+      }
+
+      socket.on('connect', async () => {
+        await loadHistory();
+        await loadUsers();
+      });
+
+      socket.on('chat:history', (messages) => {
+        messages.forEach(appendMessage);
+      });
+
+      socket.on('chat:message', (message) => {
+        appendMessage(message);
+      });
+
+      socket.on('presence:update', (users) => {
+        renderUsers(users || []);
+      });
+
+      socket.on('call:incoming', async ({ from, offer }) => {
+        await acceptIncomingCall(from, offer);
+      });
+
+      socket.on('call:answer', async ({ from, answer }) => {
+        const pc = peerConnections.get(from);
+        if (pc) {
+          await pc.setRemoteDescription(new RTCSessionDescription(answer));
+        }
+      });
+
+      socket.on('call:ice', async ({ from, candidate }) => {
+        const pc = peerConnections.get(from);
+        if (pc) {
+          await pc.addIceCandidate(new RTCIceCandidate(candidate));
+        }
+      });
+
+      socket.on('call:hangup', ({ from }) => {
+        const pc = peerConnections.get(from);
+        if (pc) {
+          pc.close();
+          peerConnections.delete(from);
+          notifyUser(`${from} ended the call.`);
+        }
+      });
+
+      socket.on('chat:error', (message) => {
+        notifyUser(message);
+      });
+
+      socket.on('connect_error', (err) => {
+        notifyUser('Socket connection error: ' + err.message);
+      });
+
+      sendButton.addEventListener('click', () => {
+        const text = messageInput.value.trim();
+        if (!text) return;
+        socket.emit('chat:send', { text });
+        messageInput.value = '';
+      });
+
+      messageInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          sendButton.click();
+        }
+      });
+    </script>
+  </body>
+</html>

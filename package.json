@@ -8,8 +8,7 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "start": "node .",
-    "dev": "node ."
+    "start": "node ."
   },
   "author": "playstation451",
   "license": "AGPL-3.0-only",
@@ -20,12 +19,8 @@
     "@mercuryworkshop/libcurl-transport": "^1.5.1",
     "@mercuryworkshop/wisp-js": "^0.3.3",
     "@tomphttp/bare-server-node": "^2.0.5",
-    "bcryptjs": "^2.4.3",
     "ejs": "^3.1.10",
     "express": "^4.21.1",
-    "express-session": "^1.18.1",
-    "redis": "^5.0.0",
-    "socket.io": "^4.8.1",
     "venus-pit": "^1.1.7",
     "wisp-server-node": "^1.1.7"
   },

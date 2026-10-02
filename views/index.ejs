@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farium · Browse Freely</title>
+    <title>Farium · Green Forest</title>
 
     <!-- External proxy libraries (keep as is) -->
     <script src="/scram/scramjet.js"></script>
@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
-        /* ============ RESET & DESIGN TOKENS ============ */
+        /* ============ RESET & GREEN FOREST TOKENS ============ */
         * {
             margin: 0;
             padding: 0;
@@ -25,40 +25,41 @@
         }
 
         :root {
-            --bg: #000000;
-            --bg-2: #08080a;
-            --bg-3: #101014;
-            --text: #f8f8fc;
-            --text-dim: rgba(255, 255, 255, 0.5);
-            --text-dim-2: rgba(255, 255, 255, 0.78);
-            --card: rgba(255, 255, 255, 0.045);
-            --card-hover: rgba(255, 255, 255, 0.09);
-            --card-border: rgba(255, 255, 255, 0.09);
-            --card-border-hover: rgba(255, 255, 255, 0.28);
-            --input-bg: rgba(255, 255, 255, 0.05);
-            --input-border: rgba(255, 255, 255, 0.12);
-            --input-border-focus: rgba(255, 255, 255, 0.45);
-            --shadow: rgba(0, 0, 0, 0.8);
-            --accent: #7c8cff;
-            --accent-2: #b47cff;
-            --accent-glow: rgba(124, 140, 255, 0.35);
-            --ring: rgba(124, 140, 255, 0.35);
+            --bg: #0a0f0a;
+            --bg-2: #0f150f;
+            --bg-3: #141c14;
+            --text: #e8f0e8;
+            --text-dim: rgba(180, 220, 180, 0.55);
+            --text-dim-2: rgba(200, 235, 200, 0.82);
+            --card: rgba(30, 50, 30, 0.32);
+            --card-hover: rgba(50, 80, 50, 0.45);
+            --card-border: rgba(120, 200, 120, 0.18);
+            --card-border-hover: rgba(140, 240, 140, 0.45);
+            --input-bg: rgba(10, 20, 10, 0.45);
+            --input-border: rgba(120, 200, 120, 0.22);
+            --input-border-focus: rgba(140, 240, 140, 0.65);
+            --shadow: rgba(0, 0, 0, 0.85);
+            --accent: #5cb85c;
+            --accent-2: #3a9e3a;
+            --accent-glow: rgba(92, 184, 92, 0.35);
+            --ring: rgba(92, 184, 92, 0.25);
 
             --bg-scale: 1;
             --bg-pos-x: 50%;
             --bg-pos-y: 50%;
 
-            --overlay-top: rgba(0, 0, 0, 0.62);
-            --overlay-bottom: rgba(0, 0, 0, 0.82);
+            --overlay-top: rgba(0, 0, 0, 0.35);
+            --overlay-bottom: rgba(0, 0, 0, 0.55);
 
-            --radius-card: 20px;
-            --radius-btn: 14px;
+            --radius-card: 24px;
+            --radius-btn: 16px;
+            --radius-pill: 40px;
             --transition-smooth: cubic-bezier(0.22, 0.98, 0.36, 1);
         }
 
         /* ============ GLOBAL & SCROLLBAR ============ */
         html {
-            background: #000;
+            background: #0a0f0a;
             scroll-behavior: smooth;
         }
 
@@ -73,9 +74,14 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            background-color: #000;
+            background-color: #0a0f0a;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            background-image: url('/public/background.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
         }
 
         body::before {
@@ -84,7 +90,7 @@
             inset: 0;
             background:
                 linear-gradient(180deg, var(--overlay-top) 0%, var(--overlay-bottom) 100%),
-                radial-gradient(900px 600px at 50% 40%, rgba(124, 140, 255, 0.06), transparent 70%);
+                radial-gradient(900px 600px at 50% 40%, rgba(92, 184, 92, 0.06), transparent 70%);
             z-index: 0;
             pointer-events: none;
             transition: background 0.2s ease;
@@ -98,11 +104,11 @@
             background: transparent;
         }
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(120, 200, 120, 0.25);
             border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.25);
+            background: rgba(140, 240, 140, 0.45);
         }
 
         /* ============ ANIMATIONS ============ */
@@ -118,6 +124,10 @@
             from { opacity: 0; transform: translateX(24px); }
             to { opacity: 1; transform: translateX(0); }
         }
+        @keyframes slideInSearch {
+            from { opacity: 0; transform: translateY(18px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
         @keyframes logoDrop {
             0% { opacity: 0; transform: translateY(-40px) scale(0.82); }
             70% { opacity: 1; transform: translateY(4px) scale(1.02); }
@@ -127,11 +137,15 @@
             to { transform: rotate(360deg); }
         }
         @keyframes osWindowOpen {
-            from { opacity: 0; transform: scale(0.96); }
-            to { opacity: 1; transform: scale(1); }
+            from { opacity: 0; transform: scale(0.95) translateY(12px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes glassShimmer {
+            0% { background-position: 200% 200%; }
+            100% { background-position: -200% -200%; }
         }
 
-        /* ============ SIDE DOCK — REMOVABLE BUTTONS ============ */
+        /* ============ SIDE DOCK — GLASS GREEN ============ */
         .side-dock {
             position: fixed;
             top: 0;
@@ -145,12 +159,13 @@
             justify-content: center;
             gap: 6px;
             padding: 20px 12px;
-            background: rgba(10, 10, 14, 0.88);
-            border-left: 1px solid var(--card-border);
+            background: rgba(15, 30, 15, 0.55);
+            border-left: 1px solid rgba(120, 200, 120, 0.15);
             animation: slideRight 0.45s var(--transition-smooth) both;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(28px) saturate(140%);
+            -webkit-backdrop-filter: blur(28px) saturate(140%);
             transition: width 0.3s var(--transition-smooth);
+            box-shadow: -8px 0 32px rgba(0, 0, 0, 0.5);
         }
         .side-dock::before {
             content: "";
@@ -160,8 +175,9 @@
             bottom: 18%;
             width: 2px;
             background: linear-gradient(180deg, transparent, var(--accent), var(--accent-2), transparent);
-            opacity: 0.6;
+            opacity: 0.7;
             pointer-events: none;
+            border-radius: 2px;
         }
 
         .dock-header {
@@ -169,7 +185,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 6px 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            border-bottom: 1px solid rgba(120, 200, 120, 0.12);
             margin-bottom: 6px;
         }
         .dock-header span {
@@ -187,7 +203,7 @@
             font-size: 16px;
             line-height: 1;
             padding: 4px 8px;
-            border-radius: 6px;
+            border-radius: 8px;
             transition: all 0.2s;
         }
         .dock-collapse-btn:hover {
@@ -208,7 +224,7 @@
             width: 4px;
         }
         .dock-items::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(120, 200, 120, 0.2);
             border-radius: 4px;
         }
 
@@ -232,6 +248,8 @@
             will-change: transform;
             font-family: inherit;
             flex-shrink: 0;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
         .dock-item .label {
             flex: 1;
@@ -250,7 +268,7 @@
         }
         .dock-item:hover {
             color: var(--text);
-            background: var(--card-hover);
+            background: rgba(50, 100, 50, 0.35);
             border-color: var(--card-border-hover);
             transform: translateY(-2px) scale(1.02);
             box-shadow: 0 12px 28px -12px var(--shadow);
@@ -264,12 +282,12 @@
         }
         .dock-item.active {
             color: var(--text);
-            background: var(--card);
-            border-color: var(--card-border);
+            background: rgba(60, 120, 60, 0.3);
+            border-color: rgba(120, 200, 120, 0.35);
         }
         .dock-item.games-btn {
-            background: linear-gradient(135deg, rgba(124, 140, 255, 0.18), rgba(180, 124, 255, 0.14));
-            border: 1px solid rgba(124, 140, 255, 0.35);
+            background: linear-gradient(135deg, rgba(60, 140, 60, 0.3), rgba(40, 100, 40, 0.2));
+            border: 1px solid rgba(120, 200, 120, 0.35);
             color: var(--text);
         }
         .dock-item.games-btn svg {
@@ -286,7 +304,6 @@
             stroke: #fff;
         }
 
-        /* Remove button */
         .dock-remove {
             position: absolute;
             top: 50%;
@@ -296,8 +313,8 @@
             height: 20px;
             border-radius: 50%;
             border: none;
-            background: rgba(220, 50, 50, 0.25);
-            color: #ff7b7b;
+            background: rgba(180, 40, 40, 0.3);
+            color: #ff8888;
             font-size: 12px;
             line-height: 1;
             cursor: pointer;
@@ -315,7 +332,7 @@
             transform: translateY(-50%) scale(1);
         }
         .dock-remove:hover {
-            background: rgba(220, 50, 50, 0.6);
+            background: rgba(200, 50, 50, 0.7);
             color: #fff;
             transform: translateY(-50%) scale(1.1) !important;
         }
@@ -323,11 +340,10 @@
         .dock-sep {
             height: 1px;
             margin: 6px 8px;
-            background: linear-gradient(90deg, transparent, var(--card-border), transparent);
+            background: linear-gradient(90deg, transparent, rgba(120, 200, 120, 0.2), transparent);
             flex-shrink: 0;
         }
 
-        /* Collapsed dock state */
         .side-dock.collapsed {
             width: 60px;
             padding: 20px 6px;
@@ -398,11 +414,11 @@
             max-height: 240px;
             object-fit: contain;
             transition: transform 0.35s var(--transition-smooth);
-            filter: drop-shadow(0 8px 32px rgba(124, 140, 255, 0.15));
+            filter: drop-shadow(0 8px 32px rgba(92, 184, 92, 0.25));
         }
         .logo-image-wrap:hover .farius-logo {
             transform: translateY(-6px) scale(1.04);
-            filter: drop-shadow(0 12px 40px rgba(124, 140, 255, 0.28));
+            filter: drop-shadow(0 12px 40px rgba(92, 184, 92, 0.4));
         }
         .tagline {
             font-size: 0.72rem;
@@ -412,24 +428,27 @@
             margin-bottom: 30px;
             font-weight: 600;
         }
+
+        /* ============ SEARCH BAR — TRANSPARENT GLASS ============ */
         .search-container {
             display: flex;
             align-items: center;
             max-width: 520px;
             margin: 0 auto;
-            background: rgba(12, 12, 16, 0.88);
-            border: 1px solid var(--card-border);
-            border-radius: 18px;
+            background: rgba(20, 40, 20, 0.35);
+            border: 1px solid rgba(120, 200, 120, 0.2);
+            border-radius: var(--radius-pill);
             padding: 6px;
-            box-shadow: 0 16px 44px -18px var(--shadow);
-            animation: slideUp 0.45s var(--transition-smooth);
-            transition: border-color 0.25s, box-shadow 0.25s;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 16px 44px -18px rgba(0, 0, 0, 0.8);
+            animation: slideInSearch 0.55s var(--transition-smooth);
+            transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+            backdrop-filter: blur(32px) saturate(150%);
+            -webkit-backdrop-filter: blur(32px) saturate(150%);
         }
         .search-container:focus-within {
-            border-color: var(--input-border-focus);
-            box-shadow: 0 0 0 4px var(--ring), 0 16px 44px -18px var(--shadow);
+            border-color: rgba(140, 240, 140, 0.6);
+            box-shadow: 0 0 0 4px rgba(92, 184, 92, 0.2), 0 16px 44px -18px rgba(0, 0, 0, 0.8);
+            background: rgba(30, 60, 30, 0.45);
         }
         .search-input {
             flex: 1;
@@ -443,14 +462,14 @@
             font-weight: 500;
         }
         .search-input::placeholder {
-            color: var(--text-dim);
+            color: rgba(180, 220, 180, 0.5);
             font-weight: 400;
         }
         .search-button {
-            background: linear-gradient(180deg, var(--accent), #5a6bff);
+            background: linear-gradient(180deg, #5cb85c, #3a8e3a);
             border: none;
-            border-radius: 14px;
-            padding: 12px 24px;
+            border-radius: var(--radius-pill);
+            padding: 12px 28px;
             cursor: pointer;
             outline: none;
             color: white;
@@ -458,13 +477,13 @@
             font-weight: 700;
             transition: all 0.2s var(--transition-smooth);
             font-family: inherit;
-            box-shadow: 0 8px 24px -8px var(--accent-glow);
+            box-shadow: 0 8px 24px -8px rgba(92, 184, 92, 0.5);
             letter-spacing: 0.3px;
         }
         .search-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 14px 32px -8px var(--accent-glow);
-            filter: brightness(1.08);
+            box-shadow: 0 14px 32px -8px rgba(92, 184, 92, 0.6);
+            filter: brightness(1.1);
         }
         .search-button:active {
             transform: scale(0.96);
@@ -477,58 +496,59 @@
             margin-top: 24px;
             gap: 12px;
             flex-wrap: wrap;
-            animation: slideUp 0.45s ease 0.1s both;
+            animation: slideUp 0.55s var(--transition-smooth) 0.1s both;
         }
         .app-button {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 50px;
-            height: 50px;
+            width: 54px;
+            height: 54px;
             border-radius: var(--radius-btn);
-            background: rgba(12, 12, 16, 0.88);
+            background: rgba(20, 40, 20, 0.4);
             cursor: pointer;
             outline: none;
-            border: 1px solid var(--card-border);
+            border: 1px solid rgba(120, 200, 120, 0.18);
             color: var(--text);
             text-decoration: none;
             transition: all 0.25s var(--transition-smooth);
-            box-shadow: 0 8px 20px -10px var(--shadow);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 8px 20px -10px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px) saturate(140%);
+            -webkit-backdrop-filter: blur(20px) saturate(140%);
         }
         .app-button:hover {
-            background: var(--card-hover);
-            border-color: var(--card-border-hover);
+            background: rgba(50, 100, 50, 0.4);
+            border-color: rgba(140, 240, 140, 0.5);
             transform: translateY(-4px) scale(1.05);
-            box-shadow: 0 14px 28px -10px var(--shadow);
+            box-shadow: 0 14px 28px -10px rgba(0, 0, 0, 0.7);
         }
         .app-button:active {
             transform: scale(0.94);
         }
         .app-button img {
-            width: 26px;
-            height: 26px;
+            width: 28px;
+            height: 28px;
             object-fit: contain;
             opacity: 0.9;
             transition: opacity 0.2s;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
         }
         .app-button:hover img {
             opacity: 1;
         }
         #add-app-button {
             background: transparent;
-            border: 1.5px dashed var(--input-border);
+            border: 1.5px dashed rgba(120, 200, 120, 0.3);
         }
         #add-app-button:hover {
             border-color: var(--accent);
-            background: var(--card);
+            background: rgba(50, 100, 50, 0.3);
         }
         #add-app-button svg {
             stroke: var(--text) !important;
         }
 
-        /* ============ BROWSER OVERLAY ============ */
+        /* ============ SIMPLE BROWSER OVERLAY — GREEN GLASS ============ */
         .browser-overlay {
             position: fixed;
             inset: 0;
@@ -537,34 +557,37 @@
             flex-direction: column;
             color: var(--text);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: #000;
+            background-color: rgba(5, 12, 5, 0.75);
+            backdrop-filter: blur(40px) saturate(140%);
+            -webkit-backdrop-filter: blur(40px) saturate(140%);
         }
         .browser-overlay::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(180deg, var(--overlay-top) 0%, var(--overlay-bottom) 100%);
+            background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.65) 100%);
             z-index: 0;
             pointer-events: none;
         }
         .browser-overlay.open {
             display: flex;
+            animation: fadeIn 0.3s ease;
         }
         .browser-overlay > * {
             position: relative;
             z-index: 1;
         }
 
-        /* Tabs */
+        /* Tabs — Green Glass */
         .tabs-bar {
             display: flex;
             align-items: center;
             gap: 4px;
             padding: 10px 14px 0;
-            background: rgba(10, 10, 14, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--card-border);
+            background: rgba(10, 25, 10, 0.5);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(120, 200, 120, 0.12);
             overflow-x: auto;
             flex-shrink: 0;
             scrollbar-width: none;
@@ -591,13 +614,13 @@
             flex-shrink: 0;
         }
         .tab:hover {
-            background: var(--card);
+            background: rgba(40, 80, 40, 0.3);
             color: var(--text);
         }
         .tab.active {
-            background: var(--card);
+            background: rgba(40, 90, 40, 0.45);
             color: var(--text);
-            border-color: var(--card-border);
+            border-color: rgba(120, 200, 120, 0.2);
             font-weight: 600;
             box-shadow: inset 0 3px 0 0 var(--accent);
         }
@@ -614,7 +637,7 @@
             height: 15px;
             border-radius: 4px;
             flex-shrink: 0;
-            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            background: linear-gradient(135deg, #5cb85c, #2d8a2d);
             display: grid;
             place-items: center;
             color: #fff;
@@ -649,14 +672,14 @@
             opacity: 1;
         }
         .tab-close:hover {
-            background: rgba(220, 38, 38, 0.25);
-            color: #ff7b7b;
+            background: rgba(200, 50, 50, 0.4);
+            color: #ff8888;
         }
         .new-tab-btn {
             width: 28px;
             height: 28px;
             border-radius: 10px;
-            border: 1px dashed var(--input-border);
+            border: 1px dashed rgba(120, 200, 120, 0.25);
             background: transparent;
             cursor: pointer;
             color: var(--text-dim);
@@ -672,7 +695,7 @@
         .new-tab-btn:hover {
             border-color: var(--accent);
             color: var(--text);
-            background: var(--card);
+            background: rgba(40, 80, 40, 0.3);
         }
 
         /* Toolbar */
@@ -681,10 +704,10 @@
             align-items: center;
             gap: 6px;
             padding: 12px 16px;
-            background: rgba(10, 10, 14, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--card-border);
+            background: rgba(10, 25, 10, 0.45);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(120, 200, 120, 0.1);
             flex-shrink: 0;
         }
         .browser-toolbar button {
@@ -701,7 +724,7 @@
             transition: all 0.18s;
         }
         .browser-toolbar button:hover:not(:disabled) {
-            background: var(--card);
+            background: rgba(40, 80, 40, 0.35);
             color: var(--text);
         }
         .browser-toolbar button:active:not(:disabled) {
@@ -725,16 +748,19 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1.5px solid var(--input-border);
+            background: rgba(15, 30, 15, 0.5);
+            border: 1.5px solid rgba(120, 200, 120, 0.18);
             border-radius: 20px;
             padding: 0 16px;
             height: 38px;
-            transition: border-color 0.25s, box-shadow 0.25s;
+            transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
         .browser-address:focus-within {
-            border-color: var(--input-border-focus);
-            box-shadow: 0 0 0 4px var(--ring);
+            border-color: rgba(140, 240, 140, 0.55);
+            box-shadow: 0 0 0 4px rgba(92, 184, 92, 0.15);
+            background: rgba(25, 50, 25, 0.55);
         }
         .browser-address .lock-icon {
             width: 14px;
@@ -757,13 +783,13 @@
             font-weight: 500;
         }
         .browser-address input::placeholder {
-            color: var(--text-dim);
+            color: rgba(180, 220, 180, 0.45);
             font-weight: 400;
         }
         .browser-loader {
             width: 15px;
             height: 15px;
-            border: 2px solid var(--card-border);
+            border: 2px solid rgba(120, 200, 120, 0.15);
             border-top-color: var(--accent);
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
@@ -784,7 +810,7 @@
             width: 100%;
             height: 100%;
             border: none;
-            background: #fff;
+            background: #0a0f0a;
             display: none;
         }
         .browser-frame-wrap iframe.visible {
@@ -833,25 +859,28 @@
         }
         .new-tab-search input {
             flex: 1;
-            background: rgba(12, 12, 16, 0.9);
-            border: 1.5px solid var(--input-border);
+            background: rgba(15, 30, 15, 0.5);
+            border: 1.5px solid rgba(120, 200, 120, 0.18);
             border-radius: 16px;
             padding: 15px 20px;
             color: var(--text);
             font-size: 14px;
             outline: none;
             font-family: inherit;
-            transition: border-color 0.25s, box-shadow 0.25s;
+            transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
         .new-tab-search input::placeholder {
-            color: var(--text-dim);
+            color: rgba(180, 220, 180, 0.45);
         }
         .new-tab-search input:focus {
-            border-color: var(--input-border-focus);
-            box-shadow: 0 0 0 4px var(--ring);
+            border-color: rgba(140, 240, 140, 0.55);
+            box-shadow: 0 0 0 4px rgba(92, 184, 92, 0.15);
+            background: rgba(25, 50, 25, 0.55);
         }
         .new-tab-search button {
-            background: linear-gradient(180deg, var(--accent), #5a6bff);
+            background: linear-gradient(180deg, #5cb85c, #3a8e3a);
             border: none;
             border-radius: 16px;
             padding: 15px 26px;
@@ -861,17 +890,17 @@
             font-family: inherit;
             font-size: 14px;
             transition: all 0.2s;
-            box-shadow: 0 8px 24px -8px var(--accent-glow);
+            box-shadow: 0 8px 24px -8px rgba(92, 184, 92, 0.5);
         }
         .new-tab-search button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 28px -8px var(--accent-glow);
+            box-shadow: 0 12px 28px -8px rgba(92, 184, 92, 0.6);
         }
         .new-tab-search button:active {
             transform: scale(0.96);
         }
 
-        /* ============ CHOOSER MODAL ============ */
+        /* ============ CHOOSER MODAL — GREEN GLASS ============ */
         .chooser-overlay {
             position: fixed;
             inset: 0;
@@ -879,24 +908,26 @@
             display: none;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 0, 0, 0.86);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(5, 12, 5, 0.7);
+            backdrop-filter: blur(32px) saturate(140%);
+            -webkit-backdrop-filter: blur(32px) saturate(140%);
             animation: fadeIn 0.3s ease;
         }
         .chooser-overlay.open {
             display: flex;
         }
         .chooser-card {
-            background: #16161c;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
+            background: rgba(20, 40, 20, 0.45);
+            border: 1px solid rgba(120, 200, 120, 0.2);
+            border-radius: var(--radius-card);
             padding: 48px 52px 40px;
             max-width: 680px;
             width: 92%;
             text-align: center;
-            box-shadow: 0 40px 100px -24px rgba(0, 0, 0, 0.98);
+            box-shadow: 0 40px 100px -24px rgba(0, 0, 0, 0.95);
             animation: slideUp 0.35s var(--transition-smooth);
+            backdrop-filter: blur(40px) saturate(140%);
+            -webkit-backdrop-filter: blur(40px) saturate(140%);
         }
         .chooser-logo {
             display: flex;
@@ -907,7 +938,7 @@
             max-width: 220px;
             max-height: 110px;
             object-fit: contain;
-            filter: drop-shadow(0 0 32px rgba(124, 140, 255, 0.4));
+            filter: drop-shadow(0 0 32px rgba(92, 184, 92, 0.4));
         }
         .chooser-title {
             font-size: 28px;
@@ -917,7 +948,7 @@
             color: #fff;
         }
         .chooser-sub {
-            color: #999;
+            color: rgba(180, 220, 180, 0.7);
             font-size: 14px;
             margin-bottom: 36px;
             font-weight: 400;
@@ -932,9 +963,9 @@
             flex: 1;
             min-width: 220px;
             padding: 26px 24px 22px;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(255, 255, 255, 0.04);
+            border-radius: var(--radius-btn);
+            border: 1px solid rgba(120, 200, 120, 0.2);
+            background: rgba(30, 60, 30, 0.3);
             color: var(--text);
             font-weight: 600;
             font-size: 16px;
@@ -945,12 +976,14 @@
             align-items: center;
             gap: 12px;
             font-family: inherit;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
         }
         .chooser-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(124, 140, 255, 0.7);
+            background: rgba(50, 100, 50, 0.4);
+            border-color: rgba(140, 240, 140, 0.6);
             transform: translateY(-4px);
-            box-shadow: 0 20px 40px -16px rgba(124, 140, 255, 0.3);
+            box-shadow: 0 20px 40px -16px rgba(92, 184, 92, 0.3);
         }
         .chooser-btn:active {
             transform: scale(0.98);
@@ -965,14 +998,14 @@
         .chooser-btn span {
             font-size: 12px;
             font-weight: 400;
-            color: #888;
+            color: rgba(180, 220, 180, 0.6);
             letter-spacing: 0.2px;
         }
         .chooser-close {
             margin-top: 32px;
             background: none;
             border: none;
-            color: #888;
+            color: rgba(180, 220, 180, 0.6);
             font-size: 13px;
             cursor: pointer;
             font-weight: 500;
@@ -983,40 +1016,52 @@
         }
         .chooser-close:hover {
             color: #fff;
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(50, 100, 50, 0.35);
         }
 
-        /* ============ BROWSER OS — WINDOWS 11 DARK ============ */
+        /* ============ BROWSER OS — GREEN FOREST DARK ============ */
         .os-desktop {
             position: fixed;
             inset: 0;
             z-index: 300;
             display: none;
             flex-direction: column;
-            background: #000;
+            background: #0a0f0a;
+            background-image: url('/public/background.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             overflow: hidden;
             font-family: 'Inter', 'Segoe UI', sans-serif;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.35s ease;
         }
         .os-desktop.open {
             display: flex;
         }
+        .os-desktop::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.5) 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
         .os-window {
             position: absolute;
-            background: #1e1e1e;
-            border: 1px solid #383838;
-            border-radius: 8px;
-            box-shadow: 0 16px 56px rgba(0, 0, 0, 0.8);
+            background: rgba(15, 30, 15, 0.75);
+            border: 1px solid rgba(120, 200, 120, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8), inset 0 1px rgba(255, 255, 255, 0.05);
             display: flex;
             flex-direction: column;
             overflow: hidden;
             min-width: 280px;
             min-height: 160px;
             z-index: 10;
-            animation: osWindowOpen 0.22s ease-out;
+            animation: osWindowOpen 0.25s var(--transition-smooth);
+            backdrop-filter: blur(32px) saturate(140%);
+            -webkit-backdrop-filter: blur(32px) saturate(140%);
         }
         .os-window.minimized {
             display: none;
@@ -1025,39 +1070,43 @@
             top: 0 !important;
             left: 0 !important;
             width: 100% !important;
-            height: calc(100% - 42px) !important;
+            height: calc(100% - 48px) !important;
             border-radius: 0;
         }
         .os-window.snapped-left {
             top: 0 !important;
             left: 0 !important;
             width: 50% !important;
-            height: calc(100% - 42px) !important;
+            height: calc(100% - 48px) !important;
+            border-radius: 0;
         }
         .os-window.snapped-right {
             top: 0 !important;
             left: 50% !important;
             width: 50% !important;
-            height: calc(100% - 42px) !important;
+            height: calc(100% - 48px) !important;
+            border-radius: 0;
         }
 
         /* Title bar */
         .os-window-titlebar {
             display: flex;
             align-items: center;
-            height: 34px;
-            background: #1e1e1e;
-            border-bottom: 1px solid #2c2c2c;
+            height: 38px;
+            background: rgba(10, 25, 10, 0.6);
+            border-bottom: 1px solid rgba(120, 200, 120, 0.12);
             cursor: default;
             user-select: none;
             flex-shrink: 0;
             position: relative;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
         .os-window-title {
             flex: 1;
             font-size: 12px;
-            font-weight: 400;
-            color: #d0d0d0;
+            font-weight: 500;
+            color: #c8e0c8;
             padding: 0 12px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -1078,7 +1127,7 @@
         .os-window-icon svg {
             width: 15px;
             height: 15px;
-            stroke: #d0d0d0;
+            stroke: #8cbf8c;
             fill: none;
             stroke-width: 1.8;
         }
@@ -1093,12 +1142,12 @@
             height: 100%;
             border: none;
             background: transparent;
-            color: #d0d0d0;
+            color: #c8e0c8;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.1s, color 0.1s;
+            transition: background 0.12s, color 0.12s;
             padding: 0;
         }
         .os-window-control svg {
@@ -1109,13 +1158,13 @@
             stroke-width: 1.2;
         }
         .os-window-control.min:hover {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(120, 200, 120, 0.15);
         }
         .os-window-control.max:hover {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(120, 200, 120, 0.15);
         }
         .os-window-control.close:hover {
-            background: #c42b1c;
+            background: #b33a2e;
             color: #fff;
         }
         .os-window-control.close:hover svg {
@@ -1127,13 +1176,13 @@
             flex: 1;
             position: relative;
             overflow: hidden;
-            background: #181818;
+            background: rgba(12, 25, 12, 0.5);
         }
         .os-window-content iframe {
             width: 100%;
             height: 100%;
             border: none;
-            background: #fff;
+            background: #0a0f0a;
             display: block;
         }
 
@@ -1151,19 +1200,22 @@
         .os-resize-handle.se { bottom: -3px; right: -3px; width: 12px; height: 12px; cursor: nwse-resize; }
         .os-resize-handle.sw { bottom: -3px; left: -3px; width: 12px; height: 12px; cursor: nesw-resize; }
 
-        /* Taskbar */
+        /* Taskbar — Green Glass */
         .os-taskbar {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 42px;
-            background: #1a1a1a;
-            border-top: 1px solid #2c2c2c;
+            height: 48px;
+            background: rgba(8, 20, 8, 0.65);
+            border-top: 1px solid rgba(120, 200, 120, 0.15);
             display: flex;
             align-items: center;
             z-index: 500;
             user-select: none;
+            backdrop-filter: blur(32px) saturate(140%);
+            -webkit-backdrop-filter: blur(32px) saturate(140%);
+            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5);
         }
         .os-taskbar-center {
             display: flex;
@@ -1175,29 +1227,29 @@
             height: 100%;
         }
         .os-taskbar-btn {
-            width: 42px;
-            height: 42px;
+            width: 44px;
+            height: 44px;
             border: none;
             background: transparent;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            border-radius: 6px;
-            transition: background 0.12s;
+            border-radius: 10px;
+            transition: background 0.15s;
             position: relative;
             padding: 0;
         }
         .os-taskbar-btn:hover {
-            background: rgba(255, 255, 255, 0.07);
+            background: rgba(120, 200, 120, 0.15);
         }
         .os-taskbar-btn:active {
-            background: rgba(255, 255, 255, 0.12);
+            background: rgba(120, 200, 120, 0.25);
         }
         .os-taskbar-btn svg {
-            width: 21px;
-            height: 21px;
-            stroke: #e0e0e0;
+            width: 22px;
+            height: 22px;
+            stroke: #b8d8b8;
             fill: none;
             stroke-width: 1.6;
         }
@@ -1208,22 +1260,24 @@
         }
         .os-taskbar-btn .os-taskbar-tooltip {
             position: absolute;
-            bottom: calc(100% + 10px);
+            bottom: calc(100% + 12px);
             left: 50%;
             transform: translateX(-50%);
-            background: #2a2a2a;
-            border: 1px solid #3a3a3a;
-            color: #e0e0e0;
+            background: rgba(20, 45, 20, 0.85);
+            border: 1px solid rgba(120, 200, 120, 0.2);
+            color: #d0e8d0;
             font-size: 11px;
             font-weight: 400;
-            padding: 5px 12px;
-            border-radius: 6px;
+            padding: 5px 14px;
+            border-radius: 8px;
             white-space: nowrap;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.15s;
             font-family: inherit;
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
         .os-taskbar-btn:hover .os-taskbar-tooltip {
             opacity: 1;
@@ -1231,16 +1285,17 @@
         .os-taskbar-btn.running::after {
             content: '';
             position: absolute;
-            bottom: 4px;
+            bottom: 5px;
             left: 50%;
             transform: translateX(-50%);
-            width: 6px;
-            height: 2px;
-            background: #7c8cff;
-            border-radius: 1px;
+            width: 7px;
+            height: 2.5px;
+            background: #5cb85c;
+            border-radius: 2px;
+            box-shadow: 0 0 8px rgba(92, 184, 92, 0.6);
         }
         .os-taskbar-btn.active-app {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(120, 200, 120, 0.15);
         }
         .os-taskbar-left {
             display: flex;
@@ -1257,23 +1312,23 @@
             gap: 4px;
         }
         .os-tray-btn {
-            height: 34px;
+            height: 36px;
             padding: 0 10px;
             border: none;
             background: transparent;
-            color: #d0d0d0;
+            color: #b8d8b8;
             display: flex;
             align-items: center;
             gap: 6px;
             cursor: pointer;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 11px;
             font-weight: 400;
             transition: background 0.12s;
             font-family: inherit;
         }
         .os-tray-btn:hover {
-            background: rgba(255, 255, 255, 0.07);
+            background: rgba(120, 200, 120, 0.12);
         }
         .os-tray-btn svg {
             width: 15px;
@@ -1288,7 +1343,7 @@
             align-items: flex-end;
             padding: 0 10px;
             font-size: 11px;
-            color: #d0d0d0;
+            color: #b8d8b8;
             line-height: 1.35;
             font-weight: 400;
             cursor: default;
@@ -1298,21 +1353,21 @@
         }
         .os-tray-clock .date {
             font-size: 10px;
-            color: #a0a0a0;
+            color: #8aa88a;
         }
 
-        /* Start menu */
+        /* Start menu — Green Glass */
         .os-start-menu {
             position: absolute;
-            bottom: 52px;
+            bottom: 58px;
             left: 50%;
             transform: translateX(-50%) translateY(10px);
             width: 600px;
             max-width: 92vw;
             max-height: 660px;
-            background: #1c1c1e;
-            border: 1px solid #3a3a3c;
-            border-radius: 12px;
+            background: rgba(12, 30, 12, 0.7);
+            border: 1px solid rgba(120, 200, 120, 0.18);
+            border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
             padding: 32px 36px 28px;
             z-index: 600;
@@ -1320,9 +1375,9 @@
             flex-direction: column;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.18s, transform 0.18s;
-            backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
+            transition: opacity 0.2s, transform 0.2s;
+            backdrop-filter: blur(40px) saturate(140%);
+            -webkit-backdrop-filter: blur(40px) saturate(140%);
         }
         .os-start-menu.open {
             display: flex;
@@ -1334,16 +1389,18 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            background: #2a2a2c;
-            border: 1px solid #3a3a3c;
-            border-radius: 8px;
+            background: rgba(15, 35, 15, 0.5);
+            border: 1px solid rgba(120, 200, 120, 0.15);
+            border-radius: 12px;
             padding: 10px 16px;
             margin-bottom: 28px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
         .os-start-search svg {
             width: 16px;
             height: 16px;
-            stroke: #888;
+            stroke: #8aa88a;
             fill: none;
             stroke-width: 1.8;
         }
@@ -1351,18 +1408,18 @@
             flex: 1;
             background: transparent;
             border: none;
-            color: #e0e0e0;
+            color: #d0e8d0;
             font-size: 13px;
             outline: none;
             font-family: inherit;
         }
         .os-start-search input::placeholder {
-            color: #888;
+            color: #6a8a6a;
         }
         .os-start-section-title {
             font-size: 12px;
             font-weight: 600;
-            color: #a0a0a0;
+            color: #8aa88a;
             margin-bottom: 14px;
             letter-spacing: 0.4px;
             text-transform: uppercase;
@@ -1378,31 +1435,31 @@
             align-items: center;
             gap: 8px;
             padding: 16px 8px 12px;
-            border-radius: 8px;
+            border-radius: 12px;
             background: transparent;
             border: none;
             cursor: pointer;
-            transition: background 0.12s;
+            transition: background 0.15s;
             font-family: inherit;
-            color: #e0e0e0;
+            color: #d0e8d0;
         }
         .os-start-app:hover {
-            background: rgba(255, 255, 255, 0.07);
+            background: rgba(120, 200, 120, 0.12);
         }
         .os-start-app:active {
-            background: rgba(255, 255, 255, 0.12);
+            background: rgba(120, 200, 120, 0.2);
         }
         .os-start-app svg {
             width: 28px;
             height: 28px;
-            stroke: #c0c0c0;
+            stroke: #a8c8a8;
             fill: none;
             stroke-width: 1.5;
         }
         .os-start-app span {
             font-size: 11px;
             font-weight: 400;
-            color: #c0c0c0;
+            color: #a8c8a8;
         }
         .os-start-app img {
             width: 28px;
@@ -1410,15 +1467,15 @@
             object-fit: contain;
         }
 
-        /* Calculator */
+        /* Calculator — Green Glass */
         .os-calc-display {
-            background: #1a1a1a;
-            border-bottom: 1px solid #2e2e2e;
+            background: rgba(10, 25, 10, 0.6);
+            border-bottom: 1px solid rgba(120, 200, 120, 0.12);
             padding: 16px 20px;
             text-align: right;
             font-size: 30px;
             font-weight: 400;
-            color: #e0e0e0;
+            color: #d0e8d0;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -1430,48 +1487,50 @@
             gap: 3px;
             padding: 10px;
             flex: 1;
-            background: #1a1a1a;
+            background: rgba(10, 25, 10, 0.4);
         }
         .os-calc-btn {
-            background: #2a2a2a;
-            border: 1px solid #2e2e2e;
-            border-radius: 4px;
-            color: #e0e0e0;
+            background: rgba(30, 60, 30, 0.4);
+            border: 1px solid rgba(120, 200, 120, 0.12);
+            border-radius: 10px;
+            color: #d0e8d0;
             font-size: 16px;
             font-weight: 400;
             cursor: pointer;
             font-family: inherit;
-            transition: background 0.1s;
+            transition: background 0.12s, border-color 0.12s;
         }
         .os-calc-btn:hover {
-            background: #333;
+            background: rgba(50, 100, 50, 0.5);
+            border-color: rgba(120, 200, 120, 0.3);
         }
         .os-calc-btn:active {
-            background: #3a3a3a;
+            background: rgba(70, 130, 70, 0.5);
         }
         .os-calc-btn.op {
-            background: #2d2d2d;
-            color: #a5b0ff;
+            background: rgba(40, 80, 40, 0.4);
+            color: #8cd88c;
         }
         .os-calc-btn.op:hover {
-            background: #363636;
+            background: rgba(60, 110, 60, 0.5);
         }
         .os-calc-btn.eq {
-            background: #7c8cff;
+            background: linear-gradient(180deg, #5cb85c, #3a8e3a);
             color: #fff;
+            border-color: rgba(120, 200, 120, 0.4);
         }
         .os-calc-btn.eq:hover {
-            background: #6a7aee;
+            background: linear-gradient(180deg, #6ac86a, #4a9e4a);
         }
         .os-calc-btn.clr {
-            background: #2d2d2d;
+            background: rgba(40, 80, 40, 0.4);
             color: #ff9b9b;
         }
         .os-calc-btn.clr:hover {
-            background: #363636;
+            background: rgba(60, 110, 60, 0.5);
         }
 
-        /* Clock */
+        /* Clock — Green */
         .os-clock-display {
             flex: 1;
             display: flex;
@@ -1480,23 +1539,24 @@
             justify-content: center;
             gap: 8px;
             padding: 28px;
-            background: #1a1a1a;
+            background: rgba(10, 25, 10, 0.4);
         }
         .os-clock-time {
             font-size: 52px;
             font-weight: 300;
             letter-spacing: -1.5px;
-            color: #e0e0e0;
+            color: #d0e8d0;
             font-variant-numeric: tabular-nums;
+            text-shadow: 0 0 40px rgba(92, 184, 92, 0.3);
         }
         .os-clock-date {
             font-size: 15px;
-            color: #a0a0a0;
+            color: #8aa88a;
             font-weight: 400;
             letter-spacing: 0.3px;
         }
 
-        /* Wallpaper gallery */
+        /* Wallpaper gallery — Green */
         .os-wallpaper-gallery {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -1504,21 +1564,21 @@
             padding: 16px;
             height: 100%;
             overflow-y: auto;
-            background: #1a1a1a;
+            background: rgba(10, 25, 10, 0.3);
         }
         .os-wallpaper-gallery::-webkit-scrollbar {
             width: 8px;
         }
         .os-wallpaper-gallery::-webkit-scrollbar-track {
-            background: #1a1a1a;
+            background: rgba(10, 25, 10, 0.3);
         }
         .os-wallpaper-gallery::-webkit-scrollbar-thumb {
-            background: #3a3a3a;
+            background: rgba(120, 200, 120, 0.25);
             border-radius: 4px;
         }
         .os-wallpaper-thumb {
             aspect-ratio: 16/9;
-            border-radius: 6px;
+            border-radius: 10px;
             border: 2px solid transparent;
             background-size: cover;
             background-position: center;
@@ -1526,42 +1586,43 @@
             transition: border-color 0.18s, transform 0.18s;
         }
         .os-wallpaper-thumb:hover {
-            border-color: #7c8cff;
-            transform: scale(1.03);
+            border-color: #5cb85c;
+            transform: scale(1.04);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
         }
         .os-wallpaper-actions {
             padding: 14px 16px;
-            border-top: 1px solid #2e2e2e;
+            border-top: 1px solid rgba(120, 200, 120, 0.12);
             display: flex;
             gap: 10px;
-            background: #1c1c1e;
+            background: rgba(12, 30, 12, 0.5);
         }
         .os-wallpaper-actions button {
             flex: 1;
             padding: 10px 14px;
-            border-radius: 6px;
-            border: 1px solid #3a3a3a;
-            background: #2a2a2a;
-            color: #e0e0e0;
+            border-radius: 10px;
+            border: 1px solid rgba(120, 200, 120, 0.18);
+            background: rgba(30, 60, 30, 0.4);
+            color: #d0e8d0;
             font-weight: 400;
             cursor: pointer;
             font-size: 12px;
             font-family: inherit;
-            transition: background 0.12s;
+            transition: background 0.15s;
         }
         .os-wallpaper-actions button:hover {
-            background: #333;
+            background: rgba(50, 100, 50, 0.5);
         }
         .os-wallpaper-actions button.primary {
-            background: #7c8cff;
-            border-color: #7c8cff;
+            background: linear-gradient(180deg, #5cb85c, #3a8e3a);
+            border-color: rgba(120, 200, 120, 0.4);
             color: #fff;
         }
         .os-wallpaper-actions button.primary:hover {
-            background: #6a7aee;
+            background: linear-gradient(180deg, #6ac86a, #4a9e4a);
         }
 
-        /* Desktop icons */
+        /* Desktop icons — Green */
         .os-desktop-icons {
             position: absolute;
             top: 20px;
@@ -1576,30 +1637,30 @@
             flex-direction: column;
             align-items: center;
             gap: 6px;
-            width: 80px;
+            width: 84px;
             padding: 10px 6px;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: background 0.12s;
+            transition: background 0.15s;
             user-select: none;
         }
         .os-desktop-icon:hover {
-            background: rgba(124, 140, 255, 0.22);
-            outline: 1px solid rgba(124, 140, 255, 0.45);
+            background: rgba(92, 184, 92, 0.2);
+            outline: 1px solid rgba(92, 184, 92, 0.4);
         }
         .os-desktop-icon svg {
             width: 34px;
             height: 34px;
-            stroke: #fff;
+            stroke: #e0f0e0;
             fill: none;
             stroke-width: 1.4;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.9));
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.8));
         }
         .os-desktop-icon span {
             font-size: 11px;
-            font-weight: 400;
-            color: #fff;
-            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+            font-weight: 500;
+            color: #e0f0e0;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
             text-align: center;
             line-height: 1.25;
         }
@@ -1607,13 +1668,13 @@
         /* Snap preview */
         .os-snap-preview {
             position: absolute;
-            background: rgba(124, 140, 255, 0.18);
-            border: 2px solid rgba(124, 140, 255, 0.55);
+            background: rgba(92, 184, 92, 0.15);
+            border: 2px solid rgba(92, 184, 92, 0.45);
             pointer-events: none;
             z-index: 400;
             display: none;
             transition: all 0.15s ease;
-            border-radius: 8px;
+            border-radius: 12px;
         }
         .os-snap-preview.show {
             display: block;
@@ -1622,13 +1683,13 @@
         /* Toast */
         .os-toast {
             position: absolute;
-            bottom: 56px;
+            bottom: 62px;
             right: 16px;
-            background: #2a2a2c;
-            border: 1px solid #3a3a3c;
-            border-radius: 10px;
+            background: rgba(20, 45, 20, 0.8);
+            border: 1px solid rgba(120, 200, 120, 0.2);
+            border-radius: 14px;
             padding: 14px 20px;
-            color: #e0e0e0;
+            color: #d0e8d0;
             font-size: 12.5px;
             box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7);
             z-index: 700;
@@ -1638,29 +1699,31 @@
             -webkit-backdrop-filter: blur(24px);
         }
 
-        /* OS browser inner */
+        /* OS browser inner — Green */
         .os-browser-inner {
             display: flex;
             flex-direction: column;
             height: 100%;
-            background: #181818;
+            background: rgba(10, 20, 10, 0.5);
         }
         .os-browser-bar {
             display: flex;
             align-items: center;
             gap: 4px;
             padding: 8px 10px;
-            background: #1e1e1e;
-            border-bottom: 1px solid #2e2e2e;
+            background: rgba(10, 25, 10, 0.6);
+            border-bottom: 1px solid rgba(120, 200, 120, 0.12);
             flex-shrink: 0;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
         .os-browser-bar button {
             width: 32px;
             height: 32px;
-            border-radius: 6px;
+            border-radius: 8px;
             border: none;
             background: transparent;
-            color: #c0c0c0;
+            color: #b8d8b8;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -1668,7 +1731,7 @@
             transition: background 0.12s;
         }
         .os-browser-bar button:hover:not(:disabled) {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(120, 200, 120, 0.15);
         }
         .os-browser-bar button:disabled {
             opacity: 0.3;
@@ -1688,28 +1751,28 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            background: #2a2a2c;
-            border: 1px solid #3a3a3c;
-            border-radius: 6px;
+            background: rgba(15, 35, 15, 0.5);
+            border: 1px solid rgba(120, 200, 120, 0.15);
+            border-radius: 10px;
             padding: 0 12px;
-            height: 30px;
+            height: 32px;
         }
         .os-browser-url input {
             flex: 1;
             background: transparent;
             border: none;
-            color: #e0e0e0;
+            color: #d0e8d0;
             font-size: 12.5px;
             outline: none;
             font-family: inherit;
         }
         .os-browser-url input::placeholder {
-            color: #888;
+            color: #6a8a6a;
         }
         .os-browser-iframe {
             flex: 1;
             border: none;
-            background: #fff;
+            background: #0a0f0a;
             width: 100%;
         }
 
@@ -1756,9 +1819,9 @@
                 max-width: 100%;
             }
             .app-button {
-                width: 46px;
-                height: 46px;
-                border-radius: 14px;
+                width: 50px;
+                height: 50px;
+                border-radius: 16px;
             }
             .tab {
                 max-width: 150px;
@@ -1805,8 +1868,8 @@
                 gap: 0;
             }
             .os-taskbar-btn {
-                width: 38px;
-                height: 38px;
+                width: 40px;
+                height: 40px;
             }
             .os-tray-clock {
                 display: none;
@@ -1820,212 +1883,12 @@
                 transition-duration: 0.01ms !important;
             }
         }
-
-        /* ============ BLACK + SILVER GLASS THEME ============ */
-        :root {
-            --bg: #070707;
-            --bg-2: #101010;
-            --bg-3: #181818;
-            --text: #f4f4f4;
-            --text-dim: rgba(255, 255, 255, 0.58);
-            --text-dim-2: rgba(255, 255, 255, 0.84);
-            --card: rgba(255, 255, 255, 0.075);
-            --card-hover: rgba(255, 255, 255, 0.15);
-            --card-border: rgba(255, 255, 255, 0.18);
-            --card-border-hover: rgba(255, 255, 255, 0.46);
-            --input-bg: rgba(0, 0, 0, 0.38);
-            --input-border: rgba(255, 255, 255, 0.2);
-            --input-border-focus: rgba(255, 255, 255, 0.72);
-            --shadow: rgba(0, 0, 0, 0.82);
-            --accent: #e8e8e8;
-            --accent-2: #777777;
-            --accent-glow: rgba(220, 220, 220, 0.28);
-            --ring: rgba(255, 255, 255, 0.14);
-            --overlay-top: rgba(0, 0, 0, 0.2);
-            --overlay-bottom: rgba(0, 0, 0, 0.58);
-        }
-
-        #shader-background {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            width: 100%;
-            height: 100%;
-            background: #080808;
-        }
-        body, .browser-overlay {
-            background-color: transparent !important;
-            background-image: none !important;
-            background-attachment: initial !important;
-        }
-        body::before, .browser-overlay::before {
-            background: linear-gradient(135deg, rgba(255,255,255,.025), rgba(0,0,0,.34)) !important;
-        }
-        .countdown, .side-dock, .search-container, .app-button,
-        .browser-toolbar, .tabs-bar, .browser-address, .new-tab-search input,
-        .new-tab-search button, .chooser-card, .chooser-btn, .os-window,
-        .os-taskbar, .os-start-menu, .os-browser-bar, .os-browser-url,
-        .os-tray-btn, .os-taskbar-btn {
-            background: linear-gradient(135deg, rgba(255,255,255,.13), rgba(0,0,0,.42)) !important;
-            border-color: rgba(255,255,255,.2) !important;
-            box-shadow: 0 18px 45px rgba(0,0,0,.48), inset 0 1px rgba(255,255,255,.2), inset 0 -1px rgba(0,0,0,.5);
-            backdrop-filter: blur(24px) saturate(115%);
-            -webkit-backdrop-filter: blur(24px) saturate(115%);
-        }
-        .side-dock { background: rgba(5,5,5,.62) !important; }
-        .dock-item, .browser-toolbar button { color: var(--text-dim-2); }
-        .dock-item:hover, .app-button:hover, .chooser-btn:hover,
-        .browser-toolbar button:hover:not(:disabled), .os-taskbar-btn:hover {
-            background: linear-gradient(135deg, rgba(255,255,255,.24), rgba(0,0,0,.32)) !important;
-            color: #fff;
-            border-color: rgba(255,255,255,.58) !important;
-        }
-        .dock-item.games-btn, .search-button, .new-tab-search button,
-        .os-calc-btn.eq, .os-wallpaper-actions button.primary {
-            background: linear-gradient(135deg, #eeeeee, #686868) !important;
-            border: 1px solid rgba(255,255,255,.75) !important;
-            color: #090909 !important;
-            box-shadow: 0 12px 30px rgba(0,0,0,.5), inset 0 1px rgba(255,255,255,.8);
-        }
-        .farius-logo, .new-tab-logo img, .chooser-logo img {
-            filter: drop-shadow(0 10px 25px rgba(0, 0, 0, .55));
-        }
-        .browser-frame-wrap, .new-tab-page { background: transparent !important; }
-        .os-desktop { background-color: #080808 !important; }
-        .os-window, .os-window-titlebar, .os-window-content, .os-calc-grid,
-        .os-calc-display, .os-clock-display, .os-wallpaper-gallery, .os-start-menu {
-            color: #f2f2f2 !important;
-            background: rgba(18,18,18,.78) !important;
-        }
-        .os-window-title, .os-clock-time, .os-calc-display, .os-start-app span { color: #f2f2f2 !important; }
-        .os-window-control, .os-start-app { color: #e5e5e5; }
-
-        /* ============ WATER DROP BACKGROUND ============ */
-        #water-drop-layer {
-            position: fixed;
-            inset: 0;
-            z-index: 1;
-            overflow: hidden;
-            pointer-events: none;
-            isolation: isolate;
-        }
-
-        .water-drop {
-            position: absolute;
-            top: -12vh;
-            left: 0;
-            width: var(--drop-size);
-            height: calc(var(--drop-size) * 2.9);
-            border-radius: 55% 55% 48% 48% / 48% 48% 58% 58%;
-            background:
-                radial-gradient(circle at 34% 22%,
-                    rgba(255,255,255,.78) 0 5%,
-                    rgba(255,255,255,.22) 6% 14%,
-                    transparent 15%),
-                linear-gradient(105deg,
-                    rgba(255,255,255,.08),
-                    rgba(255,255,255,.42) 38%,
-                    rgba(190,220,255,.13) 58%,
-                    rgba(255,255,255,.04));
-            border: 1px solid rgba(255,255,255,.24);
-            box-shadow:
-                inset -2px -3px 5px rgba(0,0,0,.22),
-                inset 2px 2px 5px rgba(255,255,255,.18),
-                0 0 12px rgba(180,215,255,.07);
-            opacity: var(--drop-opacity);
-            filter: blur(var(--drop-blur));
-            transform: translate3d(0,0,0) rotate(var(--drop-tilt));
-            animation:
-                waterDropFall var(--drop-duration) linear var(--drop-delay) infinite,
-                waterDropSway calc(var(--drop-duration) * .65) ease-in-out var(--drop-delay) infinite alternate;
-            will-change: transform, opacity;
-        }
-
-        .water-drop::after {
-            content: "";
-            position: absolute;
-            top: -42%;
-            left: 50%;
-            width: 1px;
-            height: 48%;
-            transform: translateX(-50%);
-            background: linear-gradient(
-                to top,
-                rgba(255,255,255,.10),
-                transparent
-            );
-            opacity: .45;
-        }
-
-        .water-drop::before {
-            content: "";
-            position: absolute;
-            left: 28%;
-            top: 12%;
-            width: 22%;
-            height: 32%;
-            border-radius: 50%;
-            background: rgba(255,255,255,.28);
-            filter: blur(.7px);
-        }
-
-        @keyframes waterDropFall {
-            0% {
-                transform: translate3d(0, -16vh, 0) rotate(var(--drop-tilt)) scale(.88);
-                opacity: 0;
-            }
-            7% {
-                opacity: var(--drop-opacity);
-            }
-            88% {
-                opacity: var(--drop-opacity);
-            }
-            100% {
-                transform: translate3d(0, 118vh, 0) rotate(var(--drop-tilt)) scale(1.04);
-                opacity: 0;
-            }
-        }
-
-        @keyframes waterDropSway {
-            0%   { margin-left: -7px; }
-            100% { margin-left: 7px; }
-        }
-
-        /* Tiny droplets make the effect feel like real rain instead of falling pills. */
-        .water-splash {
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            border-radius: 50%;
-            background: rgba(255,255,255,.45);
-            box-shadow: 0 0 8px rgba(190,220,255,.18);
-            animation: splashFall var(--splash-duration) linear var(--splash-delay) infinite;
-            opacity: 0;
-        }
-
-        @keyframes splashFall {
-            0%   { transform: translate3d(0,-10vh,0) scale(.6); opacity: 0; }
-            10%  { opacity: .55; }
-            88%  { opacity: .28; }
-            100% { transform: translate3d(var(--splash-drift),115vh,0) scale(1); opacity: 0; }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .water-drop,
-            .water-splash {
-                animation-play-state: paused;
-            }
-        }
-
     </style>
 </head>
 <body>
-    <canvas id="shader-background" aria-hidden="true"></canvas>
-    <div id="water-drop-layer" aria-hidden="true"></div>
-
     <div class="main-content" id="main-content">
         <div class="logo-image-wrap"><img class="farius-logo" src="/logo.gif" alt="Farium"></div>
-        <div class="tagline">Browse Freely</div>
+        <div class="tagline">Browse Freely · Green Forest</div>
         <div class="search-container">
             <input type="text" class="search-input" id="search-input" placeholder="Search or enter a URL..." autocomplete="off">
             <button class="search-button" id="search-go">Go</button>
@@ -2077,7 +1940,7 @@
         </div>
     </nav>
 
-    <!-- ============ SIMPLE BROWSER OVERLAY ============ -->
+    <!-- ============ SIMPLE BROWSER OVERLAY — GREEN GLASS ============ -->
     <div class="browser-overlay" id="browser-overlay">
         <div class="tabs-bar" id="tabs-bar">
             <button class="new-tab-btn" id="new-tab-btn" title="New Tab">+</button>
@@ -2222,11 +2085,11 @@
         <div class="os-taskbar">
             <div class="os-taskbar-left">
                 <button class="os-taskbar-btn" data-os-app="start" title="Start">
-                    <svg viewBox="0 0 24 24" style="stroke:none;fill:#e0e0e0;">
-                        <rect x="3" y="3" width="8" height="8" rx="1" fill="#e0e0e0" stroke="none"/>
-                        <rect x="13" y="3" width="8" height="8" rx="1" fill="#e0e0e0" stroke="none"/>
-                        <rect x="3" y="13" width="8" height="8" rx="1" fill="#e0e0e0" stroke="none"/>
-                        <rect x="13" y="13" width="8" height="8" rx="1" fill="#e0e0e0" stroke="none"/>
+                    <svg viewBox="0 0 24 24" style="stroke:none;fill:#b8d8b8;">
+                        <rect x="3" y="3" width="8" height="8" rx="2" fill="#b8d8b8" stroke="none"/>
+                        <rect x="13" y="3" width="8" height="8" rx="2" fill="#b8d8b8" stroke="none"/>
+                        <rect x="3" y="13" width="8" height="8" rx="2" fill="#b8d8b8" stroke="none"/>
+                        <rect x="13" y="13" width="8" height="8" rx="2" fill="#b8d8b8" stroke="none"/>
                     </svg>
                     <span class="os-taskbar-tooltip">Start</span>
                 </button>
@@ -2270,10 +2133,10 @@
 
     <a href="#" class="venusFooter" style="position: fixed; bottom: 16px; left: 24px; color: var(--text-dim); font-size: 10px; text-decoration: none; z-index: 10; transition: color 0.2s;">Venus integration</a>
 
-    <div class="page-slide" id="pageSlide" style="position: fixed; inset: 0; z-index: 30000; background: #000; transform: translateX(100%); transition: transform 0.45s cubic-bezier(0.65, 0, 0.35, 1); pointer-events: none; display: flex; align-items: center; justify-content: center; will-change: transform;"></div>
+    <div class="page-slide" id="pageSlide" style="position: fixed; inset: 0; z-index: 30000; background: #0a0f0a; transform: translateX(100%); transition: transform 0.45s cubic-bezier(0.65, 0, 0.35, 1); pointer-events: none; display: flex; align-items: center; justify-content: center; will-change: transform;"></div>
 
     <script>
-        /* ============ ORIGINAL SCRIPT (with minor polish) ============ */
+        /* ============ ENHANCED SCRIPT — GREEN FOREST ============ */
         let tabs = [];
         let activeTabId = null;
 
@@ -2493,42 +2356,6 @@
             } catch (err) {}
         }
 
-        (function initBackground() {
-            const DEFAULT_BG = '/assets/backgrounds/foggy-forest.png';
-            const DEFAULT_DARKNESS = 72;
-            const DEFAULT_SCALE = 1;
-            const DEFAULT_X = 50;
-            const DEFAULT_Y = 50;
-
-            const bg = '';
-            const scale = parseFloat(localStorage.getItem('bgScale')) || DEFAULT_SCALE;
-            const posX = parseFloat(localStorage.getItem('bgX'));
-            const posY = parseFloat(localStorage.getItem('bgY'));
-            const finalX = isNaN(posX) ? DEFAULT_X : posX;
-            const finalY = isNaN(posY) ? DEFAULT_Y : posY;
-
-            document.documentElement.style.setProperty('--bg-scale', scale);
-            document.documentElement.style.setProperty('--bg-pos-x', finalX + '%');
-            document.documentElement.style.setProperty('--bg-pos-y', finalY + '%');
-
-            const applyTo = (el) => {
-                el.style.backgroundColor = 'transparent';
-                el.style.backgroundImage = 'none';
-            };
-            applyTo(document.body);
-            const overlay = document.getElementById('browser-overlay');
-            if (overlay) applyTo(overlay);
-
-            const raw = localStorage.getItem('bgDarkness');
-            const percent = raw !== null ? Number(raw) : DEFAULT_DARKNESS;
-            const p = Math.max(0, Math.min(100, percent));
-            const alpha = p / 100;
-            const alphaBottom = Math.min(1, alpha * 1.15);
-
-            document.documentElement.style.setProperty('--overlay-top', `rgba(0, 0, 0, ${alpha.toFixed(3)})`);
-            document.documentElement.style.setProperty('--overlay-bottom', `rgba(0, 0, 0, ${alphaBottom.toFixed(3)})`);
-        })();
-
         (function initFullscreenToggle() {
             const btn = document.getElementById('browser-fullscreen');
             if (!btn) return;
@@ -2585,7 +2412,6 @@
                 const dockItems = document.getElementById('dockItems');
                 const collapseBtn = document.getElementById('dockCollapseBtn');
 
-                // Collapse toggle
                 let collapsed = localStorage.getItem('dockCollapsed') === 'true';
                 if (collapsed) dock.classList.add('collapsed');
 
@@ -2594,7 +2420,6 @@
                     dock.classList.toggle('collapsed', collapsed);
                     localStorage.setItem('dockCollapsed', collapsed);
                     collapseBtn.textContent = collapsed ? '▶' : '◀';
-                    // Update main content margin
                     const main = document.getElementById('main-content');
                     if (main) {
                         main.style.marginRight = collapsed ? '60px' : '180px';
@@ -2605,19 +2430,15 @@
                     document.getElementById('main-content').style.marginRight = '60px';
                 }
 
-                // Remove buttons — persisted
                 const hiddenDockItems = JSON.parse(localStorage.getItem('hiddenDockItems') || '[]');
                 hiddenDockItems.forEach(id => {
                     const item = dockItems.querySelector(`[data-dock-id="${id}"]`);
                     if (item) item.style.display = 'none';
-                    // Also hide the separator before games if it's the only one left? We'll handle separators separately.
                 });
 
-                // Also handle separators: hide a separator if the next visible item is hidden
                 function updateSeparators() {
                     const seps = dockItems.querySelectorAll('.dock-sep');
                     seps.forEach(sep => {
-                        // Find next visible dock item after this separator
                         let next = sep.nextElementSibling;
                         let nextVisible = false;
                         while (next) {
@@ -2640,7 +2461,6 @@
                         const item = dockItems.querySelector(`[data-dock-id="${id}"]`);
                         if (item) {
                             item.style.display = 'none';
-                            // Persist
                             const hidden = JSON.parse(localStorage.getItem('hiddenDockItems') || '[]');
                             if (!hidden.includes(id)) {
                                 hidden.push(id);
@@ -2650,8 +2470,6 @@
                         }
                     });
                 });
-
-                // If all dock items are hidden, maybe hide the dock? Not required.
             })();
 
             const gamesBtn = document.getElementById("gamesBtn");
@@ -2790,11 +2608,10 @@
                 document.getElementById('app-buttons').insertBefore(btn, document.getElementById('add-app-button'));
             });
 
-            // Browser OS
             initBrowserOS();
         });
 
-        /* ============ BROWSER OS — WINDOWS 11 DARK ============ */
+        /* ============ BROWSER OS — GREEN FOREST ============ */
         let osWindows = [];
         let osWindowZ = 100;
         let osMinimized = [];
@@ -2809,8 +2626,6 @@
             const savedWall = localStorage.getItem('os-wallpaper');
             if (savedWall) {
                 desktop.style.backgroundImage = `url('${savedWall}')`;
-            } else {
-                desktop.style.backgroundImage = 'none';
             }
 
             updateOSTrayClock();
@@ -3202,15 +3017,15 @@
             gallery.className = 'os-wallpaper-gallery';
 
             const presets = [
-                '/assets/backgrounds/foggy-forest.png',
-                'https://picsum.photos/seed/mountain/800/450',
-                'https://picsum.photos/seed/ocean/800/450',
-                'https://picsum.photos/seed/city/800/450',
-                'https://picsum.photos/seed/space/800/450',
+                '/public/background.png',
                 'https://picsum.photos/seed/forest/800/450',
-                'https://picsum.photos/seed/desert/800/450',
-                'https://picsum.photos/seed/abstract/800/450',
-                'https://picsum.photos/seed/night/800/450'
+                'https://picsum.photos/seed/woods/800/450',
+                'https://picsum.photos/seed/moss/800/450',
+                'https://picsum.photos/seed/leaves/800/450',
+                'https://picsum.photos/seed/ferns/800/450',
+                'https://picsum.photos/seed/rainforest/800/450',
+                'https://picsum.photos/seed/pine/800/450',
+                'https://picsum.photos/seed/jungle/800/450'
             ];
 
             presets.forEach(url => {
@@ -3234,7 +3049,7 @@
             const resetBtn = document.createElement('button');
             resetBtn.textContent = 'Reset to default';
             resetBtn.addEventListener('click', () => {
-                setOSWallpaper('/assets/backgrounds/foggy-forest.png');
+                setOSWallpaper('/public/background.png');
             });
 
             actions.appendChild(uploadBtn);
@@ -3250,15 +3065,15 @@
             wrap.style.padding = '28px';
             wrap.style.overflowY = 'auto';
             wrap.style.height = '100%';
-            wrap.style.background = '#181818';
-            wrap.style.color = '#e0e0e0';
+            wrap.style.background = 'rgba(10, 25, 10, 0.4)';
+            wrap.style.color = '#d0e8d0';
 
             const title = document.createElement('h2');
             title.textContent = 'System Settings';
             title.style.fontSize = '22px';
             title.style.fontWeight = '600';
             title.style.marginBottom = '24px';
-            title.style.color = '#fff';
+            title.style.color = '#e0f0e0';
 
             const section = document.createElement('div');
             section.style.marginBottom = '24px';
@@ -3268,22 +3083,22 @@
             label.style.fontSize = '13px';
             label.style.fontWeight = '600';
             label.style.marginBottom = '12px';
-            label.style.color = '#a0a0a0';
+            label.style.color = '#8aa88a';
 
             const changeBtn = document.createElement('button');
             changeBtn.textContent = 'Change wallpaper';
             changeBtn.style.padding = '10px 20px';
-            changeBtn.style.background = '#7c8cff';
+            changeBtn.style.background = 'linear-gradient(180deg, #5cb85c, #3a8e3a)';
             changeBtn.style.border = 'none';
-            changeBtn.style.borderRadius = '6px';
+            changeBtn.style.borderRadius = '10px';
             changeBtn.style.color = '#fff';
             changeBtn.style.cursor = 'pointer';
             changeBtn.style.fontFamily = 'inherit';
             changeBtn.style.fontSize = '13px';
             changeBtn.style.fontWeight = '500';
-            changeBtn.style.transition = 'background 0.15s';
-            changeBtn.addEventListener('mouseenter', () => changeBtn.style.background = '#6a7aee');
-            changeBtn.addEventListener('mouseleave', () => changeBtn.style.background = '#7c8cff');
+            changeBtn.style.transition = 'filter 0.15s';
+            changeBtn.addEventListener('mouseenter', () => changeBtn.style.filter = 'brightness(1.15)');
+            changeBtn.addEventListener('mouseleave', () => changeBtn.style.filter = 'brightness(1)');
             changeBtn.addEventListener('click', () => {
                 document.getElementById('os-wallpaper-input').click();
             });
@@ -3333,7 +3148,7 @@
                 const preview = document.getElementById('os-snap-preview');
                 const threshold = 20;
                 const screenW = window.innerWidth;
-                const screenH = window.innerHeight - 42;
+                const screenH = window.innerHeight - 48;
 
                 clearTimeout(osSnapPreviewTimer);
 
@@ -3519,218 +3334,6 @@
             });
         }
 
-        /* ============ IMPROVED WEBGL SHADER — WATER DROPS ============ */
-        (function initShaderBackground() {
-            const canvas = document.getElementById('shader-background');
-            const gl = canvas && canvas.getContext('webgl', { antialias: true, alpha: false, premultipliedAlpha: false });
-            if (!gl) return;
-
-            const vertexSource = `
-                attribute vec2 position;
-                void main() { gl_Position = vec4(position, 0.0, 1.0); }
-            `;
-
-            const fragmentSource = `
-                precision highp float;
-                uniform vec2 resolution;
-                uniform float time;
-                uniform vec2 pointer;
-                uniform float pulse;
-
-                #define PI 3.14159265359
-
-                float hash(vec2 p) {
-                    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
-                }
-
-                float noise(vec2 p) {
-                    vec2 i = floor(p);
-                    vec2 f = fract(p);
-                    f = f * f * (3.0 - 2.0 * f);
-                    return mix(
-                        mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
-                        mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x),
-                        f.y
-                    );
-                }
-
-                float fbm(vec2 p) {
-                    float value = 0.0;
-                    float amplitude = 0.5;
-                    for (int i = 0; i < 5; i++) {
-                        value += noise(p) * amplitude;
-                        p = p * 2.02 + vec2(17.3, 9.1);
-                        amplitude *= 0.5;
-                    }
-                    return value;
-                }
-
-                // Water drop distortion
-                vec2 dropDistort(vec2 uv, vec2 dropCenter, float dropRadius, float dropStrength) {
-                    vec2 delta = uv - dropCenter;
-                    float dist = length(delta);
-                    float influence = smoothstep(dropRadius, dropRadius * 0.2, dist);
-                    // Refraction-like displacement
-                    vec2 direction = normalize(delta + 0.0001);
-                    float wave = sin(dist * 30.0 - time * 6.0) * 0.5 + 0.5;
-                    return direction * influence * dropStrength * wave;
-                }
-
-                void main() {
-                    vec2 uv = gl_FragCoord.xy / resolution.xy;
-                    vec2 aspect = vec2(resolution.x / resolution.y, 1.0);
-                    vec2 p = (uv - 0.5) * aspect;
-
-                    float t = time * 0.18;
-
-                    // Mouse influence
-                    vec2 mouseUV = pointer;
-                    vec2 mousePos = (mouseUV - 0.5) * aspect;
-                    float mouseDist = length(p - mousePos);
-                    float mouseInfluence = smoothstep(0.6, 0.0, mouseDist) * (0.4 + pulse * 0.6);
-
-                    // Simulate multiple water drops
-                    // Drop 1: moving with pointer
-                    vec2 drop1Center = mousePos + vec2(sin(t * 1.3) * 0.15, cos(t * 1.7) * 0.12);
-                    float drop1Radius = 0.32 + sin(t * 2.1) * 0.08;
-                    float drop1Strength = 0.06 + pulse * 0.08;
-
-                    // Drop 2: auto-moving
-                    vec2 drop2Center = vec2(sin(t * 0.9) * 0.4, cos(t * 0.7) * 0.35);
-                    float drop2Radius = 0.28 + sin(t * 1.5) * 0.1;
-                    float drop2Strength = 0.05;
-
-                    // Drop 3: auto-moving
-                    vec2 drop3Center = vec2(cos(t * 0.6 + 2.0) * 0.45, sin(t * 0.8 + 1.0) * 0.3);
-                    float drop3Radius = 0.25 + cos(t * 1.8) * 0.09;
-                    float drop3Strength = 0.045;
-
-                    // Combine distortions
-                    vec2 distortion = vec2(0.0);
-                    distortion += dropDistort(p, drop1Center, drop1Radius, drop1Strength);
-                    distortion += dropDistort(p, drop2Center, drop2Radius, drop2Strength);
-                    distortion += dropDistort(p, drop3Center, drop3Radius, drop3Strength);
-
-                    // Add subtle flowing distortion
-                    vec2 flow = vec2(t * 0.1, -t * 0.08);
-                    float field = fbm(p * 2.5 + flow);
-                    distortion += vec2(
-                        sin(field * 5.0 + t * 1.5) * 0.01,
-                        cos(field * 5.0 + t * 1.2) * 0.01
-                    );
-
-                    // Sample the base pattern with distortion
-                    vec2 distortedP = p + distortion;
-
-                    float bands = sin((distortedP.x * 4.0 + distortedP.y * 3.2) + field * 4.0 - t * 2.5);
-                    float surface = smoothstep(-0.35, 0.85, bands * 0.5 + field * 0.8);
-
-                    // Water-like caustics
-                    float caustic = fbm(distortedP * 6.0 + t * 0.5);
-                    caustic = pow(caustic, 2.0);
-
-                    // Vignette
-                    float vignette = smoothstep(1.5, 0.2, length(p));
-
-                    // Color palette — black, silver, deep water
-                    vec3 black = vec3(0.004, 0.005, 0.008);
-                    vec3 deepWater = vec3(0.02, 0.04, 0.06);
-                    vec3 charcoal = vec3(0.06, 0.075, 0.09);
-                    vec3 silver = vec3(0.45, 0.5, 0.58);
-                    vec3 highlight = vec3(0.85, 0.9, 1.0);
-
-                    vec3 color = mix(black, deepWater, surface * 0.7);
-                    color = mix(color, charcoal, smoothstep(0.4, 0.8, surface) * 0.6);
-                    color = mix(color, silver, smoothstep(0.65, 0.95, surface) * 0.35);
-                    color += highlight * caustic * 0.08;
-                    color += silver * vignette * 0.04;
-
-                    // Mouse proximity glow
-                    color += highlight * mouseInfluence * 0.12;
-
-                    // Subtle pulse
-                    color += highlight * pulse * 0.03;
-
-                    gl_FragColor = vec4(color, 1.0);
-                }
-            `;
-
-            function compile(type, source) {
-                const shader = gl.createShader(type);
-                gl.shaderSource(shader, source);
-                gl.compileShader(shader);
-                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-                    console.warn(gl.getShaderInfoLog(shader));
-                }
-                return shader;
-            }
-
-            const program = gl.createProgram();
-            gl.attachShader(program, compile(gl.VERTEX_SHADER, vertexSource));
-            gl.attachShader(program, compile(gl.FRAGMENT_SHADER, fragmentSource));
-            gl.linkProgram(program);
-            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-                console.warn(gl.getProgramInfoLog(program));
-                return;
-            }
-            gl.useProgram(program);
-
-            const buffer = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-                -1, -1, 1, -1, -1, 1,
-                -1, 1, 1, -1, 1, 1
-            ]), gl.STATIC_DRAW);
-
-            const position = gl.getAttribLocation(program, 'position');
-            gl.enableVertexAttribArray(position);
-            gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
-
-            const resolution = gl.getUniformLocation(program, 'resolution');
-            const time = gl.getUniformLocation(program, 'time');
-            const pointer = gl.getUniformLocation(program, 'pointer');
-            const pulse = gl.getUniformLocation(program, 'pulse');
-
-            let waveX = 0.5;
-            let waveY = 0.5;
-            let targetX = 0.5;
-            let targetY = 0.5;
-            let wavePulse = 0.0;
-
-            function moveWave(x, y, pressed = false) {
-                targetX = x / Math.max(innerWidth, 1);
-                targetY = 1.0 - y / Math.max(innerHeight, 1);
-                if (pressed) wavePulse = 1.0;
-            }
-
-            addEventListener('pointermove', e => moveWave(e.clientX, e.clientY, e.buttons > 0));
-            addEventListener('pointerdown', e => moveWave(e.clientX, e.clientY, true));
-            addEventListener('pointerup', () => { wavePulse = Math.max(wavePulse, 0.5); });
-
-            function resize() {
-                const ratio = Math.min(window.devicePixelRatio || 1, 2);
-                canvas.width = Math.floor(innerWidth * ratio);
-                canvas.height = Math.floor(innerHeight * ratio);
-                gl.viewport(0, 0, canvas.width, canvas.height);
-            }
-
-            function draw(now) {
-                waveX += (targetX - waveX) * 0.06;
-                waveY += (targetY - waveY) * 0.06;
-                wavePulse *= 0.975;
-                gl.uniform2f(resolution, canvas.width, canvas.height);
-                gl.uniform1f(time, now * 0.001);
-                gl.uniform2f(pointer, waveX, waveY);
-                gl.uniform1f(pulse, wavePulse);
-                gl.drawArrays(gl.TRIANGLES, 0, 6);
-                requestAnimationFrame(draw);
-            }
-
-            addEventListener('resize', resize);
-            resize();
-            requestAnimationFrame(draw);
-        })();
-
         function handleOSApp(app) {
             if (app === 'start') {
                 document.getElementById('os-start-menu').classList.toggle('open');
@@ -3751,84 +3354,15 @@
             if (app === 'browser') {
                 createOSWindow('browser', { width: 820, height: 540 });
             } else if (app === 'calculator') {
-                createOSWindow('calculator', { width: 320, height: 460, title: 'Calculator' });
+                createOSWindow('calculator', { width: 340, height: 500, title: 'Calculator' });
             } else if (app === 'clock') {
-                createOSWindow('clock', { width: 380, height: 260, title: 'Clock' });
+                createOSWindow('clock', { width: 400, height: 280, title: 'Clock' });
             } else if (app === 'wallpaper') {
-                createOSWindow('wallpaper', { width: 540, height: 440, title: 'Wallpaper' });
+                createOSWindow('wallpaper', { width: 560, height: 460, title: 'Wallpaper' });
             } else if (app === 'settings') {
-                createOSWindow('settings', { width: 520, height: 400, title: 'Settings' });
+                createOSWindow('settings', { width: 540, height: 420, title: 'Settings' });
             }
         }
     </script>
-
-    <script>
-        /* ============ LIGHTWEIGHT FALLING WATER DROPS ============ */
-        (() => {
-            const layer = document.getElementById('water-drop-layer');
-            if (!layer) return;
-
-            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-            const isSmallScreen = () => window.innerWidth < 700;
-
-            function random(min, max) {
-                return Math.random() * (max - min) + min;
-            }
-
-            function createDrops() {
-                layer.innerHTML = '';
-
-                // Fewer elements on phones keeps the effect smooth.
-                const mainCount = isSmallScreen() ? 18 : 30;
-                const tinyCount = isSmallScreen() ? 12 : 24;
-
-                for (let i = 0; i < mainCount; i++) {
-                    const drop = document.createElement('span');
-                    drop.className = 'water-drop';
-
-                    const size = random(3.5, 10);
-                    const duration = random(5.5, 11.5);
-                    const delay = random(-11, 0);
-
-                    drop.style.left = `${random(-2, 102)}vw`;
-                    drop.style.setProperty('--drop-size', `${size}px`);
-                    drop.style.setProperty('--drop-duration', `${duration}s`);
-                    drop.style.setProperty('--drop-delay', `${delay}s`);
-                    drop.style.setProperty('--drop-opacity', random(.12, .42).toFixed(2));
-                    drop.style.setProperty('--drop-blur', `${random(0, .7).toFixed(2)}px`);
-                    drop.style.setProperty('--drop-tilt', `${random(-9, 9).toFixed(1)}deg`);
-
-                    layer.appendChild(drop);
-                }
-
-                for (let i = 0; i < tinyCount; i++) {
-                    const splash = document.createElement('span');
-                    splash.className = 'water-splash';
-
-                    splash.style.left = `${random(0, 100)}vw`;
-                    splash.style.setProperty('--splash-duration', `${random(3.5, 8)}s`);
-                    splash.style.setProperty('--splash-delay', `${random(-8, 0)}s`);
-                    splash.style.setProperty('--splash-drift', `${random(-35, 35)}px`);
-
-                    layer.appendChild(splash);
-                }
-            }
-
-            createDrops();
-
-            // Rebuild only when crossing the mobile/desktop breakpoint.
-            let wasSmall = isSmallScreen();
-            window.addEventListener('resize', () => {
-                const nowSmall = isSmallScreen();
-                if (nowSmall !== wasSmall) {
-                    wasSmall = nowSmall;
-                    createDrops();
-                }
-            }, { passive: true });
-
-            reduceMotion.addEventListener?.('change', createDrops);
-        })();
-    </script>
-
 </body>
 </html>

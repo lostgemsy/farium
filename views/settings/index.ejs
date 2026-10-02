@@ -13,26 +13,25 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg: #000000;
-            --bg-2: #050505;
-            --bg-3: #0a0a0a;
-            --text: #f5f5f7;
-            --text-dim: rgba(255,255,255,.42);
-            --text-dim-2: rgba(255,255,255,.68);
-            --card: rgba(255,255,255,.04);
-            --card-hover: rgba(255,255,255,.075);
-            --card-border: rgba(255,255,255,.08);
-            --card-border-hover: rgba(255,255,255,.26);
-            --input-bg: rgba(255,255,255,.045);
-            --input-border: rgba(255,255,255,.1);
-            --input-border-focus: rgba(255,255,255,.4);
-            --shadow: rgba(0,0,0,.8);
-            --accent: #e6e6e6;
-            --accent-2: #858585;
-            --accent-glow: rgba(255,255,255,.2);
-            --ring: rgba(255,255,255,.18);
+            --bg: #0a0f0a;
+            --bg-2: #0f150f;
+            --bg-3: #141c14;
+            --text: #e8f0e8;
+            --text-dim: rgba(180, 220, 180, 0.55);
+            --text-dim-2: rgba(200, 235, 200, 0.82);
+            --card: rgba(30, 50, 30, 0.32);
+            --card-hover: rgba(50, 80, 50, 0.45);
+            --card-border: rgba(120, 200, 120, 0.18);
+            --card-border-hover: rgba(140, 240, 140, 0.45);
+            --input-bg: rgba(10, 20, 10, 0.45);
+            --input-border: rgba(120, 200, 120, 0.22);
+            --input-border-focus: rgba(140, 240, 140, 0.65);
+            --shadow: rgba(0, 0, 0, 0.85);
+            --accent: #5cb85c;
+            --accent-2: #3a9e3a;
+            --accent-glow: rgba(92, 184, 92, 0.35);
+            --ring: rgba(92, 184, 92, 0.25);
 
-            /* Background editor state — set from JS */
             --bg-scale: 1;
             --bg-pos-x: 50%;
             --bg-pos-y: 50%;
@@ -51,7 +50,7 @@
 
         html {
             min-height: 100%;
-            background: #000;
+            background: #0a0f0a;
         }
 
         body {
@@ -67,8 +66,12 @@
             position: relative;
             overflow-x: hidden;
 
-            background-color: #000;
-            background: #050505;
+            background-color: #0a0f0a;
+            background-image: url('/public/background.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             isolation: isolate;
         }
 
@@ -79,21 +82,9 @@
             z-index: -1;
             pointer-events: none;
             background:
-                radial-gradient(circle at 15% 10%, rgba(255,255,255,.09), transparent 28%),
-                radial-gradient(circle at 85% 80%, rgba(170,170,170,.08), transparent 30%),
-                linear-gradient(135deg, #151515 0%, #050505 48%, #101010 100%);
-        }
-
-        body::after {
-            content: '';
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            pointer-events: none;
-            opacity: .16;
-            background-image: linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px);
-            background-size: 64px 64px;
-            mask-image: linear-gradient(to bottom, black, transparent 75%);
+                linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.55) 100%),
+                radial-gradient(900px 600px at 50% 40%, rgba(92, 184, 92, 0.06), transparent 70%);
+            transition: background 0.2s ease;
         }
 
         /* ============ SETTINGS WRAPPER ============ */
@@ -105,8 +96,13 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
-            margin-right: 130px;
+            margin-right: 180px;
             max-width: 860px;
+            transition: margin-right 0.3s cubic-bezier(0.22, 0.98, 0.36, 1);
+        }
+
+        .side-dock.collapsed ~ .settings-wrapper {
+            margin-right: 60px;
         }
 
         .logo-area {
@@ -125,9 +121,11 @@
             max-width: 240px;
             object-fit: contain;
             transition: transform 0.3s ease;
+            filter: drop-shadow(0 8px 32px rgba(92, 184, 92, 0.25));
         }
         .farius-logo:hover {
             transform: scale(1.05) translateY(-3px);
+            filter: drop-shadow(0 12px 40px rgba(92, 184, 92, 0.4));
         }
 
         .logo-fallback {
@@ -149,10 +147,11 @@
             font-weight: 800;
             letter-spacing: -1px;
             animation: slideUp 0.4s 0.05s ease both;
-            background: linear-gradient(180deg, #ffffff, #8d8d8d);
+            background: linear-gradient(180deg, #ffffff, #a8d8a8);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.4));
         }
 
         .page-subtitle {
@@ -168,15 +167,15 @@
         /* ============ SETTING CARD ============ */
         .settings-container {
             position: relative;
-            background: linear-gradient(135deg, rgba(255,255,255,.095), rgba(255,255,255,.025));
-            backdrop-filter: blur(18px) saturate(120%);
-            -webkit-backdrop-filter: blur(18px) saturate(120%);
+            background: rgba(20, 40, 20, 0.35);
+            backdrop-filter: blur(28px) saturate(140%);
+            -webkit-backdrop-filter: blur(28px) saturate(140%);
             padding: 24px 26px;
-            border-radius: 16px;
-            border: 1px solid var(--card-border);
-            box-shadow: 0 12px 32px -16px var(--shadow);
+            border-radius: 20px;
+            border: 1px solid rgba(120, 200, 120, 0.18);
+            box-shadow: 0 12px 32px -16px var(--shadow), inset 0 1px rgba(255, 255, 255, 0.05);
             animation: slideUp 0.4s ease both;
-            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+            transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
         }
 
         .settings-container::before {
@@ -190,12 +189,12 @@
             border-top-left-radius: 2px;
             border-bottom-left-radius: 2px;
             opacity: 0.6;
-            transition: opacity 0.2s ease;
+            transition: opacity 0.25s ease;
         }
 
         .settings-container:hover {
             border-color: var(--card-border-hover);
-            background: rgba(15,15,15,.85);
+            background: rgba(30, 60, 30, 0.45);
             transform: translateY(-2px);
         }
         .settings-container:hover::before { opacity: 1; }
@@ -221,15 +220,17 @@
         .setting-item select,
         .setting-item input[type="text"] {
             min-height: 40px;
-            border-radius: 10px;
-            border: 1.5px solid var(--input-border);
-            background: rgba(5,5,5,.75);
+            border-radius: 12px;
+            border: 1.5px solid rgba(120, 200, 120, 0.22);
+            background: rgba(10, 25, 10, 0.5);
             color: var(--text);
             font-size: 0.8rem;
             font-family: inherit;
             font-weight: 500;
             outline: none;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
 
         .setting-item select {
@@ -245,19 +246,19 @@
 
         .setting-item select:hover,
         .setting-item input[type="text"]:hover {
-            border-color: var(--card-border-hover);
-            background: rgba(8,8,8,.9);
+            border-color: rgba(140, 240, 140, 0.45);
+            background: rgba(20, 45, 20, 0.55);
         }
 
         .setting-item select:focus,
         .setting-item input[type="text"]:focus {
-            border-color: var(--input-border-focus);
-            background: #0d0d0d;
-            box-shadow: 0 0 0 3px var(--ring);
+            border-color: rgba(140, 240, 140, 0.65);
+            background: rgba(25, 55, 25, 0.6);
+            box-shadow: 0 0 0 4px rgba(92, 184, 92, 0.15);
         }
 
         .setting-item select option {
-            background-color: #0a0a0a;
+            background-color: #0f1a0f;
             color: var(--text);
         }
 
@@ -287,29 +288,31 @@
             flex-direction: column;
             gap: 8px;
             padding: 8px;
-            border-radius: 12px;
-            border: 1.5px solid var(--card-border);
-            background: rgba(5,5,5,.75);
+            border-radius: 14px;
+            border: 1.5px solid rgba(120, 200, 120, 0.15);
+            background: rgba(10, 25, 10, 0.45);
             cursor: pointer;
             transition: border-color .2s ease, background .2s ease, transform .2s ease;
             text-align: left;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
         .bg-card:hover {
-            border-color: var(--card-border-hover);
-            background: rgba(15,15,15,.9);
+            border-color: rgba(140, 240, 140, 0.45);
+            background: rgba(30, 60, 30, 0.5);
             transform: translateY(-2px);
         }
         .bg-card.selected {
             border-color: var(--accent);
-            background: rgba(124,140,255,.1);
-            box-shadow: 0 0 0 3px var(--ring);
+            background: rgba(60, 120, 60, 0.35);
+            box-shadow: 0 0 0 3px rgba(92, 184, 92, 0.2);
         }
 
         .bg-thumb {
             width: 100%;
             aspect-ratio: 16 / 9;
-            border-radius: 8px;
-            background: #000;
+            border-radius: 10px;
+            background: #0a0f0a;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -355,9 +358,9 @@
         .bg-adjust {
             flex: 1;
             padding: 12px 16px;
-            border-radius: 10px;
-            border: 1.5px solid var(--input-border);
-            background: rgba(5,5,5,.75);
+            border-radius: 12px;
+            border: 1.5px solid rgba(120, 200, 120, 0.22);
+            background: rgba(10, 25, 10, 0.5);
             color: var(--text);
             font-family: inherit;
             font-size: 0.82rem;
@@ -368,19 +371,21 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
         .bg-reset:hover,
         .bg-adjust:hover {
             transform: translateY(-1px);
-            background: rgba(15,15,15,.9);
-            border-color: var(--card-border-hover);
+            background: rgba(30, 60, 30, 0.5);
+            border-color: rgba(140, 240, 140, 0.45);
         }
         .bg-adjust {
-            background: linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.04));
-            border-color: rgba(255,255,255,.3);
+            background: linear-gradient(135deg, rgba(92, 184, 92, 0.25), rgba(58, 158, 58, 0.15));
+            border-color: rgba(120, 200, 120, 0.35);
         }
         .bg-adjust:hover {
-            background: linear-gradient(135deg, rgba(124,140,255,.28), rgba(180,124,255,.22));
+            background: linear-gradient(135deg, rgba(92, 184, 92, 0.4), rgba(58, 158, 58, 0.3));
         }
         .bg-adjust svg, .bg-reset svg {
             width: 14px;
@@ -397,28 +402,30 @@
             position: fixed;
             inset: 0;
             z-index: 25000;
-            background: rgba(0,0,0,.85);
+            background: rgba(5, 12, 5, 0.7);
             display: none;
             align-items: center;
             justify-content: center;
             padding: 24px;
             animation: fadeIn .25s ease;
+            backdrop-filter: blur(32px) saturate(140%);
+            -webkit-backdrop-filter: blur(32px) saturate(140%);
         }
         .bg-editor-overlay.open { display: flex; }
 
         .bg-editor {
             width: min(100%, 900px);
-            background: linear-gradient(145deg, rgba(30,30,30,.97), rgba(7,7,7,.98));
-            backdrop-filter: blur(22px);
-            -webkit-backdrop-filter: blur(22px);
-            border: 1.5px solid var(--card-border);
-            border-radius: 18px;
+            background: rgba(20, 40, 20, 0.5);
+            backdrop-filter: blur(40px) saturate(140%);
+            -webkit-backdrop-filter: blur(40px) saturate(140%);
+            border: 1.5px solid rgba(120, 200, 120, 0.2);
+            border-radius: 20px;
             padding: 22px;
             display: flex;
             flex-direction: column;
             gap: 16px;
             animation: popIn .3s cubic-bezier(.2,.9,.25,1.15);
-            box-shadow: 0 30px 80px -20px rgba(0,0,0,.9);
+            box-shadow: 0 30px 80px -20px rgba(0,0,0,.9), inset 0 1px rgba(255, 255, 255, 0.05);
         }
 
         .bg-editor-header {
@@ -440,9 +447,9 @@
         }
         .bg-editor-close {
             width: 34px; height: 34px;
-            border-radius: 9px;
-            border: 1.5px solid var(--input-border);
-            background: rgba(5,5,5,.75);
+            border-radius: 10px;
+            border: 1.5px solid rgba(120, 200, 120, 0.22);
+            background: rgba(10, 25, 10, 0.5);
             color: var(--text);
             cursor: pointer;
             display: flex;
@@ -452,53 +459,50 @@
             transition: background .15s ease, transform .15s ease;
         }
         .bg-editor-close:hover {
-            background: rgba(30,30,30,.9);
+            background: rgba(40, 80, 40, 0.5);
             transform: rotate(90deg);
         }
 
-        /* The preview canvas — where you drag the background */
         .bg-editor-preview {
             position: relative;
             width: 100%;
             aspect-ratio: 16 / 9;
-            border-radius: 12px;
+            border-radius: 14px;
             overflow: hidden;
-            background-color: #000;
+            background-color: #0a0f0a;
             background-image: none;
             background-size: calc(100% * var(--preview-scale, 1));
             background-position: var(--preview-x, 50%) var(--preview-y, 50%);
             background-repeat: no-repeat;
             cursor: grab;
             user-select: none;
-            border: 1px solid var(--card-border);
+            border: 1px solid rgba(120, 200, 120, 0.15);
             touch-action: none;
         }
         .bg-editor-preview.dragging { cursor: grabbing; }
 
-        /* Grid lines overlay */
         .bg-editor-preview::before {
             content: '';
             position: absolute;
             inset: 0;
             pointer-events: none;
             background-image:
-                linear-gradient(to right, rgba(255,255,255,.10) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255,255,255,.10) 1px, transparent 1px);
+                linear-gradient(to right, rgba(120, 200, 120, 0.08) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(120, 200, 120, 0.08) 1px, transparent 1px);
             background-size: 8.333% 8.333%;
             z-index: 1;
         }
-        /* Center crosshair */
         .bg-editor-preview::after {
             content: '';
             position: absolute;
             top: 50%; left: 50%;
             width: 40px; height: 40px;
             transform: translate(-50%, -50%);
-            border: 1px solid rgba(124,140,255,.5);
+            border: 1px solid rgba(92, 184, 92, 0.5);
             border-radius: 50%;
             pointer-events: none;
             z-index: 2;
-            box-shadow: 0 0 20px rgba(124,140,255,.3);
+            box-shadow: 0 0 20px rgba(92, 184, 92, 0.3);
         }
 
         .bg-editor-preview-hint {
@@ -506,16 +510,17 @@
             bottom: 12px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,.7);
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
+            background: rgba(10, 25, 10, 0.7);
+            border: 1px solid rgba(120, 200, 120, 0.2);
+            border-radius: 10px;
             padding: 6px 12px;
             font-size: 11px;
             color: var(--text-dim-2);
             letter-spacing: .3px;
             pointer-events: none;
             z-index: 3;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
 
         .bg-editor-controls {
@@ -543,14 +548,13 @@
             font-variant-numeric: tabular-nums;
         }
 
-        /* Sliders in editor */
         .bg-editor-slider {
             -webkit-appearance: none;
             appearance: none;
             width: 100%;
             height: 6px;
             border-radius: 3px;
-            background: rgba(255,255,255,.08);
+            background: rgba(120, 200, 120, 0.15);
             outline: none;
             cursor: pointer;
         }
@@ -561,7 +565,7 @@
             border-radius: 50%;
             background: linear-gradient(135deg, var(--accent), var(--accent-2));
             cursor: pointer;
-            box-shadow: 0 0 0 3px rgba(124,140,255,.25);
+            box-shadow: 0 0 0 3px rgba(92, 184, 92, 0.25), 0 4px 12px -4px rgba(0,0,0,.8);
             transition: transform .15s ease;
         }
         .bg-editor-slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
@@ -571,7 +575,7 @@
             background: linear-gradient(135deg, var(--accent), var(--accent-2));
             border: none;
             cursor: pointer;
-            box-shadow: 0 0 0 3px rgba(124,140,255,.25);
+            box-shadow: 0 0 0 3px rgba(92, 184, 92, 0.25), 0 4px 12px -4px rgba(0,0,0,.8);
         }
 
         .bg-editor-actions {
@@ -579,33 +583,36 @@
             gap: 10px;
             margin-top: 6px;
             padding-top: 16px;
-            border-top: 1px solid var(--card-border);
+            border-top: 1px solid rgba(120, 200, 120, 0.12);
         }
         .bg-editor-btn {
             flex: 1;
             padding: 12px 18px;
-            border-radius: 11px;
-            border: 1.5px solid var(--input-border);
-            background: rgba(5,5,5,.75);
+            border-radius: 12px;
+            border: 1.5px solid rgba(120, 200, 120, 0.22);
+            background: rgba(10, 25, 10, 0.5);
             color: var(--text);
             font-family: inherit;
             font-size: 0.84rem;
             font-weight: 700;
             cursor: pointer;
             transition: transform .15s ease, background .15s ease;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
         .bg-editor-btn:hover {
             transform: translateY(-1px);
-            background: rgba(15,15,15,.9);
+            background: rgba(30, 60, 30, 0.5);
         }
         .bg-editor-btn.primary {
-            background: linear-gradient(135deg, var(--accent), var(--accent-2));
-            border-color: transparent;
+            background: linear-gradient(180deg, #5cb85c, #3a8e3a);
+            border-color: rgba(120, 200, 120, 0.4);
             color: #fff;
             box-shadow: 0 10px 26px -10px var(--accent-glow);
         }
         .bg-editor-btn.primary:hover {
             box-shadow: 0 14px 32px -10px var(--accent-glow);
+            filter: brightness(1.08);
         }
 
         /* ============ DARKNESS SLIDER ============ */
@@ -653,7 +660,7 @@
             border-radius: 50%;
             background: linear-gradient(135deg, var(--accent), var(--accent-2));
             cursor: pointer;
-            box-shadow: 0 0 0 3px rgba(124,140,255,.25), 0 4px 12px -4px rgba(0,0,0,.8);
+            box-shadow: 0 0 0 3px rgba(92, 184, 92, 0.25), 0 4px 12px -4px rgba(0,0,0,.8);
             transition: transform .15s ease;
         }
         .darkness-slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
@@ -664,7 +671,7 @@
             background: linear-gradient(135deg, var(--accent), var(--accent-2));
             border: none;
             cursor: pointer;
-            box-shadow: 0 0 0 3px rgba(124,140,255,.25), 0 4px 12px -4px rgba(0,0,0,.8);
+            box-shadow: 0 0 0 3px rgba(92, 184, 92, 0.25), 0 4px 12px -4px rgba(0,0,0,.8);
             transition: transform .15s ease;
         }
         .darkness-slider::-moz-range-thumb:hover { transform: scale(1.1); }
@@ -684,7 +691,7 @@
             gap: 12px;
             margin-top: 26px;
             padding-top: 22px;
-            border-top: 1px solid var(--card-border);
+            border-top: 1px solid rgba(120, 200, 120, 0.12);
             animation: slideUp 0.4s 0.25s ease both;
             flex-wrap: wrap;
         }
@@ -694,11 +701,11 @@
             align-items: center;
             gap: 8px;
             padding: 13px 28px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, rgba(255,255,255,.1), rgba(255,255,255,.025));
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1.5px solid var(--input-border);
+            border-radius: 14px;
+            background: rgba(20, 40, 20, 0.4);
+            backdrop-filter: blur(20px) saturate(140%);
+            -webkit-backdrop-filter: blur(20px) saturate(140%);
+            border: 1.5px solid rgba(120, 200, 120, 0.22);
             color: var(--text);
             font-family: inherit;
             font-size: 0.85rem;
@@ -706,7 +713,7 @@
             letter-spacing: 0.3px;
             cursor: pointer;
             text-decoration: none;
-            transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
             box-shadow: 0 8px 22px -12px var(--shadow);
         }
 
@@ -718,12 +725,12 @@
             stroke-width: 2;
             stroke-linecap: round;
             stroke-linejoin: round;
-            transition: transform 0.2s ease;
+            transition: transform 0.25s ease;
         }
 
         .action-btn:hover {
-            background: linear-gradient(135deg, var(--accent), var(--accent-2));
-            border-color: transparent;
+            background: linear-gradient(180deg, #5cb85c, #3a8e3a);
+            border-color: rgba(120, 200, 120, 0.4);
             color: #ffffff;
             transform: translateY(-3px);
             box-shadow: 0 14px 36px -12px var(--accent-glow);
@@ -732,27 +739,28 @@
         .action-btn:hover svg { transform: translateX(-3px); }
         .action-btn:active { transform: translateY(-1px) scale(0.98); }
 
-        /* ============ RIGHT SIDE PANEL ============ */
+        /* ============ RIGHT SIDE PANEL (matching main page) ============ */
         .side-dock {
             position: fixed;
             top: 0;
             bottom: 0;
             right: 0;
             z-index: 100;
-            width: 130px;
+            width: 180px;
             display: flex;
             flex-direction: column;
             align-items: stretch;
             justify-content: center;
             gap: 6px;
-            padding: 18px 12px;
-            background: linear-gradient(180deg, rgba(18,18,18,.88), rgba(4,4,4,.94));
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-left: 1px solid var(--card-border);
-            animation: slideRight .4s cubic-bezier(.2,.9,.25,1.15) both;
+            padding: 20px 12px;
+            background: rgba(15, 30, 15, 0.55);
+            border-left: 1px solid rgba(120, 200, 120, 0.15);
+            animation: slideRight 0.45s cubic-bezier(0.22, 0.98, 0.36, 1) both;
+            backdrop-filter: blur(28px) saturate(140%);
+            -webkit-backdrop-filter: blur(28px) saturate(140%);
+            transition: width 0.3s cubic-bezier(0.22, 0.98, 0.36, 1);
+            box-shadow: -8px 0 32px rgba(0, 0, 0, 0.5);
         }
-
         .side-dock::before {
             content: "";
             position: absolute;
@@ -761,78 +769,172 @@
             bottom: 18%;
             width: 2px;
             background: linear-gradient(180deg, transparent, var(--accent), var(--accent-2), transparent);
-            opacity: .5;
+            opacity: 0.7;
             pointer-events: none;
+            border-radius: 2px;
         }
 
-        .dock-btn {
+        .dock-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 6px 10px;
+            border-bottom: 1px solid rgba(120, 200, 120, 0.12);
+            margin-bottom: 6px;
+        }
+        .dock-header span {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.6px;
+            color: var(--text-dim);
+            font-weight: 700;
+        }
+        .dock-collapse-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .dock-collapse-btn:hover {
+            background: var(--card-hover);
+            color: var(--text);
+        }
+
+        .dock-items {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex: 1;
+            padding-right: 2px;
+        }
+        .dock-items::-webkit-scrollbar {
+            width: 4px;
+        }
+        .dock-items::-webkit-scrollbar-thumb {
+            background: rgba(120, 200, 120, 0.2);
+            border-radius: 4px;
+        }
+
+        .dock-item {
+            position: relative;
             display: flex;
             align-items: center;
             gap: 10px;
             height: 44px;
-            padding: 0 14px;
-            border-radius: 12px;
+            padding: 0 12px;
+            border-radius: 16px;
             text-decoration: none;
             color: var(--text-dim-2);
-            font-size: 12.5px;
-            font-weight: 700;
-            letter-spacing: .3px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
             background: transparent;
             border: 1px solid transparent;
-            transition: transform .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+            transition: all 0.25s cubic-bezier(0.22, 0.98, 0.36, 1);
             cursor: pointer;
             will-change: transform;
+            font-family: inherit;
+            flex-shrink: 0;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
-
-        .dock-btn .label { flex: 1; text-align: left; }
-
-        .dock-btn svg {
-            width: 17px;
-            height: 17px;
+        .dock-item .label {
+            flex: 1;
+            text-align: left;
+        }
+        .dock-item svg {
+            width: 18px;
+            height: 18px;
             stroke: currentColor;
             fill: none;
             stroke-width: 1.9;
             stroke-linecap: round;
             stroke-linejoin: round;
             flex-shrink: 0;
-            transition: stroke .2s ease, transform .25s ease;
+            transition: stroke 0.2s ease, transform 0.25s ease;
         }
-
-        .dock-btn:hover {
+        .dock-item:hover {
             color: var(--text);
-            background: var(--card-hover);
-            border-color: var(--card-border-hover);
-            transform: translateY(-3px) scale(1.04);
-            box-shadow: 0 10px 24px -10px var(--shadow);
+            background: rgba(50, 100, 50, 0.35);
+            border-color: rgba(140, 240, 140, 0.45);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 12px 28px -12px var(--shadow);
         }
-        .dock-btn:hover svg { stroke: var(--accent); transform: scale(1.08); }
-        .dock-btn:active { transform: translateY(-1px) scale(1.01); }
-
-        .dock-btn.active {
+        .dock-item:hover svg {
+            stroke: var(--accent);
+            transform: scale(1.1);
+        }
+        .dock-item:active {
+            transform: translateY(-1px) scale(1.01);
+        }
+        .dock-item.active {
             color: var(--text);
-            background: var(--card);
-            border-color: var(--card-border);
+            background: rgba(60, 120, 60, 0.3);
+            border-color: rgba(120, 200, 120, 0.35);
         }
-
-        .dock-btn.games-btn {
-            background: linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.035));
-            border: 1px solid rgba(255,255,255,.24);
+        .dock-item.games-btn {
+            background: linear-gradient(135deg, rgba(60, 140, 60, 0.3), rgba(40, 100, 40, 0.2));
+            border: 1px solid rgba(120, 200, 120, 0.35);
             color: var(--text);
         }
-        .dock-btn.games-btn svg { stroke: var(--accent); }
-        .dock-btn.games-btn:hover {
+        .dock-item.games-btn svg {
+            stroke: var(--accent);
+        }
+        .dock-item.games-btn:hover {
             background: linear-gradient(135deg, var(--accent), var(--accent-2));
             border-color: transparent;
             color: #fff;
-            transform: translateY(-3px) scale(1.06);
-            box-shadow: 0 12px 28px -10px var(--accent-glow);
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 14px 32px -10px var(--accent-glow);
         }
-        .dock-btn.games-btn:hover svg { stroke: #fff; }
+        .dock-item.games-btn:hover svg {
+            stroke: #fff;
+        }
 
         .dock-sep {
             height: 1px;
-            margin: 4px 6px;
-            background: linear-gradient(90deg, transparent, var(--card-border), transparent);
+            margin: 6px 8px;
+            background: linear-gradient(90deg, transparent, rgba(120, 200, 120, 0.2), transparent);
+            flex-shrink: 0;
+        }
+
+        .side-dock.collapsed {
+            width: 60px;
+            padding: 20px 6px;
+            align-items: center;
+        }
+        .side-dock.collapsed .dock-header span,
+        .side-dock.collapsed .dock-item .label,
+        .side-dock.collapsed .dock-sep {
+            display: none;
+        }
+        .side-dock.collapsed .dock-header {
+            border-bottom: none;
+            padding: 0 0 8px;
+            justify-content: center;
+        }
+        .side-dock.collapsed .dock-collapse-btn {
+            font-size: 18px;
+        }
+        .side-dock.collapsed .dock-item {
+            justify-content: center;
+            padding: 0;
+            width: 44px;
+            height: 44px;
+        }
+        .side-dock.collapsed .dock-item svg {
+            width: 20px;
+            height: 20px;
+        }
+        .side-dock.collapsed .dock-item .label {
+            display: none;
         }
 
         /* ============ PAGE SLIDE ============ */
@@ -840,7 +942,7 @@
             position: fixed;
             inset: 0;
             z-index: 30000;
-            background: #000;
+            background: #0a0f0a;
             transform: translateX(100%);
             transition: transform .45s cubic-bezier(.65, 0, .35, 1);
             pointer-events: none;
@@ -854,7 +956,7 @@
             content: "";
             width: 40px;
             height: 40px;
-            border: 3px solid var(--input-border);
+            border: 3px solid rgba(120, 200, 120, 0.2);
             border-top-color: var(--accent);
             border-radius: 50%;
             opacity: 0;
@@ -876,13 +978,14 @@
 
         /* ============ MOBILE ============ */
         @media (max-width: 720px) {
-            .side-dock { width: 60px; padding: 14px 6px; gap: 4px; }
-            .dock-btn { height: 42px; padding: 0; justify-content: center; gap: 0; }
-            .dock-btn .label { display: none; }
-            .dock-btn svg { width: 20px; height: 20px; }
-            .settings-wrapper { margin-right: 60px; padding: 30px 14px 40px; gap: 13px; }
+            .side-dock { width: 68px; padding: 16px 8px; gap: 6px; }
+            .dock-item { height: 46px; padding: 0; justify-content: center; gap: 0; }
+            .dock-item .label { display: none; }
+            .dock-item svg { width: 21px; height: 21px; }
+            .settings-wrapper { margin-right: 68px; padding: 30px 14px 40px; gap: 13px; }
+            .side-dock.collapsed ~ .settings-wrapper { margin-right: 60px; }
             .farius-logo { max-height: 60px; max-width: 180px; }
-            .settings-container { padding: 17px 18px; border-radius: 14px; }
+            .settings-container { padding: 17px 18px; border-radius: 18px; }
             .setting-item { gap: 12px; }
             .setting-item label { font-size: 0.76rem; }
             .setting-item select { min-width: 132px; max-width: 52%; padding-left: 10px; padding-right: 25px; }
@@ -985,72 +1088,30 @@
 
     </div>
 
-    <!-- Background editor removed: the shader supplies the page background. -->
-    <!-- ============ BACKGROUND EDITOR HUD ============ -->
-    <div class="bg-editor-overlay" id="bgEditorOverlay" style="display:none;">
-        <div class="bg-editor">
-            <div class="bg-editor-header">
-                <div>
-                    <div class="bg-editor-title">Adjust Background Fit</div>
-                    <div class="bg-editor-sub">Drag the preview to move · Scroll to zoom · Or use the sliders below</div>
-                </div>
-                <button class="bg-editor-close" id="bgEditorClose" type="button" aria-label="Close">×</button>
-            </div>
-
-            <div class="bg-editor-preview" id="bgEditorPreview">
-                <div class="bg-editor-preview-hint">Drag me · Scroll to zoom</div>
-            </div>
-
-            <div class="bg-editor-controls">
-                <div class="bg-editor-control">
-                    <div class="bg-editor-control-header">
-                        <span>Zoom</span>
-                        <span class="bg-editor-control-value" id="editorScaleValue">100%</span>
-                    </div>
-                    <input type="range" class="bg-editor-slider" id="editorScale" min="50" max="300" step="1" value="100">
-                </div>
-                <div class="bg-editor-control">
-                    <div class="bg-editor-control-header">
-                        <span>Horizontal</span>
-                        <span class="bg-editor-control-value" id="editorXValue">50%</span>
-                    </div>
-                    <input type="range" class="bg-editor-slider" id="editorX" min="0" max="100" step="1" value="50">
-                </div>
-                <div class="bg-editor-control">
-                    <div class="bg-editor-control-header">
-                        <span>Vertical</span>
-                        <span class="bg-editor-control-value" id="editorYValue">50%</span>
-                    </div>
-                    <input type="range" class="bg-editor-slider" id="editorY" min="0" max="100" step="1" value="50">
-                </div>
-            </div>
-
-            <div class="bg-editor-actions">
-                <button class="bg-editor-btn" id="bgEditorCancel" type="button">Cancel</button>
-                <button class="bg-editor-btn" id="bgEditorReset" type="button">Reset</button>
-                <button class="bg-editor-btn primary" id="bgEditorSave" type="button">Save</button>
-            </div>
+    <!-- ============ RIGHT SIDE PANEL (matching main page) ============ -->
+    <nav class="side-dock" id="sideDock" aria-label="Site navigation">
+        <div class="dock-header">
+            <span>Menu</span>
+            <button class="dock-collapse-btn" id="dockCollapseBtn" title="Collapse/Expand">◀</button>
         </div>
-    </div>
-
-    <!-- RIGHT SIDE PANEL -->
-    <nav class="side-dock" aria-label="Site navigation">
-        <a href="/" class="dock-btn" title="Home">
-            <span class="label">Home</span>
-            <svg viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM9 20v-6h6v6"/></svg>
-        </a>
-        <a href="/settings" class="dock-btn active" title="Settings">
-            <span class="label">Settings</span>
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-        </a>
-        <div class="dock-sep" aria-hidden="true"></div>
-        <a href="/gnmath.html" class="dock-btn games-btn" id="gamesBtn" title="Play Games">
-            <span class="label">Games</span>
-            <svg viewBox="0 0 24 24">
-                <rect x="2" y="6" width="20" height="12" rx="3"/>
-                <path d="M6 12h4M8 10v4M15 11h.01M17.5 13h.01"/>
-            </svg>
-        </a>
+        <div class="dock-items" id="dockItems">
+            <a href="/" class="dock-item" data-dock-id="home" title="Home">
+                <span class="label">Home</span>
+                <svg viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM9 20v-6h6v6"/></svg>
+            </a>
+            <a href="/settings" class="dock-item active" data-dock-id="settings" title="Settings">
+                <span class="label">Settings</span>
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            </a>
+            <div class="dock-sep" data-sep-id="sep1"></div>
+            <a href="/gnmath.html" class="dock-item games-btn" id="gamesBtn" data-dock-id="games" title="Play Games">
+                <span class="label">Games</span>
+                <svg viewBox="0 0 24 24">
+                    <rect x="2" y="6" width="20" height="12" rx="3"/>
+                    <path d="M6 12h4M8 10v4M15 11h.01M17.5 13h.01"/>
+                </svg>
+            </a>
+        </div>
     </nav>
 
     <div class="page-slide" id="pageSlide"></div>
@@ -1075,14 +1136,42 @@
             { name: 'Backgroundly 2',     file: 'backgroundly2.png' }
         ];
 
-        const DEFAULT_BG = BG_BASE + 'foggy-forest.png';
+        const DEFAULT_BG = '/public/background.png';
         const DEFAULT_DARKNESS = 72;
-        const DEFAULT_SCALE = 1;    // 1 = cover (100%)
-        const DEFAULT_X = 50;       // 50% = center
-        const DEFAULT_Y = 50;       // 50% = center
+        const DEFAULT_SCALE = 1;
+        const DEFAULT_X = 50;
+        const DEFAULT_Y = 50;
 
         /* ============ SETTINGS LOGIC ============ */
         document.addEventListener('DOMContentLoaded', () => {
+
+            /* ---------- SIDE DOCK COLLAPSE ---------- */
+            (function initDock() {
+                const dock = document.getElementById('sideDock');
+                const collapseBtn = document.getElementById('dockCollapseBtn');
+                const settingsWrapper = document.querySelector('.settings-wrapper');
+
+                let collapsed = localStorage.getItem('dockCollapsed') === 'true';
+                if (collapsed) dock.classList.add('collapsed');
+
+                function updateMargin() {
+                    if (settingsWrapper) {
+                        settingsWrapper.style.marginRight = collapsed ? '60px' : '180px';
+                    }
+                }
+
+                collapseBtn.addEventListener('click', () => {
+                    collapsed = !collapsed;
+                    dock.classList.toggle('collapsed', collapsed);
+                    localStorage.setItem('dockCollapsed', collapsed);
+                    collapseBtn.textContent = collapsed ? '▶' : '◀';
+                    updateMargin();
+                });
+                if (collapsed) {
+                    collapseBtn.textContent = '▶';
+                    updateMargin();
+                }
+            })();
 
             /* ---------- PAGE SLIDE ENTER ---------- */
             (function () {
@@ -1113,258 +1202,6 @@
                         window.location.href = "/gnmath.html";
                     }, 500);
                 });
-            }
-
-                        /* Background controls were removed; the shader owns the page background. */
-            if (false) {
-                function applyBackground() {}
-            function applyBackground(url, scale, posX, posY) {
-                document.body.style.backgroundColor = '#000';
-                document.body.style.backgroundImage = `url('${url}')`;
-                document.body.style.backgroundSize = `calc(100% * ${scale}) auto`;
-                document.body.style.backgroundPosition = `${posX}% ${posY}%`;
-                document.body.style.backgroundRepeat = 'no-repeat';
-                document.body.style.backgroundAttachment = 'fixed';
-            }
-
-            /* ---------- APPLY DARKNESS ---------- */
-            function applyDarkness(percent) {
-                const p = Math.max(0, Math.min(100, Number(percent)));
-                const alpha = p / 100;
-                const alphaBottom = Math.min(1, alpha * 1.15);
-                document.body.style.setProperty('--overlay-top', `rgba(0, 0, 0, ${alpha.toFixed(3)})`);
-                document.body.style.setProperty('--overlay-bottom', `rgba(0, 0, 0, ${alphaBottom.toFixed(3)})`);
-            }
-
-            /* ---------- STATE ---------- */
-            const state = {
-                bg: localStorage.getItem('bg') || DEFAULT_BG,
-                scale: parseFloat(localStorage.getItem('bgScale')) || DEFAULT_SCALE,
-                x: parseFloat(localStorage.getItem('bgX')) || DEFAULT_X,
-                y: parseFloat(localStorage.getItem('bgY')) || DEFAULT_Y
-            };
-
-            /* ---------- BACKGROUND PICKER GRID ---------- */
-            const bgGrid = document.getElementById('bgGrid');
-            const bgReset = document.getElementById('bgReset');
-            const bgAdjust = document.getElementById('bgAdjust');
-
-            BACKGROUNDS.forEach(item => {
-                const url = BG_BASE + item.file;
-
-                const card = document.createElement('div');
-                card.className = 'bg-card';
-                card.dataset.path = url;
-                if (url === state.bg) card.classList.add('selected');
-
-                const thumb = document.createElement('div');
-                thumb.className = 'bg-thumb';
-                thumb.style.backgroundImage = `url('${url}')`;
-
-                const name = document.createElement('div');
-                name.className = 'bg-name';
-                name.textContent = item.name;
-
-                const badge = document.createElement('div');
-                badge.className = 'bg-badge';
-                badge.textContent = 'Active';
-
-                card.appendChild(thumb);
-                card.appendChild(name);
-                card.appendChild(badge);
-
-                card.addEventListener('click', () => {
-                    state.bg = url;
-                    // Reset transform when a new wallpaper is picked
-                    state.scale = DEFAULT_SCALE;
-                    state.x = DEFAULT_X;
-                    state.y = DEFAULT_Y;
-                    localStorage.setItem('bg', state.bg);
-                    localStorage.setItem('bgScale', state.scale);
-                    localStorage.setItem('bgX', state.x);
-                    localStorage.setItem('bgY', state.y);
-                    applyBackground(state.bg, state.scale, state.x, state.y);
-                    document.querySelectorAll('.bg-card').forEach(c => c.classList.remove('selected'));
-                    card.classList.add('selected');
-                });
-
-                bgGrid.appendChild(card);
-            });
-
-            bgReset.addEventListener('click', () => {
-                state.bg = DEFAULT_BG;
-                state.scale = DEFAULT_SCALE;
-                state.x = DEFAULT_X;
-                state.y = DEFAULT_Y;
-                localStorage.setItem('bg', state.bg);
-                localStorage.setItem('bgScale', state.scale);
-                localStorage.setItem('bgX', state.x);
-                localStorage.setItem('bgY', state.y);
-                applyBackground(state.bg, state.scale, state.x, state.y);
-                document.querySelectorAll('.bg-card').forEach(c => {
-                    c.classList.toggle('selected', c.dataset.path === DEFAULT_BG);
-                });
-            });
-
-            /* ---------- DARKNESS SLIDER ---------- */
-            const darknessSlider = document.getElementById('darknessSlider');
-            const darknessValue = document.getElementById('darknessValue');
-
-            const savedDarkness = localStorage.getItem('bgDarkness');
-            const initialDarkness = savedDarkness !== null ? Number(savedDarkness) : DEFAULT_DARKNESS;
-            darknessSlider.value = String(initialDarkness);
-            darknessValue.textContent = initialDarkness + '%';
-            applyDarkness(initialDarkness);
-
-            darknessSlider.addEventListener('input', (e) => {
-                const val = Number(e.target.value);
-                darknessValue.textContent = val + '%';
-                applyDarkness(val);
-                localStorage.setItem('bgDarkness', val);
-            });
-
-            /* ---------- INITIAL APPLY ---------- */
-            applyBackground(state.bg, state.scale, state.x, state.y);
-
-            /* ============================================================
-               BACKGROUND EDITOR (HUD)
-               ============================================================ */
-            const overlay = document.getElementById('bgEditorOverlay');
-            const preview = document.getElementById('bgEditorPreview');
-            const editorClose = document.getElementById('bgEditorClose');
-            const editorCancel = document.getElementById('bgEditorCancel');
-            const editorReset = document.getElementById('bgEditorReset');
-            const editorSave = document.getElementById('bgEditorSave');
-
-            const scaleSlider = document.getElementById('editorScale');
-            const xSlider = document.getElementById('editorX');
-            const ySlider = document.getElementById('editorY');
-            const scaleValue = document.getElementById('editorScaleValue');
-            const xValue = document.getElementById('editorXValue');
-            const yValue = document.getElementById('editorYValue');
-
-            // Working copy while the editor is open — doesn't touch page until Save
-            let editor = { scale: state.scale, x: state.x, y: state.y };
-
-            function renderEditorPreview() {
-                preview.style.setProperty('--preview-scale', editor.scale);
-                preview.style.setProperty('--preview-x', editor.x + '%');
-                preview.style.setProperty('--preview-y', editor.y + '%');
-                preview.style.backgroundImage = `url('${state.bg}')`;
-
-                scaleSlider.value = String(Math.round(editor.scale * 100));
-                xSlider.value = String(Math.round(editor.x));
-                ySlider.value = String(Math.round(editor.y));
-                scaleValue.textContent = Math.round(editor.scale * 100) + '%';
-                xValue.textContent = Math.round(editor.x) + '%';
-                yValue.textContent = Math.round(editor.y) + '%';
-            }
-
-            function openEditor() {
-                editor = { scale: state.scale, x: state.x, y: state.y };
-                renderEditorPreview();
-                overlay.classList.add('open');
-            }
-
-            function closeEditor() {
-                overlay.classList.remove('open');
-            }
-
-            bgAdjust.addEventListener('click', openEditor);
-            editorClose.addEventListener('click', closeEditor);
-            editorCancel.addEventListener('click', closeEditor);
-
-            overlay.addEventListener('click', (e) => {
-                if (e.target === overlay) closeEditor();
-            });
-
-            editorReset.addEventListener('click', () => {
-                editor = { scale: DEFAULT_SCALE, x: DEFAULT_X, y: DEFAULT_Y };
-                renderEditorPreview();
-            });
-
-            editorSave.addEventListener('click', () => {
-                state.scale = editor.scale;
-                state.x = editor.x;
-                state.y = editor.y;
-                localStorage.setItem('bgScale', state.scale);
-                localStorage.setItem('bgX', state.x);
-                localStorage.setItem('bgY', state.y);
-                applyBackground(state.bg, state.scale, state.x, state.y);
-                closeEditor();
-            });
-
-            /* ---------- SLIDERS ---------- */
-            scaleSlider.addEventListener('input', (e) => {
-                editor.scale = Number(e.target.value) / 100;
-                renderEditorPreview();
-            });
-            xSlider.addEventListener('input', (e) => {
-                editor.x = Number(e.target.value);
-                renderEditorPreview();
-            });
-            ySlider.addEventListener('input', (e) => {
-                editor.y = Number(e.target.value);
-                renderEditorPreview();
-            });
-
-            /* ---------- DRAG TO MOVE ---------- */
-            let dragging = false;
-            let dragStart = null;
-
-            preview.addEventListener('pointerdown', (e) => {
-                dragging = true;
-                dragStart = {
-                    mouseX: e.clientX,
-                    mouseY: e.clientY,
-                    x: editor.x,
-                    y: editor.y
-                };
-                preview.classList.add('dragging');
-                preview.setPointerCapture(e.pointerId);
-            });
-
-            preview.addEventListener('pointermove', (e) => {
-                if (!dragging) return;
-                const rect = preview.getBoundingClientRect();
-                const dx = e.clientX - dragStart.mouseX;
-                const dy = e.clientY - dragStart.mouseY;
-
-                // Convert pixel movement to percentage of the preview box,
-                // negative because moving the mouse right should move the image left
-                const pctX = (dx / rect.width) * 100;
-                const pctY = (dy / rect.height) * 100;
-
-                editor.x = Math.max(0, Math.min(100, dragStart.x - pctX));
-                editor.y = Math.max(0, Math.min(100, dragStart.y - pctY));
-                renderEditorPreview();
-            });
-
-            preview.addEventListener('pointerup', (e) => {
-                dragging = false;
-                preview.classList.remove('dragging');
-                try { preview.releasePointerCapture(e.pointerId); } catch (err) {}
-            });
-            preview.addEventListener('pointercancel', () => {
-                dragging = false;
-                preview.classList.remove('dragging');
-            });
-
-            /* ---------- SCROLL TO ZOOM ---------- */
-            preview.addEventListener('wheel', (e) => {
-                e.preventDefault();
-                const step = e.deltaY > 0 ? -0.05 : 0.05;
-                editor.scale = Math.max(0.5, Math.min(3, editor.scale + step));
-                renderEditorPreview();
-            }, { passive: false });
-
-            /* ---------- KEYBOARD ---------- */
-            document.addEventListener('keydown', (e) => {
-                if (!overlay.classList.contains('open')) return;
-                if (e.key === 'Escape') closeEditor();
-                if (e.key === 'Enter') editorSave.click();
-            });
-
             }
 
             /* ---------- PROXY TYPE ---------- */

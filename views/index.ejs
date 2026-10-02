@@ -77,7 +77,7 @@
             background-color: #0a0f0a;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            background-image: url('/public/background.png');
+            background-image: url('/public/assets/backgrounds/background.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -558,6 +558,10 @@
             color: var(--text);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: rgba(5, 12, 5, 0.75);
+            background-image: url('/public/assets/backgrounds/background.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             backdrop-filter: blur(40px) saturate(140%);
             -webkit-backdrop-filter: blur(40px) saturate(140%);
         }
@@ -1027,7 +1031,7 @@
             display: none;
             flex-direction: column;
             background: #0a0f0a;
-            background-image: url('/public/background.png');
+            background-image: url('/public/assets/backgrounds/background.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -3017,7 +3021,7 @@
             gallery.className = 'os-wallpaper-gallery';
 
             const presets = [
-                '/public/background.png',
+                '/public/assets/backgrounds/background.png',
                 'https://picsum.photos/seed/forest/800/450',
                 'https://picsum.photos/seed/woods/800/450',
                 'https://picsum.photos/seed/moss/800/450',
@@ -3049,7 +3053,7 @@
             const resetBtn = document.createElement('button');
             resetBtn.textContent = 'Reset to default';
             resetBtn.addEventListener('click', () => {
-                setOSWallpaper('/public/background.png');
+                setOSWallpaper('/public/assets/backgrounds/background.png');
             });
 
             actions.appendChild(uploadBtn);

@@ -1,5 +1,6 @@
 import express from "express";
 import { createServer } from "node:http";
+import { existsSync } from "node:fs";
 import { epoxyPath } from "@mercuryworkshop/epoxy-transport";
 import { libcurlPath } from "@mercuryworkshop/libcurl-transport";
 import { baremuxPath } from "@mercuryworkshop/bare-mux/node";
@@ -15,6 +16,22 @@ const app = express();
 
 const publicPath = join(__dirname, "public");
 app.use(express.static(publicPath));
+
+// Serve background.png from either public/ or repo root so CSS url('/background.png') works
+app.get("/background.png", (req, res) => {
+    const candidates = [
+        join(publicPath, "background.png"),
+        join(__dirname, "background.png"),
+    ];
+
+    for (const filePath of candidates) {
+        if (existsSync(filePath)) {
+            return res.sendFile(filePath);
+        }
+    }
+
+    return res.status(404).send("background.png not found");
+});
 
 app.set('view engine', 'ejs');
 app.set('views', join(__dirname, 'views'));

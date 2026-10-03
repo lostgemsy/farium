@@ -49,6 +49,7 @@
             --radius-btn: 14px;
             --radius-pill: 40px;
             --transition-smooth: cubic-bezier(0.22, 0.98, 0.36, 1);
+            --transition-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         /* ============ GLOBAL ============ */
@@ -125,6 +126,43 @@
             60%  { opacity: 1; transform: translateY(-6px) scale(1.02); }
             80%  { transform: translateY(2px) scale(0.99); }
             100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Drop-in keyframe — like the search bar forming itself */
+        @keyframes appDropIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-140px) scale(0.6) rotateX(45deg);
+                filter: blur(10px);
+            }
+            55% {
+                opacity: 1;
+                transform: translateY(10px) scale(1.08) rotateX(-6deg);
+                filter: blur(0);
+            }
+            75% {
+                transform: translateY(-5px) scale(0.99) rotateX(2deg);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1) rotateX(0);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes glowPulse {
+            0%, 100% {
+                box-shadow:
+                    0 10px 30px -10px rgba(0, 0, 0, 0.6),
+                    0 0 0 0 rgba(92, 184, 92, 0.4),
+                    inset 0 1px rgba(255, 255, 255, 0.15);
+            }
+            50% {
+                box-shadow:
+                    0 14px 36px -10px rgba(0, 0, 0, 0.65),
+                    0 0 24px -4px rgba(92, 184, 92, 0.55),
+                    inset 0 1px rgba(255, 255, 255, 0.2);
+            }
         }
 
         /* ============ SIDE DOCK ============ */
@@ -403,60 +441,137 @@
         }
         .search-button:active { transform: scale(0.96); }
 
-        /* ============ APP BUTTONS (transparent, no boxes) ============ */
+        /* ============ APP BUTTONS (glassy + drop-in animation) ============ */
         .app-buttons {
             display: flex;
             justify-content: center;
-            margin-top: 24px;
-            gap: 20px;
+            margin-top: 28px;
+            gap: 22px;
             flex-wrap: wrap;
-            animation: slideUp 0.55s var(--transition-smooth) 0.1s both;
+            perspective: 800px;
         }
+
         .app-button {
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
             background: transparent;
             cursor: pointer;
             outline: none;
             border: none;
             color: var(--text);
             text-decoration: none;
-            transition: all 0.3s var(--transition-smooth);
-            position: relative;
+            opacity: 0;
+            transform: translateY(-140px) scale(0.6) rotateX(45deg);
+            filter: blur(10px);
+            will-change: transform, opacity, filter;
+            transition: transform 0.35s var(--transition-smooth),
+                        box-shadow 0.35s var(--transition-smooth);
         }
+
+        /* The glassy surface */
         .app-button::before {
             content: '';
             position: absolute;
             inset: 0;
-            border-radius: 50%;
-            background: rgba(30, 60, 30, 0.25);
-            backdrop-filter: blur(14px) saturate(140%);
-            -webkit-backdrop-filter: blur(14px) saturate(140%);
-            border: 1px solid rgba(140, 220, 140, 0.25);
-            transition: all 0.3s var(--transition-smooth);
+            border-radius: 18px;
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.22) 0%,
+                    rgba(140, 220, 140, 0.12) 40%,
+                    rgba(20, 45, 20, 0.35) 100%
+                );
+            backdrop-filter: blur(22px) saturate(160%);
+            -webkit-backdrop-filter: blur(22px) saturate(160%);
+            border: 1.5px solid rgba(180, 255, 180, 0.3);
+            box-shadow:
+                0 10px 30px -10px rgba(0, 0, 0, 0.6),
+                0 0 0 0 rgba(92, 184, 92, 0.4),
+                inset 0 1px rgba(255, 255, 255, 0.15);
+            transition: all 0.35s var(--transition-smooth);
+            animation: glowPulse 3.6s ease-in-out infinite;
+            overflow: hidden;
+        }
+
+        /* Glass shine highlight */
+        .app-button::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 18px;
+            background:
+                radial-gradient(
+                    ellipse at 30% 10%,
+                    rgba(255, 255, 255, 0.35) 0%,
+                    rgba(255, 255, 255, 0.05) 30%,
+                    transparent 60%
+                );
             opacity: 0.9;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+
+        .app-button:hover {
+            transform: translateY(-6px) scale(1.08);
         }
         .app-button:hover::before {
-            background: rgba(60, 120, 60, 0.45);
-            border-color: rgba(160, 255, 160, 0.7);
-            transform: scale(1.08);
-            box-shadow: 0 0 32px -6px rgba(92, 184, 92, 0.6);
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(200, 255, 200, 0.35) 0%,
+                    rgba(140, 240, 140, 0.22) 40%,
+                    rgba(40, 90, 40, 0.5) 100%
+                );
+            border-color: rgba(200, 255, 200, 0.7);
+            box-shadow:
+                0 20px 40px -12px rgba(0, 0, 0, 0.7),
+                0 0 40px -4px rgba(92, 184, 92, 0.8),
+                inset 0 1px rgba(255, 255, 255, 0.3);
+            animation-play-state: paused;
         }
-        .app-button:active { transform: scale(0.94); }
+        .app-button:hover::after {
+            opacity: 1;
+            background:
+                radial-gradient(
+                    ellipse at 30% 10%,
+                    rgba(255, 255, 255, 0.55) 0%,
+                    rgba(255, 255, 255, 0.1) 30%,
+                    transparent 60%
+                );
+        }
+
+        .app-button:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+
         .app-button img {
             position: relative;
-            z-index: 1;
-            width: 28px;
-            height: 28px;
+            z-index: 2;
+            width: 30px;
+            height: 30px;
             object-fit: contain;
-            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
-            transition: transform 0.3s var(--transition-smooth);
+            filter:
+                drop-shadow(0 2px 6px rgba(0, 0, 0, 0.65))
+                drop-shadow(0 0 12px rgba(92, 184, 92, 0.25));
+            transition: transform 0.35s var(--transition-smooth),
+                        filter 0.35s ease;
         }
-        .app-button:hover img { transform: scale(1.12); }
+        .app-button:hover img {
+            transform: scale(1.15) rotate(-4deg);
+            filter:
+                drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7))
+                drop-shadow(0 0 20px rgba(140, 240, 140, 0.5));
+        }
+
+        /* When drop-in class is added by JS, run the keyframes */
+        .app-button.drop-in {
+            animation: appDropIn 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
 
         /* ============ SIMPLE BROWSER OVERLAY ============ */
         .browser-overlay {
@@ -1552,8 +1667,10 @@
             .farius-logo { max-width: min(320px, 80vw); max-height: 160px; }
             .logo-image-wrap { min-height: 100px; margin-bottom: 16px; }
             .search-container { max-width: 100%; }
-            .app-button { width: 48px; height: 48px; }
-            .app-button img { width: 24px; height: 24px; }
+            .app-button { width: 54px; height: 54px; border-radius: 16px; }
+            .app-button::before,
+            .app-button::after { border-radius: 16px; }
+            .app-button img { width: 26px; height: 26px; }
             .tab { max-width: 150px; min-width: 80px; }
             .browser-toolbar { padding: 10px; gap: 4px; }
             .browser-toolbar button { width: 32px; height: 32px; }
@@ -1576,6 +1693,11 @@
                 animation-duration: 0.01ms !important;
                 animation-iteration-count: 1 !important;
                 transition-duration: 0.01ms !important;
+            }
+            .app-button {
+                opacity: 1 !important;
+                transform: none !important;
+                filter: none !important;
             }
         }
     </style>
@@ -1616,6 +1738,14 @@
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
             </a>
             <div class="dock-sep"></div>
+            <a href="/soundboard.html" class="dock-item soundboard-btn" id="soundboardBtn" data-dock-id="soundboard" title="Soundboard">
+                <span class="label">Soundboard</span>
+                <svg viewBox="0 0 24 24">
+                    <path d="M9 18V5l12-2v13"/>
+                    <circle cx="6" cy="18" r="3"/>
+                    <circle cx="18" cy="16" r="3"/>
+                </svg>
+            </a>
             <a href="/gnmath.html" class="dock-item games-btn" id="gamesBtn" data-dock-id="games" title="Play Games">
                 <span class="label">Games</span>
                 <svg viewBox="0 0 24 24">
@@ -2124,6 +2254,31 @@
 
             initProxy();
 
+            /* ========== APP BUTTONS: STAGGERED DROP-IN ========== */
+            (function initAppButtons() {
+                const appButtons = document.querySelectorAll('#app-buttons .app-button');
+                appButtons.forEach((btn, idx) => {
+                    // Reset to the initial hidden state
+                    btn.classList.remove('drop-in');
+                    btn.style.opacity = '0';
+                    btn.style.transform = 'translateY(-140px) scale(0.6) rotateX(45deg)';
+                    btn.style.filter = 'blur(10px)';
+
+                    // Stagger each button's drop-in
+                    setTimeout(() => {
+                        btn.classList.add('drop-in');
+                    }, 400 + idx * 180);
+                });
+
+                // Wire up click handlers after drop-in
+                appButtons.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.getElementById('chooser-overlay').classList.add('open');
+                        document.getElementById('chooser-overlay').dataset.pendingUrl = btn.dataset.url;
+                    });
+                });
+            })();
+
             /* Search triggers chooser */
             document.getElementById('search-go').addEventListener('click', () => {
                 const raw = document.getElementById('search-input').value.trim();
@@ -2162,14 +2317,6 @@
             document.getElementById('choose-os').addEventListener('click', () => {
                 document.getElementById('chooser-overlay').classList.remove('open');
                 openBrowserOS();
-            });
-
-            /* App buttons trigger chooser */
-            document.querySelectorAll('#app-buttons .app-button[data-url]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.getElementById('chooser-overlay').classList.add('open');
-                    document.getElementById('chooser-overlay').dataset.pendingUrl = btn.dataset.url;
-                });
             });
 
             /* Simple browser controls */

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Admin Slider</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding: 20px;
+      }
+
+      .container {
+        text-align: center;
+        max-width: 600px;
+        width: 100%;
+      }
+
+      .title {
+        color: #fff;
+        font-size: 2rem;
+        margin-bottom: 30px;
+        text-shadow: 0 0 20px rgba(92, 106, 196, 0.6);
+        letter-spacing: 2px;
+      }
+
+      .slider-wrapper {
+        position: relative;
+        background: rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(12px);
+        border-radius: 20px;
+        padding: 30px 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+      }
+
+      .slider {
+        display: flex;
+        transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        border-radius: 16px;
+      }
+
+      .slide {
+        min-width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+      }
+
+      .slide img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid #5C6AC4;
+        box-shadow: 0 0 25px rgba(92, 106, 196, 0.6);
+        transition: transform 0.3s;
+        animation: float 3s ease-in-out infinite;
+      }
+
+      .slide img:hover {
+        transform: scale(1.1);
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
+      }
+
+      .slide .name {
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      .slide .category {
+        color: #a8b2ff;
+        font-size: 0.9rem;
+        background: rgba(92, 106, 196, 0.25);
+        padding: 4px 16px;
+        border-radius: 20px;
+        border: 1px solid rgba(92, 106, 196, 0.4);
+      }
+
+      .nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(92, 106, 196, 0.5);
+        color: #fff;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+      }
+
+      .nav:hover {
+        background: rgba(92, 106, 196, 0.85);
+      }
+
+      .nav.prev {
+        left: 10px;
+      }
+
+      .nav.next {
+        right: 10px;
+      }
+
+      .dots {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.2s;
+        padding: 0;
+      }
+
+      .dot.active {
+        background: #5C6AC4;
+        transform: scale(1.3);
+        box-shadow: 0 0 10px rgba(92, 106, 196, 0.8);
+      }
+
+      .dot:hover {
+        background: rgba(255, 255, 255, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="title">Admin Team</h1>
+      <div class="slider-wrapper">
+        <div class="slider" id="slider"></div>
+        <button class="nav prev" id="prevBtn">&lsaquo;</button>
+        <button class="nav next" id="nextBtn">&rsaquo;</button>
+      </div>
+      <div class="dots" id="dots"></div>
+    </div>
+
+    <script>
+      const admins = [
+        { img: 'adminlogos/alan.png', name: 'Alan', category: 'Admin' },
+        { img: 'adminlogos/alan.png', name: 'Alan', category: 'Admin' },
+        { img: 'adminlogos/alan.png', name: 'Alan', category: 'Admin' }
+      ];
+
+      const slider = document.getElementById('slider');
+      const dotsContainer = document.getElementById('dots');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      let currentIndex = 0;
+      let isTransitioning = false;
+
+      function renderSlides() {
+        slider.innerHTML = '';
+        admins.forEach((admin, index) => {
+          const slide = document.createElement('div');
+          slide.className = 'slide';
+          slide.innerHTML = `
+            <img src="${admin.img}" alt="${admin.name}">
+            <span class="name">${admin.name}</span>
+            <span class="category">${admin.category}</span>
+          `;
+          slider.appendChild(slide);
+        });
+        updateSlider();
+      }
+
+      function renderDots() {
+        dotsContainer.innerHTML = '';
+        admins.forEach((_, index) => {
+          const dot = document.createElement('button');
+          dot.className = 'dot' + (index === currentIndex ? ' active' : '');
+          dot.addEventListener('click', () => goTo(index));
+          dotsContainer.appendChild(dot);
+        });
+      }
+
+      function updateSlider() {
+        slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+        document.querySelectorAll('.dot').forEach((dot, i) => {
+          dot.classList.toggle('active', i === currentIndex);
+        });
+      }
+
+      function goTo(index) {
+        if (isTransitioning) return;
+        isTransitioning = true;
+        currentIndex = index;
+        updateSlider();
+        setTimeout(() => { isTransitioning = false; }, 600);
+      }
+
+      function next() {
+        if (isTransitioning) return;
+        isTransitioning = true;
+        currentIndex = (currentIndex + 1) % admins.length;
+        updateSlider();
+        setTimeout(() => { isTransitioning = false; }, 600);
+      }
+
+      function prev() {
+        if (isTransitioning) return;
+        isTransitioning = true;
+        currentIndex = (currentIndex - 1 + admins.length) % admins.length;
+        updateSlider();
+        setTimeout(() => { isTransitioning = false; }, 600);
+      }
+
+      let autoSlide = setInterval(next, 3000);
+
+      function resetAutoSlide() {
+        clearInterval(autoSlide);
+        autoSlide = setInterval(next, 3000);
+      }
+
+      prevBtn.addEventListener('click', () => { prev(); resetAutoSlide(); });
+      nextBtn.addEventListener('click', () => { next(); resetAutoSlide(); });
+
+      let touchStartX = 0;
+      let touchEndX = 0;
+
+      slider.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+      });
+
+      slider.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        const diff = touchStartX - touchEndX;
+        if (Math.abs(diff) > 50) {
+          if (diff > 0) { next(); } else { prev(); }
+          resetAutoSlide();
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') { next(); resetAutoSlide(); }
+        if (e.key === 'ArrowLeft') { prev(); resetAutoSlide(); }
+      });
+
+      renderSlides();
+      renderDots();
+    </script>
+  </body>
+</html>

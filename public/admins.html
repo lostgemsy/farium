@@ -22,7 +22,6 @@
         overflow-x: hidden;
       }
 
-      /* Animated forest gradient background */
       body::before {
         content: '';
         position: fixed;
@@ -40,7 +39,6 @@
         100% { transform: scale(1.1) rotate(2deg); }
       }
 
-      /* Ambient floating particles */
       body::after {
         content: '';
         position: fixed;
@@ -141,7 +139,6 @@
         border-color: rgba(140, 220, 140, 0.28);
       }
 
-      /* Subtle inner glow */
       .slider-wrapper::before {
         content: '';
         position: absolute;
@@ -338,7 +335,6 @@
         transform: scale(1.3);
       }
 
-      /* Slide counter */
       .counter {
         margin-top: 18px;
         font-size: 0.8rem;
@@ -347,7 +343,15 @@
         letter-spacing: 1px;
       }
 
-      /* Back button */
+      .page-slide {
+        position: fixed; inset: 0; z-index: 30000; background: #0a0f0a;
+        transform: translateX(100%); transition: transform 0.45s cubic-bezier(0.65, 0, 0.35, 1);
+        pointer-events: none; will-change: transform;
+      }
+      .page-slide.active { transform: translateX(0); pointer-events: auto; }
+      .page-slide.enter { transform: translateX(0); }
+      .page-slide.leaving { transform: translateX(-100%); }
+
       .back-link {
         display: inline-flex;
         align-items: center;
@@ -362,6 +366,7 @@
         border-radius: 10px;
         background: rgba(30, 60, 30, 0.15);
         border: 1px solid transparent;
+        cursor: pointer;
       }
 
       .back-link:hover {
@@ -381,7 +386,6 @@
         stroke-linejoin: round;
       }
 
-      /* Responsive */
       @media (max-width: 640px) {
         .slider-wrapper {
           padding: 30px 20px;
@@ -406,6 +410,8 @@
     </style>
   </head>
   <body>
+    <div class="page-slide" id="pageSlide"></div>
+
     <div class="container">
       <div class="top-bar">
         <svg viewBox="0 0 24 24">
@@ -425,17 +431,37 @@
       <div class="dots" id="dots"></div>
       <div class="counter" id="counter">1 / 3</div>
 
-      <a href="/" class="back-link" onclick="event.preventDefault(); window.parent.location.href='/'">
+      <a class="back-link" id="backLink">
         <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         Back to Home
       </a>
     </div>
 
     <script>
+      (function() {
+        const slide = document.getElementById("pageSlide");
+        if (sessionStorage.getItem("slideFrom")) {
+          sessionStorage.removeItem("slideFrom");
+          slide.classList.add("enter");
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => { slide.classList.add("leaving"); });
+          });
+          setTimeout(() => { slide.classList.remove("enter", "leaving"); }, 600);
+        }
+      })();
+
+      document.getElementById("backLink").addEventListener("click", function(e) {
+        e.preventDefault();
+        const slide = document.getElementById("pageSlide");
+        slide.classList.add("active");
+        sessionStorage.setItem("slideFrom", "true");
+        setTimeout(() => { window.location.href = "/"; }, 500);
+      });
+
       const admins = [
-        { img: '/public/alan.png', name: 'Alan', category: 'Admin' },
-        { img: '/public/alan.png', name: 'Alan', category: 'Admin' },
-        { img: '/public/alan.png', name: 'Alan', category: 'Admin' }
+        { img: '/alan.png', name: 'Alan', category: 'Admin' },
+        { img: '/alan.png', name: 'Alan', category: 'Admin' },
+        { img: '/alan.png', name: 'Alan', category: 'Admin' }
       ];
 
       const slider = document.getElementById('slider');
@@ -453,7 +479,7 @@
           slide.className = 'slide';
           slide.innerHTML = `
             <div class="img-wrap">
-              <img src="${admin.img}" alt="${admin.name}" loading="lazy" onerror="this.parentElement.innerHTML='<div style=\'width:130px;height:130px;border-radius:50%;background:rgba(92,184,92,0.15);display:flex;align-items:center;justify-content:center;color:#5cb85c;font-size:3rem;font-weight:700;border:4px solid rgba(30,65,30,0.8);\'>${admin.name[0]}</div>'">
+              <img src="${admin.img}" alt="${admin.name}" loading="lazy" onerror="this.parentElement.innerHTML='<div style=\\'width:130px;height:130px;border-radius:50%;background:rgba(92,184,92,0.15);display:flex;align-items:center;justify-content:center;color:#5cb85c;font-size:3rem;font-weight:700;border:4px solid rgba(30,65,30,0.8);\\'>${admin.name[0]}</div>'">
             </div>
             <span class="name">${admin.name}</span>
             <span class="category">${admin.category}</span>
@@ -472,18 +498,18 @@
         admins.forEach((_, index) => {
           const dot = document.createElement('button');
           dot.className = 'dot' + (index === currentIndex ? ' active' : '');
-          dot.setAttribute('aria-label', `Go to slide ${index + 1}`);
+          dot.setAttribute('aria-label', 'Go to slide ' + (index + 1));
           dot.addEventListener('click', () => goTo(index));
           dotsContainer.appendChild(dot);
         });
       }
 
       function updateSlider() {
-        slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+        slider.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
         document.querySelectorAll('.dot').forEach((dot, i) => {
           dot.classList.toggle('active', i === currentIndex);
         });
-        counter.textContent = `${currentIndex + 1} / ${admins.length}`;
+        counter.textContent = (currentIndex + 1) + ' / ' + admins.length;
       }
 
       function goTo(index) {
@@ -494,15 +520,8 @@
         setTimeout(() => { isTransitioning = false; }, 550);
       }
 
-      function next() {
-        if (isTransitioning) return;
-        goTo((currentIndex + 1) % admins.length);
-      }
-
-      function prev() {
-        if (isTransitioning) return;
-        goTo((currentIndex - 1 + admins.length) % admins.length);
-      }
+      function next() { if (!isTransitioning) goTo((currentIndex + 1) % admins.length); }
+      function prev() { if (!isTransitioning) goTo((currentIndex - 1 + admins.length) % admins.length); }
 
       let autoSlide = setInterval(next, 4000);
 
@@ -514,16 +533,13 @@
       prevBtn.addEventListener('click', () => { prev(); resetAutoSlide(); });
       nextBtn.addEventListener('click', () => { next(); resetAutoSlide(); });
 
-      // Touch/swipe support
       let touchStartX = 0;
-      let touchEndX = 0;
-
       slider.addEventListener('touchstart', (e) => {
         touchStartX = e.changedTouches[0].screenX;
       }, { passive: true });
 
       slider.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
+        const touchEndX = e.changedTouches[0].screenX;
         const diff = touchStartX - touchEndX;
         if (Math.abs(diff) > 40) {
           if (diff > 0) { next(); } else { prev(); }
